@@ -74,13 +74,14 @@ public:
 
 
 static int PrintUsage();
-static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom);
+static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond);
+static double GetTimestampSeconds(int framenumber, int framespersecond);
 static int Mandelbrot(double cr, double ci, int limit);
-static PixelColor Palette(int count, int limit);
+static PixelColor Palette(int count, int limit, double timestamp);
 
 int main(int argc, const char *argv[])
 {
-    if (argc == 6)
+    if (argc >= 6)
     {
         const char *outdir = argv[1];
         int numframes = atoi(argv[2]);
@@ -92,12 +93,17 @@ int main(int argc, const char *argv[])
         double xcenter = atof(argv[3]);
         double ycenter = atof(argv[4]);
         double zoom = atof(argv[5]);
+
+        int framespersecond = 30;
+        if (argc > 6) {
+            framespersecond = atoi(argv[6]);
+        }
         if (zoom < 1.0)
         {
             fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
             return 1;
         }
-        return GenerateZoomFrames(outdir, numframes, xcenter, ycenter, zoom);
+        return GenerateZoomFrames(outdir, numframes, xcenter, ycenter, zoom, framespersecond);
     }
 
     return PrintUsage();
@@ -122,7 +128,12 @@ static int PrintUsage()
     return 1;
 }
 
-static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom)
+static double GetTimestampSeconds(int framenumber, int framespersecond)
+{
+    return framenumber / framespersecond;
+}
+
+static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond = 30)
 {
     try
     {
@@ -137,6 +148,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
 
         for (int f = 0; f < numframes; ++f)
         {
+            double timestamp = GetTimestampSeconds(f, framespersecond);
             // Calculate the real and imaginary range of values for each frame.
             // The zoom is exponential.
             // On the first frame, the scale is such that the smaller dimension (height) spans 4 units
@@ -156,7 +168,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
                 {
                     double ci = ci_top - y*ci_delta;
                     int count = Mandelbrot(cr, ci, limit);
-                    PixelColor color = Palette(count, limit);
+                    PixelColor color = Palette(count, limit, timestamp);
                     frame.SetPixel(x, y, color);
                 }
             }
@@ -215,10 +227,17 @@ static double ZigZag(double x)
 }
 
 
-static PixelColor Palette(int count, int limit)
+static PixelColor Palette(int count, int limit, double timestamp)
 {
     PixelColor color;
-
+    double onsetTimestamps [] = {0.017415, 0.117415, 0.911723, 0.950748, 1.109297, 1.189048, 1.223379, 1.336349, 1.376100, 1.799252, 1.948866, 2.019637, 2.364036, 2.532698, 2.567415, 2.903311, 3.142222, 3.732857, 4.092721, 4.321020, 4.602676, 4.884762, 4.911270, 5.166848, 5.192290, 5.495601, 5.760317, 5.789932, 6.065850, 6.088322, 6.368639, 6.546825, 6.672290, 6.922494, 6.959546, 6.980385, 7.079955, 7.240227, 7.476463, 7.524649, 7.813878, 7.834717, 8.085714, 8.104785, 8.416417, 8.673424, 8.694036, 8.763333, 8.811429, 8.971950, 9.218617, 9.249093, 9.522222, 9.687029, 9.734376, 9.768617, 9.807937, 9.831247, 10.113605, 10.395011};
+    int onsetsPassed = 1;
+    for (double onsetTimestamp : onsetTimestamps)
+    {
+        if (timestamp > onsetTimestamp) {
+            onsetsPassed++;
+        }
+    }
     if (count >= limit)
     {
         color.red = color.green = color.blue = 0;
@@ -226,9 +245,9 @@ static PixelColor Palette(int count, int limit)
     else
     {
         double x = static_cast<double>(count) / (limit - 1.0);
-        color.red   = static_cast<unsigned char>(255.0 * ZigZag(0.5 + 7.0*x));
-        color.green = static_cast<unsigned char>(255.0 * ZigZag(0.2 + 9.0*x));
-        color.blue  = static_cast<unsigned char>(255.0 * ZigZag(0.7 + 11.0*x));
+        color.red   = static_cast<unsigned char>(255.0 * ZigZag(0.5 + 7.0*x + 0.13*onsetsPassed));
+        color.green = static_cast<unsigned char>(255.0 * ZigZag(0.2 + 9.0*x + 0.15*onsetsPassed));
+        color.blue  = static_cast<unsigned char>(255.0 * ZigZag(0.7 + 11.0*x + 0.19*onsetsPassed));
     }
     color.alpha = 255;
 

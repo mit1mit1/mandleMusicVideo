@@ -16,7 +16,7 @@ rm -rf movie || Fail "Error deleting movie directory."
 mkdir movie || Fail "Error creating movie directory."
 
 # Run the mandelbrot generator. This creates all the output PNG files.
-./mandelzoom movie $((30*30)) -0.74498410019 -0.13523854817 1.0e8 ||
+./mandelzoom movie $((15*5)) -0.74498410019 -0.13523854817 1.0e8 10 ||
     Fail "Error running Mandelbrot Zoom program."
 
 # Convert the PNG files to a video file zoom.mp4.
@@ -29,7 +29,7 @@ mkdir movie || Fail "Error creating movie directory."
 # "-crf 15" : Constant Rate Factor, specifies amount of lossy compression. https://trac.ffmpeg.org/wiki/Encode/H.264
 # "-pix_fmt yuv420p" defines how colors are encoded in an mp4 file.  https://en.wikipedia.org/wiki/YUV
 # "zoom.mp4" is the output filename.
-ffmpeg -r 30 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p zoom.mp4 ||
+ffmpeg -r 15 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p zoom.mp4 ||
     Fail "Error in ffmpeg."
 
 echo "Created movie zoom.mp4"

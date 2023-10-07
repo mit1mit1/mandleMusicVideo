@@ -1,0 +1,1 @@
+ aubio onset "/mnt/c/Users/midly/Downloads/RC Rolling.m4a" > percussionOnset.txt
