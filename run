@@ -15,8 +15,11 @@ rm -rf movie || Fail "Error deleting movie directory."
 # Create a brand new, empty "movie" directory, for holding the output files.
 mkdir movie || Fail "Error creating movie directory."
 
+# TODO run aubio scripts (based on user input of what files to use?)
+
+# TODO pass in aubio outputs instead of hard coding them
 # Run the mandelbrot generator. This creates all the output PNG files.
-./mandelzoom movie $((15*5)) -0.74498410019 -0.13523854817 1.0e8 10 ||
+./mandelzoom movie $((15 * 5)) -0.74498410019 -0.13523854817 1.0e8 15 ||
     Fail "Error running Mandelbrot Zoom program."
 
 # Convert the PNG files to a video file zoom.mp4.
@@ -29,8 +32,10 @@ mkdir movie || Fail "Error creating movie directory."
 # "-crf 15" : Constant Rate Factor, specifies amount of lossy compression. https://trac.ffmpeg.org/wiki/Encode/H.264
 # "-pix_fmt yuv420p" defines how colors are encoded in an mp4 file.  https://en.wikipedia.org/wiki/YUV
 # "zoom.mp4" is the output filename.
-ffmpeg -r 15 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p zoom.mp4 ||
+filename=${RANDOM}zoom.mp4
+
+ffmpeg -r 15 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p output/${filename} ||
     Fail "Error in ffmpeg."
 
-echo "Created movie zoom.mp4"
+echo "Created movie ${filename}"
 exit 0

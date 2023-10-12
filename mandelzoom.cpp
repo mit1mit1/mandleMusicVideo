@@ -24,9 +24,12 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 #include <cmath>
 #include <vector>
 #include "lodepng.h"
+#include <algorithm>
+#include <fstream>
 
 struct PixelColor
 {
@@ -36,6 +39,18 @@ struct PixelColor
     unsigned char alpha;
 };
 
+struct Coordinate
+{
+    double realPart;
+    double imaginaryPart;
+};
+
+struct AubioNote
+{
+    float pitch;
+    float startSeconds;
+    float endSeconds;
+};
 
 class VideoFrame
 {
@@ -46,18 +61,17 @@ private:
 
 public:
     VideoFrame(int _width, int _height)
-        : width(_width)
-        , height(_height)
-        , buffer(4 * _width * _height, 255)
-        {}
+        : width(_width), height(_height), buffer(4 * _width * _height, 255)
+    {
+    }
 
     void SetPixel(int x, int y, PixelColor color)
     {
-        int index = 4 * (y*width + x);
-        buffer[index]   = color.red;
-        buffer[index+1] = color.green;
-        buffer[index+2] = color.blue;
-        buffer[index+3] = color.alpha;
+        int index = 4 * (y * width + x);
+        buffer[index] = color.red;
+        buffer[index + 1] = color.green;
+        buffer[index + 2] = color.blue;
+        buffer[index + 3] = color.alpha;
     }
 
     int SavePng(const char *outFileName)
@@ -72,12 +86,13 @@ public:
     }
 };
 
-
+static std::vector<AubioNote> ParseAubioNoteFile(const char *filename);
+static std::vector<float> ParseOnsetSecondsFile(const char *filename);
 static int PrintUsage();
-static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond);
+static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond, std::vector<float> onsetTimestamps, std::vector<AubioNote> notes);
 static double GetTimestampSeconds(int framenumber, int framespersecond);
 static int Mandelbrot(double cr, double ci, int limit);
-static PixelColor Palette(int count, int limit, double timestamp);
+static PixelColor Palette(int count, int limit, int onsetsPassed);
 
 int main(int argc, const char *argv[])
 {
@@ -95,7 +110,8 @@ int main(int argc, const char *argv[])
         double zoom = atof(argv[5]);
 
         int framespersecond = 30;
-        if (argc > 6) {
+        if (argc > 6)
+        {
             framespersecond = atoi(argv[6]);
         }
         if (zoom < 1.0)
@@ -103,48 +119,109 @@ int main(int argc, const char *argv[])
             fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
             return 1;
         }
-        return GenerateZoomFrames(outdir, numframes, xcenter, ycenter, zoom, framespersecond);
+        std::vector<AubioNote> fingerNotes = ParseAubioNoteFile("/home/midly/apps/mandelMusicalZoom/fingerPickingNotes1.txt");
+        std::vector<float> percussionOnsets = ParseOnsetSecondsFile("/home/midly/apps/mandelMusicalZoom/percussionOnset.txt");
+
+        return GenerateZoomFrames(outdir, numframes, xcenter, ycenter, zoom, framespersecond, percussionOnsets, fingerNotes);
     }
 
     return PrintUsage();
 }
 
+static std::vector<AubioNote> ParseAubioNoteFile(const char *filename)
+{
+    std::ifstream infile(filename);
+    std::cout << " Got the file ";
+
+    float x1, x2, x3;
+
+    std::vector<AubioNote> notes{};
+
+    while (infile >> x1 >> x2 >> x3)
+    {
+        AubioNote lineNote;
+        lineNote.pitch = x1;
+        lineNote.startSeconds = x2;
+        lineNote.endSeconds = x3;
+        notes.push_back(lineNote);
+    }
+
+    std::cout << "First Note: ";
+    std::cout << notes.front().startSeconds << " start sec  " << notes.front().endSeconds << " end sec  " << notes.front().pitch << " pitch ";
+
+    std::cout << "Last Note: ";
+    std::cout << notes.back().startSeconds << " start sec  " << notes.back().endSeconds << " end sec  " << notes.back().pitch << " pitch ";
+
+    return notes;
+}
+
+// TODO zoom out during silence
+
+// TODO for both onsets and notes keep track of total number of notes and get the average length between notes
+static std::vector<float> ParseOnsetSecondsFile(const char *filename)
+{
+    std::ifstream infile(filename);
+    std::cout << " Got the file ";
+
+    float x1;
+
+    std::vector<float> onsets{};
+
+    while (infile >> x1)
+    {
+        onsets.push_back(x1);
+    }
+
+    std::cout << "First Onset: ";
+    std::cout << onsets.front() << "  sec  ";
+
+    std::cout << "Last Onset: ";
+    std::cout << onsets.back() << " sec  ";
+
+    return onsets;
+}
 
 static int PrintUsage()
 {
     fprintf(stderr,
-        "\n"
-        "USAGE:\n"
-        "\n"
-        "mandelzoom outdir numframes xcenter ycenter zoom\n"
-        "    outdir    = directory to receive output PNG files.\n"
-        "    numframes = integer number of frames in the video.\n"
-        "    xcenter   = the real component of the zoom center point.\n"
-        "    ycenter   = the imaginary component of the zoom center point.\n"
-        "    zoom      = the magnification factor of the final frame.\n"
-        "\n"
-    );
+            "\n"
+            "USAGE:\n"
+            "\n"
+            "mandelzoom outdir numframes xcenter ycenter zoom\n"
+            "    outdir    = directory to receive output PNG files.\n"
+            "    numframes = integer number of frames in the video.\n"
+            "    xcenter   = the real component of the zoom center point.\n"
+            "    ycenter   = the imaginary component of the zoom center point.\n"
+            "    zoom      = the magnification factor of the final frame.\n"
+            "\n");
 
     return 1;
 }
 
 static double GetTimestampSeconds(int framenumber, int framespersecond)
 {
-    return framenumber / framespersecond;
+    return ((double)framenumber) / ((double)framespersecond);
 }
 
-static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond = 30)
+static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond, std::vector<float> onsetTimestamps, std::vector<AubioNote> notes)
 {
     try
     {
         // Create a video frame buffer with 720p resolution (1280x720).
-        const int width  = 1280;
-        const int height =  720;
+        const int width = 1280;
+        const int height = 720;
         VideoFrame frame(width, height);
 
         const int limit = 16000;
-        double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
+        // Below provides a smooth zoom all the way to the specified max zoom
+        // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
+
+        double multiplier = pow(zoom, 1.0 / (100 - 1.0));
         double denom = 1.0;
+        float currentPitch = 44;
+        Coordinate nextCentre = {};
+        nextCentre.realPart = xcenter;
+        nextCentre.imaginaryPart = ycenter;
 
         for (int f = 0; f < numframes; ++f)
         {
@@ -156,19 +233,51 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
             // On the last frame, the scale is that number of units divided by 'zoom'.
             double ver_span = 4.0 / denom;
             double hor_span = ver_span * (width - 1.0) / (height - 1.0);
-            double ci_top = ycenter + ver_span/2.0;
+            double ci_top = ycenter + ver_span / 2.0;
             double ci_delta = ver_span / (height - 1.0);
-            double cr_left = xcenter - hor_span/2.0;
+            double cr_left = xcenter - hor_span / 2.0;
             double cr_delta = hor_span / (width - 1.0);
 
-            for (int x=0; x < width; ++x)
+            int onsetsPassed = 1;
+            for (double onsetTimestamp : onsetTimestamps)
             {
-                double cr = cr_left + x*cr_delta;
-                for (int y=0; y < height; ++y)
+                if (timestamp > onsetTimestamp)
                 {
-                    double ci = ci_top - y*ci_delta;
+                    onsetsPassed++;
+                }
+            }
+
+            auto IsInNote = [=](AubioNote note)
+            {
+                return timestamp > note.startSeconds and timestamp < note.endSeconds;
+            };
+            std::vector<AubioNote>::iterator currentNote = std::find_if(notes.begin(), notes.end(), IsInNote);
+            currentPitch = ((*currentNote).pitch > 0) ? (*currentNote).pitch : 44;
+
+            multiplier = pow(zoom, 1.0 / (currentPitch - 1.0));
+
+            for (AubioNote note : notes)
+            {
+                if (note.startSeconds < timestamp && note.endSeconds > timestamp)
+                {
+                    if (note.pitch != currentPitch)
+                    {
+                        currentPitch = note.pitch;
+                        nextCentre.realPart = 32;
+                        nextCentre.imaginaryPart = 32;
+                    }
+                    break;
+                }
+            }
+
+            for (int x = 0; x < width; ++x)
+            {
+                double cr = cr_left + x * cr_delta;
+                for (int y = 0; y < height; ++y)
+                {
+                    double ci = ci_top - y * ci_delta;
                     int count = Mandelbrot(cr, ci, limit);
-                    PixelColor color = Palette(count, limit, timestamp);
+                    PixelColor color = Palette(count, limit, onsetsPassed);
                     frame.SetPixel(x, y, color);
                 }
             }
@@ -197,7 +306,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
     }
 }
 
-
 static int Mandelbrot(double cr, double ci, int limit)
 {
     int count = 0;
@@ -207,16 +315,15 @@ static int Mandelbrot(double cr, double ci, int limit)
     double zi2 = 0.0;
     while ((count < limit) && (zr2 + zi2 < 4.001))
     {
-        double tzi = 2.0*zr*zi + ci;
+        double tzi = 2.0 * zr * zi + ci;
         zr = zr2 - zi2 + cr;
         zi = tzi;
-        zr2 = zr*zr;
-        zi2 = zi*zi;
+        zr2 = zr * zr;
+        zi2 = zi * zi;
         ++count;
     }
     return count;
 }
-
 
 static double ZigZag(double x)
 {
@@ -226,18 +333,9 @@ static double ZigZag(double x)
     return y;
 }
 
-
-static PixelColor Palette(int count, int limit, double timestamp)
+static PixelColor Palette(int count, int limit, int onsetsPassed)
 {
     PixelColor color;
-    double onsetTimestamps [] = {0.017415, 0.117415, 0.911723, 0.950748, 1.109297, 1.189048, 1.223379, 1.336349, 1.376100, 1.799252, 1.948866, 2.019637, 2.364036, 2.532698, 2.567415, 2.903311, 3.142222, 3.732857, 4.092721, 4.321020, 4.602676, 4.884762, 4.911270, 5.166848, 5.192290, 5.495601, 5.760317, 5.789932, 6.065850, 6.088322, 6.368639, 6.546825, 6.672290, 6.922494, 6.959546, 6.980385, 7.079955, 7.240227, 7.476463, 7.524649, 7.813878, 7.834717, 8.085714, 8.104785, 8.416417, 8.673424, 8.694036, 8.763333, 8.811429, 8.971950, 9.218617, 9.249093, 9.522222, 9.687029, 9.734376, 9.768617, 9.807937, 9.831247, 10.113605, 10.395011};
-    int onsetsPassed = 1;
-    for (double onsetTimestamp : onsetTimestamps)
-    {
-        if (timestamp > onsetTimestamp) {
-            onsetsPassed++;
-        }
-    }
     if (count >= limit)
     {
         color.red = color.green = color.blue = 0;
@@ -245,12 +343,11 @@ static PixelColor Palette(int count, int limit, double timestamp)
     else
     {
         double x = static_cast<double>(count) / (limit - 1.0);
-        color.red   = static_cast<unsigned char>(255.0 * ZigZag(0.5 + 7.0*x + 0.13*onsetsPassed));
-        color.green = static_cast<unsigned char>(255.0 * ZigZag(0.2 + 9.0*x + 0.15*onsetsPassed));
-        color.blue  = static_cast<unsigned char>(255.0 * ZigZag(0.7 + 11.0*x + 0.19*onsetsPassed));
+        color.red = static_cast<unsigned char>(255.0 * ZigZag(0.5 + 7.0 * x + 0.13 * onsetsPassed));
+        color.green = static_cast<unsigned char>(255.0 * ZigZag(0.2 + 9.0 * x + 0.15 * onsetsPassed));
+        color.blue = static_cast<unsigned char>(255.0 * ZigZag(0.7 + 11.0 * x + 0.19 * onsetsPassed));
     }
     color.alpha = 255;
 
     return color;
 }
-
