@@ -45,6 +45,12 @@ struct Coordinate
     double imaginaryPart;
 };
 
+struct PixelIndex
+{
+    int xIndex;
+    int yIndex;
+};
+
 struct AubioNote
 {
     float pitch;
@@ -86,6 +92,9 @@ public:
     }
 };
 
+const int xResolution = 1280;
+const int yResolution = 720;
+
 static std::vector<AubioNote> ParseAubioNoteFile(const char *filename);
 static std::vector<float> ParseOnsetSecondsFile(const char *filename);
 static int PrintUsage();
@@ -93,6 +102,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
 static double GetTimestampSeconds(int framenumber, int framespersecond);
 static int Mandelbrot(double cr, double ci, int limit);
 static PixelColor Palette(int count, int limit, int onsetsPassed);
+static Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDistance, double yStepDistance, double centreX, double centreY);
 
 int main(int argc, const char *argv[])
 {
@@ -181,6 +191,78 @@ static std::vector<float> ParseOnsetSecondsFile(const char *filename)
     return onsets;
 }
 
+static Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDistance, double yStepDistance, double centreX, double centreY)
+{
+    std::vector<PixelIndex> maxBoundaryElements{};
+    int interestingPointThreshold = 3;
+    for (int x = 1; x < xResolution - 1; x++)
+    {
+        for (int y = 1; y < yResolution - 1; y++)
+        {
+            int localMandlenumber = mandleCounts[x][y];
+            int differentNeighbours = 0;
+            if (
+                mandleCounts[x - 1][y - 1] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (mandleCounts[x - 1][y] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (
+                mandleCounts[x - 1][y + 1] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (mandleCounts[x][y - 1] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (mandleCounts[x][y + 1] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (
+                mandleCounts[x + 1][y - 1] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (mandleCounts[x + 1][y] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (
+                mandleCounts[x + 1][y + 1] != localMandlenumber)
+            {
+                differentNeighbours++;
+            }
+            if (differentNeighbours > interestingPointThreshold)
+            {
+                PixelIndex interestingPoint;
+                interestingPoint.xIndex = x;
+                interestingPoint.yIndex = y;
+
+                maxBoundaryElements.push_back(interestingPoint);
+            }
+        }
+    }
+    PixelIndex chosenPixIndex;
+    chosenPixIndex.xIndex = 0;
+    chosenPixIndex.yIndex = 0;
+    if (maxBoundaryElements.size() > 0) {
+        int index = rand() % maxBoundaryElements.size();
+        chosenPixIndex.xIndex = maxBoundaryElements[index].xIndex;
+        chosenPixIndex.yIndex = maxBoundaryElements[index].yIndex;
+    }
+
+    Coordinate nextInterestingPoint;
+    // TODO add getXPosition
+    nextInterestingPoint.realPart = chosenPixIndex.xIndex * 1.0;
+    nextInterestingPoint.imaginaryPart = chosenPixIndex.yIndex * 1.0;
+    return nextInterestingPoint;
+}
+
 static int PrintUsage()
 {
     fprintf(stderr,
@@ -208,9 +290,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
     try
     {
         // Create a video frame buffer with 720p resolution (1280x720).
-        const int width = 1280;
-        const int height = 720;
-        VideoFrame frame(width, height);
+        VideoFrame frame(xResolution, yResolution);
 
         const int limit = 16000;
         // Below provides a smooth zoom all the way to the specified max zoom
@@ -223,6 +303,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
         nextCentre.realPart = xcenter;
         nextCentre.imaginaryPart = ycenter;
 
+        int mandleCounts[xResolution][yResolution];
+
         for (int f = 0; f < numframes; ++f)
         {
             double timestamp = GetTimestampSeconds(f, framespersecond);
@@ -232,11 +314,13 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
             // from the bottom of the frame to the top.
             // On the last frame, the scale is that number of units divided by 'zoom'.
             double ver_span = 4.0 / denom;
-            double hor_span = ver_span * (width - 1.0) / (height - 1.0);
+            double hor_span = ver_span * (xResolution - 1.0) / (yResolution - 1.0);
             double ci_top = ycenter + ver_span / 2.0;
-            double ci_delta = ver_span / (height - 1.0);
+            double ci_delta = ver_span / (yResolution - 1.0);
             double cr_left = xcenter - hor_span / 2.0;
-            double cr_delta = hor_span / (width - 1.0);
+            double cr_delta = hor_span / (xResolution - 1.0);
+            xcenter = xcenter + 1 / 100 * (nextCentre.realPart - xcenter);
+            ycenter = ycenter + 1 / 100 * (nextCentre.realPart - ycenter);
 
             int onsetsPassed = 1;
             for (double onsetTimestamp : onsetTimestamps)
@@ -256,31 +340,19 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
 
             multiplier = pow(zoom, 1.0 / (currentPitch - 1.0));
 
-            for (AubioNote note : notes)
-            {
-                if (note.startSeconds < timestamp && note.endSeconds > timestamp)
-                {
-                    if (note.pitch != currentPitch)
-                    {
-                        currentPitch = note.pitch;
-                        nextCentre.realPart = 32;
-                        nextCentre.imaginaryPart = 32;
-                    }
-                    break;
-                }
-            }
-
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < xResolution; ++x)
             {
                 double cr = cr_left + x * cr_delta;
-                for (int y = 0; y < height; ++y)
+                for (int y = 0; y < yResolution; ++y)
                 {
                     double ci = ci_top - y * ci_delta;
                     int count = Mandelbrot(cr, ci, limit);
+                    mandleCounts[x][y] = count;
                     PixelColor color = Palette(count, limit, onsetsPassed);
                     frame.SetPixel(x, y, color);
                 }
             }
+            GetInterestingPoint(mandleCounts, cr_delta, ci_delta, xcenter, ycenter);
 
             // Create the output PNG filename in the format "outdir/frame_12345.png".
             char number[20];
@@ -296,6 +368,21 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
 
             // Increase the zoom magnification for the next frame.
             denom *= multiplier;
+
+            // Check changes from pitches
+            for (AubioNote note : notes)
+            {
+                if (note.startSeconds < timestamp && note.endSeconds > timestamp)
+                {
+                    if (note.pitch != currentPitch)
+                    {
+                        currentPitch = note.pitch;
+                        nextCentre.realPart = currentPitch;
+                        nextCentre.imaginaryPart = currentPitch;
+                    }
+                    break;
+                }
+            }
         }
         return 0;
     }
