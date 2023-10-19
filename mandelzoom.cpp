@@ -30,33 +30,7 @@
 #include "lodepng.h"
 #include <algorithm>
 #include <fstream>
-
-struct PixelColor
-{
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-    unsigned char alpha;
-};
-
-struct Coordinate
-{
-    double realPart;
-    double imaginaryPart;
-};
-
-struct PixelIndex
-{
-    int xIndex;
-    int yIndex;
-};
-
-struct AubioNote
-{
-    float pitch;
-    float startSeconds;
-    float endSeconds;
-};
+#include "math.h"
 
 class VideoFrame
 {
@@ -92,17 +66,12 @@ public:
     }
 };
 
-const int xResolution = 1280;
-const int yResolution = 720;
-
 static std::vector<AubioNote> ParseAubioNoteFile(const char *filename);
 static std::vector<float> ParseOnsetSecondsFile(const char *filename);
 static int PrintUsage();
 static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter, double ycenter, double zoom, int framespersecond, std::vector<float> onsetTimestamps, std::vector<AubioNote> notes);
 static double GetTimestampSeconds(int framenumber, int framespersecond);
-static int Mandelbrot(double cr, double ci, int limit);
 static PixelColor Palette(int count, int limit, int onsetsPassed);
-static Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDistance, double yStepDistance, double centreX, double centreY);
 
 int main(int argc, const char *argv[])
 {
@@ -191,78 +160,6 @@ static std::vector<float> ParseOnsetSecondsFile(const char *filename)
     return onsets;
 }
 
-static Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDistance, double yStepDistance, double centreX, double centreY)
-{
-    std::vector<PixelIndex> maxBoundaryElements{};
-    int interestingPointThreshold = 3;
-    for (int x = 1; x < xResolution - 1; x++)
-    {
-        for (int y = 1; y < yResolution - 1; y++)
-        {
-            int localMandlenumber = mandleCounts[x][y];
-            int differentNeighbours = 0;
-            if (
-                mandleCounts[x - 1][y - 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x - 1][y] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (
-                mandleCounts[x - 1][y + 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x][y - 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x][y + 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (
-                mandleCounts[x + 1][y - 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x + 1][y] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (
-                mandleCounts[x + 1][y + 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (differentNeighbours > interestingPointThreshold)
-            {
-                PixelIndex interestingPoint;
-                interestingPoint.xIndex = x;
-                interestingPoint.yIndex = y;
-
-                maxBoundaryElements.push_back(interestingPoint);
-            }
-        }
-    }
-    PixelIndex chosenPixIndex;
-    chosenPixIndex.xIndex = 0;
-    chosenPixIndex.yIndex = 0;
-    if (maxBoundaryElements.size() > 0) {
-        int index = rand() % maxBoundaryElements.size();
-        chosenPixIndex.xIndex = maxBoundaryElements[index].xIndex;
-        chosenPixIndex.yIndex = maxBoundaryElements[index].yIndex;
-    }
-
-    Coordinate nextInterestingPoint;
-    // TODO add getXPosition
-    nextInterestingPoint.realPart = chosenPixIndex.xIndex * 1.0;
-    nextInterestingPoint.imaginaryPart = chosenPixIndex.yIndex * 1.0;
-    return nextInterestingPoint;
-}
-
 static int PrintUsage()
 {
     fprintf(stderr,
@@ -319,8 +216,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
             double ci_delta = ver_span / (yResolution - 1.0);
             double cr_left = xcenter - hor_span / 2.0;
             double cr_delta = hor_span / (xResolution - 1.0);
-            xcenter = xcenter + 1 / 100 * (nextCentre.realPart - xcenter);
-            ycenter = ycenter + 1 / 100 * (nextCentre.realPart - ycenter);
+            xcenter = xcenter + 1 / 36 * (nextCentre.realPart - xcenter);
+            ycenter = ycenter + 1 / 36 * (nextCentre.realPart - ycenter);
 
             int onsetsPassed = 1;
             for (double onsetTimestamp : onsetTimestamps)
@@ -352,7 +249,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
                     frame.SetPixel(x, y, color);
                 }
             }
-            GetInterestingPoint(mandleCounts, cr_delta, ci_delta, xcenter, ycenter);
 
             // Create the output PNG filename in the format "outdir/frame_12345.png".
             char number[20];
@@ -377,8 +273,9 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
                     if (note.pitch != currentPitch)
                     {
                         currentPitch = note.pitch;
-                        nextCentre.realPart = currentPitch;
-                        nextCentre.imaginaryPart = currentPitch;
+                        Coordinate nextInterstingPoint = GetInterestingPoint(mandleCounts, cr_delta, ci_delta, xcenter, ycenter);
+                        nextCentre.realPart = nextInterstingPoint.realPart;
+                        nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
                     }
                     break;
                 }
@@ -391,25 +288,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
         fprintf(stderr, "EXCEPTION: %s\n", message);
         return 1;
     }
-}
-
-static int Mandelbrot(double cr, double ci, int limit)
-{
-    int count = 0;
-    double zr = 0.0;
-    double zi = 0.0;
-    double zr2 = 0.0;
-    double zi2 = 0.0;
-    while ((count < limit) && (zr2 + zi2 < 4.001))
-    {
-        double tzi = 2.0 * zr * zi + ci;
-        zr = zr2 - zi2 + cr;
-        zi = tzi;
-        zr2 = zr * zr;
-        zi2 = zi * zi;
-        ++count;
-    }
-    return count;
 }
 
 static double ZigZag(double x)
