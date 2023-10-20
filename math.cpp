@@ -108,3 +108,13 @@ Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDist
     nextInterestingPoint.imaginaryPart = getYPosition(chosenPixIndex.yIndex, yStepDistance, centreY);
     return nextInterestingPoint;
 }
+
+int getPitchSum(std::vector<AubioNote> notes)
+{
+    int pitchSum = 0;
+    for (unsigned int i = 0; i < notes.size(); i++)
+    {
+        pitchSum += notes[i].pitch;
+    }
+    return pitchSum;
+}

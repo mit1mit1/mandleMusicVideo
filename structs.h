@@ -1,3 +1,6 @@
+#ifndef MANDLESTRUCT_H    // To make sure you don't declare the function more than once by including the header multiple times.
+#define MANDLESTRUCT_H
+
 struct PixelColor
 {
     unsigned char red;
@@ -27,3 +30,5 @@ struct AubioNote
 
 const int xResolution = 1280;
 const int yResolution = 720;
+
+#endif

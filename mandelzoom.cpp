@@ -186,16 +186,20 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
 {
     try
     {
+        const int pitchSum = getPitchSum(notes);
+        const int averagePitch = pitchSum / notes.size();
+        const int silentPitch = -1 * averagePitch;
         // Create a video frame buffer with 720p resolution (1280x720).
         VideoFrame frame(xResolution, yResolution);
 
         const int limit = 16000;
         // Below provides a smooth zoom all the way to the specified max zoom
         // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
+        double smoothMultiplier = pow(zoom, 1.0 / (numframes - 1.0));
 
-        double multiplier = pow(zoom, 1.0 / (100 - 1.0));
+        float currentPitch = silentPitch;
+        double multiplier = (0.95 + 0.05 * currentPitch / averagePitch) * smoothMultiplier;
         double denom = 1.0;
-        float currentPitch = 44;
         Coordinate nextCentre = {};
         nextCentre.realPart = xcenter;
         nextCentre.imaginaryPart = ycenter;
@@ -235,7 +239,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
             std::vector<AubioNote>::iterator currentNote = std::find_if(notes.begin(), notes.end(), IsInNote);
             currentPitch = ((*currentNote).pitch > 0) ? (*currentNote).pitch : 44;
 
-            multiplier = pow(zoom, 1.0 / (currentPitch - 1.0));
+            multiplier = (0.95 + 0.05 * currentPitch / averagePitch) * smoothMultiplier;
 
             for (int x = 0; x < xResolution; ++x)
             {
@@ -265,11 +269,13 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
             // Increase the zoom magnification for the next frame.
             denom *= multiplier;
 
+            bool noteIsPlaying = false;
             // Check changes from pitches
             for (AubioNote note : notes)
             {
                 if (note.startSeconds < timestamp && note.endSeconds > timestamp)
                 {
+                    noteIsPlaying = true;
                     if (note.pitch != currentPitch)
                     {
                         currentPitch = note.pitch;
@@ -279,6 +285,10 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
                     }
                     break;
                 }
+            }
+            if (noteIsPlaying == false)
+            {
+                currentPitch = silentPitch;
             }
         }
         return 0;
