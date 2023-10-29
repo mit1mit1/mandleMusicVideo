@@ -7,20 +7,20 @@
 // #include "stdafx.h"
 // #include <SFML/Graphics.hpp>
 
-int Mandelbrot(double cr, double ci, int limit);
+int Mandelbrot(long double cr, long double ci, int limit);
 Coordinate chooseClosestInterestingPoint(std::vector<PixelIndex> interestingPoints,
-                                  double xStepDistance,
-                                  double yStepDistance,
-                                  double centreX,
-                                  double centreY,
-                                  double targetX,
-                                  double targetY);
+                                         long double xStepDistance,
+                                         long double yStepDistance,
+                                         long double centreX,
+                                         long double centreY,
+                                         long double targetX,
+                                         long double targetY);
 Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoints,
-                                  double xStepDistance,
-                                  double yStepDistance,
-                                  double centreX,
-                                  double centreY );
-Coordinate getInterestingPoint(int mandleCounts[][yResolution], double xStepDistance, double yStepDistance, double centreX, double centreY,
+                                        long double xStepDistance,
+                                        long double yStepDistance,
+                                        long double centreX,
+                                        long double centreY);
+Coordinate getInterestingPoint(int mandleCounts[][yResolution], long double xStepDistance, long double yStepDistance, long double centreX, long double centreY,
                                int minXIndex,
                                int maxXIndex,
                                int minYIndex,
