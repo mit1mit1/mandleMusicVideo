@@ -137,8 +137,6 @@ static std::vector<AubioNote> ParseAubioNoteFile(const char *filename)
     return notes;
 }
 
-// TODO zoom out during silence
-
 // TODO for both onsets and notes keep track of total number of notes and get the average length between notes
 static std::vector<float> ParseOnsetSecondsFile(const char *filename)
 {
@@ -320,7 +318,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                         framesSinceChangeOfCentre = 0;
                         std::cout << "Changed pitch so setting new centre";
                         currentPitch = checkNote.pitch;
-                        // TODO set quadrant to get interesting point from based on what the pitch is
                         int minXIndex = (((int)currentPitch % 2) * xResolution / 2) + 1;
                         int maxXIndex = minXIndex + xResolution / 2 - 2;
                         int minYIndex = ((((int)currentPitch * 7) % 2) * yResolution / 2) + 1;
