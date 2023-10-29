@@ -1,5 +1,6 @@
 #include <vector>
 #include <cstdlib>
+#include <cmath>
 #include "math.h" // player.h must be in the current directory. or use relative or absolute path to it. e.g #include "include/player.h"
 
 double getXPosition(
@@ -116,11 +117,38 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolutio
     return sufficientlyInterestingElements;
 }
 
+Coordinate chooseClosestInterestingPoint(std::vector<PixelIndex> interestingPoints,
+                                         double xStepDistance,
+                                         double yStepDistance,
+                                         double centreX,
+                                         double centreY,
+                                         double targetX,
+                                         double targetY)
+{
+    double closestDistanceSquared = 100000;
+    Coordinate chosenInterestingPoint;
+    Coordinate testInterestingPoint;
+    for (unsigned int i = 0; i < interestingPoints.size(); i++)
+    {
+        testInterestingPoint.realPart = getXPosition(interestingPoints[i].xIndex, xStepDistance, centreX);
+        testInterestingPoint.imaginaryPart = getYPosition(interestingPoints[i].yIndex, yStepDistance, centreY);
+        double testDistanceSquared = pow((testInterestingPoint.realPart - targetX), 2) + pow((testInterestingPoint.imaginaryPart - targetY), 2);
+        if (testDistanceSquared < closestDistanceSquared)
+        {
+            closestDistanceSquared = testDistanceSquared;
+            chosenInterestingPoint.realPart = testInterestingPoint.realPart;
+            chosenInterestingPoint.imaginaryPart = testInterestingPoint.imaginaryPart;
+        }
+    }
+
+    return chosenInterestingPoint;
+}
+
 Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoints,
-                                  double xStepDistance,
-                                  double yStepDistance,
-                                  double centreX,
-                                  double centreY)
+                                        double xStepDistance,
+                                        double yStepDistance,
+                                        double centreX,
+                                        double centreY)
 {
     PixelIndex chosenPixIndex;
     chosenPixIndex.xIndex = 0;
@@ -155,10 +183,10 @@ Coordinate getInterestingPoint(
                                                                              minYIndex,
                                                                              maxYIndex);
     return chooseRandomInterestingPoint(maxBoundaryElements,
-                                  xStepDistance,
-                                  yStepDistance,
-                                  centreX,
-                                  centreY);
+                                        xStepDistance,
+                                        yStepDistance,
+                                        centreX,
+                                        centreY);
 }
 
 int getPitchSum(std::vector<AubioNote> notes)

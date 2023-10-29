@@ -8,6 +8,13 @@
 // #include <SFML/Graphics.hpp>
 
 int Mandelbrot(double cr, double ci, int limit);
+Coordinate chooseClosestInterestingPoint(std::vector<PixelIndex> interestingPoints,
+                                  double xStepDistance,
+                                  double yStepDistance,
+                                  double centreX,
+                                  double centreY,
+                                  double targetX,
+                                  double targetY);
 Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoints,
                                   double xStepDistance,
                                   double yStepDistance,

@@ -329,7 +329,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
                         if (interestingPoints.size() > 0)
                         {
                             Coordinate nextInterstingPoint = chooseRandomInterestingPoint(interestingPoints,
-                                                                                    cr_delta, ci_delta, xcenter, ycenter);
+                                                                                          cr_delta, ci_delta, xcenter, ycenter);
                             nextCentre.realPart = nextInterstingPoint.realPart;
                             nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
 
@@ -358,28 +358,25 @@ static int GenerateZoomFrames(const char *outdir, int numframes, double xcenter,
                     currentPitch = silentPitch;
                 }
             }
-            if (framesSinceChangeOfCentre > 10)
+            std::cout << "No change pitch so setting new centre close to target centre \n";
+            int minXIndex = 1;
+            int maxXIndex = xResolution - 1;
+            int minYIndex = 1;
+            int maxYIndex = yResolution - 1;
+            std::vector<PixelIndex> interestingPoints = getInterestingPixelIndexes(mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
+            if (interestingPoints.size() > 0)
             {
-                std::cout << "No change pitch so setting new centre close to target centre \n";
-                int minXIndex = xResolution * 4 / 10;
-                int maxXIndex = xResolution * 6 / 10;
-                int minYIndex = yResolution * 4 / 10;
-                int maxYIndex = yResolution * 6 / 10;
-                std::vector<PixelIndex> interestingPoints = getInterestingPixelIndexes(mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
-                if (interestingPoints.size() > 0)
-                {
-                    Coordinate nextInterstingPoint = chooseRandomInterestingPoint(interestingPoints,
-                                                                            cr_delta, ci_delta, xcenter, ycenter);
+                Coordinate nextInterstingPoint = chooseClosestInterestingPoint(
+                    interestingPoints, cr_delta, ci_delta, xcenter, ycenter, nextCentre.realPart, nextCentre.imaginaryPart);
 
-                    nextCentre.realPart = nextInterstingPoint.realPart;
-                    nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
-                    std::cout << "Real part of next centre: ";
-                    std::cout << nextCentre.realPart << "\n  ";
-                    std::cout << "Imaginary part of next centre: ";
-                    std::cout << nextCentre.imaginaryPart << " \n  ";
-                }
-                // TODO get interesting point from near current centre if pitch is unchanged (so we constantly add precision as we zoom)
+                nextCentre.realPart = nextInterstingPoint.realPart;
+                nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
+                std::cout << "Real part of next centre: ";
+                std::cout << nextCentre.realPart << "\n  ";
+                std::cout << "Imaginary part of next centre: ";
+                std::cout << nextCentre.imaginaryPart << " \n  ";
             }
+            // TODO get interesting point from near current centre if pitch is unchanged (so we constantly add precision as we zoom)
         }
         return 0;
     }
