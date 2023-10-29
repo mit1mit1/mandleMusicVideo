@@ -37,13 +37,33 @@ int Mandelbrot(double cr, double ci, int limit)
     return count;
 }
 
-Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDistance, double yStepDistance, double centreX, double centreY)
+std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolution],
+                                                   int minXIndex,
+                                                   int maxXIndex,
+                                                   int minYIndex,
+                                                   int maxYIndex)
 {
-    std::vector<PixelIndex> maxBoundaryElements{};
-    int interestingPointThreshold = 3;
-    for (int x = 1; x < xResolution - 1; x++)
+    if (minXIndex < 1)
     {
-        for (int y = 1; y < yResolution - 1; y++)
+        minXIndex = 1;
+    }
+    if (minYIndex < 1)
+    {
+        minYIndex = 1;
+    }
+    if (maxXIndex > xResolution - 1)
+    {
+        maxXIndex = xResolution - 1;
+    }
+    if (maxYIndex > yResolution - 1)
+    {
+        maxYIndex = yResolution - 1;
+    }
+    std::vector<PixelIndex> sufficientlyInterestingElements{};
+    int interestingPointThreshold = 3;
+    for (int x = minXIndex; x < maxXIndex; x++)
+    {
+        for (int y = minYIndex; y < maxYIndex; y++)
         {
             int localMandlenumber = mandleCounts[x][y];
             int differentNeighbours = 0;
@@ -89,24 +109,56 @@ Coordinate GetInterestingPoint(int mandleCounts[][yResolution], double xStepDist
                 interestingPoint.xIndex = x;
                 interestingPoint.yIndex = y;
 
-                maxBoundaryElements.push_back(interestingPoint);
+                sufficientlyInterestingElements.push_back(interestingPoint);
             }
         }
     }
+    return sufficientlyInterestingElements;
+}
+
+Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoints,
+                                  double xStepDistance,
+                                  double yStepDistance,
+                                  double centreX,
+                                  double centreY)
+{
     PixelIndex chosenPixIndex;
     chosenPixIndex.xIndex = 0;
     chosenPixIndex.yIndex = 0;
-    if (maxBoundaryElements.size() > 0)
+    if (interestingPoints.size() > 0)
     {
-        int index = rand() % maxBoundaryElements.size();
-        chosenPixIndex.xIndex = maxBoundaryElements[index].xIndex;
-        chosenPixIndex.yIndex = maxBoundaryElements[index].yIndex;
+        int index = rand() % interestingPoints.size();
+        chosenPixIndex.xIndex = interestingPoints[index].xIndex;
+        chosenPixIndex.yIndex = interestingPoints[index].yIndex;
     }
 
     Coordinate nextInterestingPoint;
     nextInterestingPoint.realPart = getXPosition(chosenPixIndex.xIndex, xStepDistance, centreX);
     nextInterestingPoint.imaginaryPart = getYPosition(chosenPixIndex.yIndex, yStepDistance, centreY);
     return nextInterestingPoint;
+}
+
+Coordinate getInterestingPoint(
+    int mandleCounts[][yResolution],
+    double xStepDistance,
+    double yStepDistance,
+    double centreX,
+    double centreY,
+    int minXIndex,
+    int maxXIndex,
+    int minYIndex,
+    int maxYIndex)
+{
+    std::vector<PixelIndex> maxBoundaryElements = getInterestingPixelIndexes(mandleCounts,
+                                                                             minXIndex,
+                                                                             maxXIndex,
+                                                                             minYIndex,
+                                                                             maxYIndex);
+    return chooseRandomInterestingPoint(maxBoundaryElements,
+                                  xStepDistance,
+                                  yStepDistance,
+                                  centreX,
+                                  centreY);
 }
 
 int getPitchSum(std::vector<AubioNote> notes)

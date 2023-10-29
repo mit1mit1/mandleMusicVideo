@@ -19,7 +19,7 @@ mkdir movie || Fail "Error creating movie directory."
 
 # TODO pass in aubio outputs instead of hard coding them
 # Run the mandelbrot generator. This creates all the output PNG files.
-./mandelzoom movie $((15 * 30)) -0.74498410019 -0.13523854817 1.0e8 15 ||
+./mandelzoom movie $((15 * 270)) -0.74498410019 -0.13523854817 1.0e8 15 ||
     Fail "Error running Mandelbrot Zoom program."
 
 # Convert the PNG files to a video file zoom.mp4.
