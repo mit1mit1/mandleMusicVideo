@@ -101,8 +101,8 @@ int main(int argc, const char *argv[])
             fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
             return 1;
         }
-        std::vector<AubioNote> fingerNotes = ParseAubioNoteFile("/home/midly/apps/mandelMusicalZoom/fingerPickingNotes1.txt");
-        std::vector<float> percussionOnsets = ParseOnsetSecondsFile("/home/midly/apps/mandelMusicalZoom/percussionOnset.txt");
+        std::vector<AubioNote> fingerNotes = ParseAubioNoteFile("./fingerPickingNotes1.txt");
+        std::vector<float> percussionOnsets = ParseOnsetSecondsFile("./percussionOnset.txt");
 
         return GenerateZoomFrames(outdir, numframes, xcenter, ycenter, zoom, framespersecond, percussionOnsets, fingerNotes);
     }
@@ -187,6 +187,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 {
     try
     {
+        bool deadEnd = false;
+        const int framesToMoveCentres = 15;
         const int pitchSum = getPitchSum(notes);
         const double averagePitch = pitchSum / notes.size();
         std::cout << " average pitch " << pitchSum << "\n  " << notes.size() << "\n  " << averagePitch << "\n  ";
@@ -195,7 +197,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
         // Create a video frame buffer with 720p resolution (1280x720).
         VideoFrame frame(xResolution, yResolution);
 
-        const int limit = 16000;
+        // TODO: increase limit as we get deeper
+        const int limit = 1600;
         // Below provides a smooth zoom all the way to the specified max zoom
         // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
         long double smoothMultiplier = pow(zoom, 1.0 / (numframes - 1.0));
@@ -297,7 +300,14 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 
             // std::cout << " previous denom " << denom << "\n  ";
             // Increase the zoom magnification for the next frame.
-            denom = denom * (0.99 + pitchMultiplier) * smoothMultiplier * deadEndMultiplier;
+            if (deadEnd)
+            {
+                denom = denom / ((0.99 + pitchMultiplier) * smoothMultiplier * deadEndMultiplier);
+            }
+            else
+            {
+                denom = denom * ((0.99 + pitchMultiplier) * smoothMultiplier * deadEndMultiplier);
+            }
             // std::cout << " new denom " << denom << "\n  ";
 
             bool noteIsPlaying = false;
@@ -334,6 +344,13 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                             std::cout << nextCentre.realPart << "\n  ";
 
                             std::cout << "Imaginary part of next centre: ";
+                            std::cout << nextCentre.imaginaryPart << " \n  ";
+                        }
+                        else
+                        {
+                            deadEnd = true;
+                            std::cout << nextCentre.realPart << "\n  ";
+                            std::cout << "!!! NO INTERESTING POINTS, RANDOM CHOICE NOT GONNA WORK !!!";
                             std::cout << nextCentre.imaginaryPart << " \n  ";
                         }
                     }
@@ -375,6 +392,15 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                     std::cout << nextCentre.realPart << "\n  ";
                     std::cout << "Imaginary part of next centre: ";
                     std::cout << nextCentre.imaginaryPart << " \n  ";
+                    deadEnd = false;
+                }
+                else
+                {
+                    // TODO: Try lower and lower 'interesting' thresholds
+                    std::cout << nextCentre.realPart << "\n  ";
+                    std::cout << "!!! NO INTERESTING POINTS, FOCUS ON EXISTING POINT NOT GONNA WORK !!!";
+                    std::cout << nextCentre.imaginaryPart << " \n  ";
+                    deadEnd = true;
                 }
             }
         }

@@ -1,4 +1,5 @@
 #include <vector>
+#include <set>
 #include <cstdlib>
 #include <cmath>
 #include "math.h" // player.h must be in the current directory. or use relative or absolute path to it. e.g #include "include/player.h"
@@ -61,50 +62,20 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolutio
         maxYIndex = yResolution - 1;
     }
     std::vector<PixelIndex> sufficientlyInterestingElements{};
-    int interestingPointThreshold = 4;
+    long unsigned int interestingPointThreshold = 3;
     for (int x = minXIndex; x < maxXIndex; x++)
     {
         for (int y = minYIndex; y < maxYIndex; y++)
         {
-            int localMandlenumber = mandleCounts[x][y];
-            int differentNeighbours = 0;
-            if (
-                mandleCounts[x - 1][y - 1] != localMandlenumber)
+            std::set<int> uniqueNeighbours;
+            for (int xDelta = -1; xDelta < 2; xDelta++)
             {
-                differentNeighbours++;
+                for (int yDelta = -1; yDelta < 2; yDelta++)
+                {
+                    uniqueNeighbours.insert(mandleCounts[x + xDelta][y + yDelta]);
+                }
             }
-            if (mandleCounts[x - 1][y] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (
-                mandleCounts[x - 1][y + 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x][y - 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x][y + 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (
-                mandleCounts[x + 1][y - 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (mandleCounts[x + 1][y] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (
-                mandleCounts[x + 1][y + 1] != localMandlenumber)
-            {
-                differentNeighbours++;
-            }
-            if (differentNeighbours > interestingPointThreshold)
+            if (uniqueNeighbours.size() > interestingPointThreshold)
             {
                 PixelIndex interestingPoint;
                 interestingPoint.xIndex = x;
