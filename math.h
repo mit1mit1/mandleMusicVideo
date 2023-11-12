@@ -31,5 +31,5 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolutio
                                                    int minYIndex,
                                                    int maxYIndex);
 int getPitchSum(std::vector<AubioNote> notes);
-
+int sumAll(int start, int end);
 #endif

@@ -88,6 +88,20 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolutio
     return sufficientlyInterestingElements;
 }
 
+int sumAll(int start, int end)
+{
+    int sum = 0;
+    if (end < start)
+    {
+        return sum;
+    }
+    for (int i = start; i < end; i++)
+    {
+        sum += i;
+    }
+    return sum;
+}
+
 Coordinate chooseClosestInterestingPoint(std::vector<PixelIndex> interestingPoints,
                                          long double xStepDistance,
                                          long double yStepDistance,
