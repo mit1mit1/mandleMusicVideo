@@ -73,7 +73,7 @@ static std::vector<float> ParseOnsetSecondsFile(const char *filename);
 static int PrintUsage();
 static int GenerateZoomFrames(const char *outdir, int numframes, long double xcenter, long double ycenter, long double zoom, int framespersecond, std::vector<float> onsetTimestamps, std::vector<AubioNote> notes);
 static double GetTimestampSeconds(int framenumber, int framespersecond);
-static PixelColor Palette(int count, int limit, int onsetsPassed, float alphaModifier);
+static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier);
 
 int main(int argc, const char *argv[])
 {
@@ -189,14 +189,14 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
     {
         bool deadEnd = false;
         int framesSinceDeadEnd = 0;
-        // TODO: Use this to divide the length into next centre by bits for a smooth zoom of scale (1x speed, 2x speed, 3x speed, 4x speed, 3x speed, 2x speed, 1x speed)
         const int framesToMoveCentres = 16;
         const int incrementsToMoveCentres = 2 * sumAll(1, framesToMoveCentres / 2);
         const int pitchSum = getPitchSum(notes);
         const double averagePitch = pitchSum / notes.size();
         std::cout << " average pitch " << pitchSum << "\n  " << notes.size() << "\n  " << averagePitch << "\n  ";
-        const double silentPitch = averagePitch / 10 * (-1);
-        std::cout << " silent pitch " << silentPitch;
+        const double defaultPitch = averagePitch / 30 * (-1);
+        bool isSilent = true;
+        std::cout << " silent pitch " << defaultPitch;
         // Create a video frame buffer with 720p resolution (1280x720).
         VideoFrame frame(xResolution, yResolution);
 
@@ -207,8 +207,9 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
         // Below provides a smooth zoom all the way to the specified max zoom
         // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
         long double smoothMultiplier = pow(zoom, 1.0 / (numframes - 1.0));
-
-        float currentPitch = silentPitch;
+        float alphaModifier = 1.0;
+        float currentPitch = defaultPitch;
+        float currentNoteLength = 0;
         long double pitchMultiplier = 0.04 * currentPitch / averagePitch;
         long double targetPitchMultiplier = pitchMultiplier;
         std::cout << " initial pitch multiplier " << pitchMultiplier << "\n  ";
@@ -245,18 +246,19 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
             long double ci_delta = ver_span / (yResolution - 1.0);
             long double cr_left = xcenter - hor_span / 2.0;
             long double cr_delta = hor_span / (xResolution - 1.0);
-            std::cout << " previous centre " << xcenter << ", " << ycenter << "\n  ";
             // xcenter = xcenter + (nextCentre.realPart - xcenter) / 8;
             // ycenter = ycenter + (nextCentre.realPart - ycenter) / 8;
             int movementMultiplier = framesSinceChangeOfCentre;
-            if (framesSinceChangeOfCentre > framesToMoveCentres / 2) {
-                movementMultiplier = framesToMoveCentres - framesSinceChangeOfCentre;  
+            if (framesSinceChangeOfCentre > framesToMoveCentres / 2)
+            {
+                movementMultiplier = framesToMoveCentres - framesSinceChangeOfCentre;
             }
-            if (framesSinceChangeOfCentre > framesToMoveCentres) {
+            if (framesSinceChangeOfCentre > framesToMoveCentres)
+            {
                 movementMultiplier = 0;
             }
-            xcenter = xcenter + (nextCentre.realPart - xcenter) * movementMultiplier  / incrementsToMoveCentres;
-            std::cout << " new centre " << xcenter << ", " << ycenter << "\n  ";
+            xcenter = xcenter + ((nextCentre.realPart - xcenter) * movementMultiplier / incrementsToMoveCentres);
+            ycenter = ycenter + ((nextCentre.imaginaryPart - ycenter) * movementMultiplier / incrementsToMoveCentres);
 
             int onsetsPassed = 1;
             for (double onsetTimestamp : onsetTimestamps)
@@ -282,13 +284,25 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
             // std::cout << " new pitch multiplier " << pitchMultiplier << "\n  ";
 
             uniqueMandleCounts.clear();
+            // f, framespersecond
+
             // TODO: use note duration to calculate a fade out over the whole note duration
-            float alphaModifier = 1.0 - ((framesSinceChangeOfCentre - 1) * 0.025);
+            if (isSilent)
+            {
+                alphaModifier = alphaModifier - 0.025;
+            }
+            else
+            {
+                alphaModifier = alphaModifier - ((framesSinceChangeOfCentre - 1) * 0.025);
+                if (currentNoteLength > 0)
+                {
+                    alphaModifier = (framesSinceChangeOfCentre / framespersecond) / currentNoteLength;
+                }
+            }
             if (alphaModifier < 0)
             {
                 alphaModifier = 0;
             }
-            std::cout << "setting alpha " << alphaModifier;
             for (int x = 0; x < xResolution; ++x)
             {
                 long double cr = cr_left + x * cr_delta;
@@ -296,17 +310,16 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                 {
                     long double ci = ci_top - y * ci_delta;
                     int count = Mandelbrot(cr, ci, limit);
-                    // TODO: check unique counts and if not enough, add a zoom out multiplier.
                     mandleCounts[x][y] = count;
                     uniqueMandleCounts.insert(count);
-                    PixelColor color = Palette(count, limit, onsetsPassed, alphaModifier);
+                    PixelColor color = Palette(count, limit, onsetsPassed, currentPitch, alphaModifier);
                     frame.SetPixel(x, y, color);
                 }
             }
-            if (uniqueMandleCounts.size() <= 1)
+            if (uniqueMandleCounts.size() <= 4)
             {
                 framesSinceDeadEnd = 0;
-                deadEndMultiplier = 0.8;
+                deadEndMultiplier = 0.9;
             }
             else if (framesSinceDeadEnd > 45)
             {
@@ -322,8 +335,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
             int error = frame.SavePng(filename.c_str());
             if (error)
                 return error;
-
-            printf("Wrote %s\n", filename.c_str());
 
             // std::cout << " previous denom " << denom << "\n  ";
             // Increase the zoom magnification for the next frame.
@@ -346,39 +357,39 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                 {
                     noteIsPlaying = true;
 
-                    std::cout << "Note pitch]: ";
-                    std::cout << checkNote.pitch << "\n  ";
-                    std::cout << checkNote.startSeconds << "\n  ";
-                    std::cout << checkNote.endSeconds << "\n  ";
-                    if (checkNote.pitch != currentPitch)
+                    if (isSilent || checkNote.pitch != currentPitch)
                     {
+                        framesSinceChangeOfCentre = 0;
+                        std::cout << "New note pitch]: ";
+                        std::cout << checkNote.pitch << "\n  ";
+                        std::cout << checkNote.startSeconds << "\n  ";
+                        std::cout << checkNote.endSeconds << "\n  ";
                         std::cout << "Changed pitch so setting new centre";
                         currentPitch = checkNote.pitch;
-                        int minXIndex = (((int)currentPitch % 2) * xResolution / 2) + 1;
-                        int maxXIndex = minXIndex + xResolution / 2 - 2;
-                        int minYIndex = ((((int)currentPitch * 7) % 2) * yResolution / 2) + 1;
-                        int maxYIndex = minYIndex + yResolution / 2 - 2;
+                        isSilent = false;
+                        currentNoteLength = checkNote.endSeconds - checkNote.startSeconds;
+                        // int minXIndex = (((int)currentPitch % 2) * xResolution / 2) + 1;
+                        // int maxXIndex = minXIndex + xResolution / 2 - 2;
+                        // int minYIndex = ((((int)currentPitch * 7) % 2) * yResolution / 2) + 1;
+                        // int maxYIndex = minYIndex + yResolution / 2 - 2;
+                        int minXIndex = 1;
+                        int maxXIndex = xResolution - 1;
+                        int minYIndex = 1;
+                        int maxYIndex = yResolution - 1;
                         std::vector<PixelIndex> interestingPoints = getInterestingPixelIndexes(mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
                         if (interestingPoints.size() > 0)
                         {
-                            framesSinceChangeOfCentre = 0;
                             Coordinate nextInterstingPoint = chooseRandomInterestingPoint(interestingPoints,
                                                                                           cr_delta, ci_delta, xcenter, ycenter);
                             nextCentre.realPart = nextInterstingPoint.realPart;
                             nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
-
-                            std::cout << "Real part of next centre: ";
-                            std::cout << nextCentre.realPart << "\n  ";
-
-                            std::cout << "Imaginary part of next centre: ";
-                            std::cout << nextCentre.imaginaryPart << " \n  ";
                         }
                         else
                         {
-                            deadEnd = true;
+                            // deadEnd = true;
                             std::cout << nextCentre.realPart << "\n  ";
-                            std::cout << "!!! NO INTERESTING POINTS, RANDOM CHOICE NOT GONNA WORK !!!";
                             std::cout << nextCentre.imaginaryPart << " \n  ";
+                            std::cout << "!!! NO INTERESTING POINTS, RANDOM CHOICE NOT GONNA WORK !!!";
                         }
                     }
                     break;
@@ -386,14 +397,15 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
             }
             if (noteIsPlaying == false)
             {
-                if (currentPitch != silentPitch)
+                isSilent = true;
+                if (currentPitch != defaultPitch)
                 {
-                    currentPitch = silentPitch;
+                    currentPitch = defaultPitch;
+                    currentNoteLength = 0;
                 }
             }
             if (framesSinceChangeOfCentre > 1)
             {
-                std::cout << "No change pitch so setting new centre close to target centre \n";
                 int minXIndex = 1;
                 int maxXIndex = xResolution - 1;
                 int minYIndex = 1;
@@ -407,19 +419,16 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 
                     nextCentre.realPart = nextInterstingPoint.realPart;
                     nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
-                    std::cout << "Real part of next centre: ";
-                    std::cout << nextCentre.realPart << "\n  ";
-                    std::cout << "Imaginary part of next centre: ";
-                    std::cout << nextCentre.imaginaryPart << " \n  ";
                     deadEnd = false;
                 }
                 else
                 {
                     // TODO: Try lower and lower 'interesting' thresholds
                     std::cout << nextCentre.realPart << "\n  ";
-                    std::cout << "!!! NO INTERESTING POINTS, FOCUS ON EXISTING POINT NOT GONNA WORK !!!";
                     std::cout << nextCentre.imaginaryPart << " \n  ";
+                    std::cout << "!!! NO INTERESTING POINTS, FOCUS ON EXISTING POINT NOT GONNA WORK !!!";
                     deadEnd = true;
+                    return 0;
                 }
             }
         }
@@ -438,7 +447,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 // the third three based on track 3's pitch,
 // and the final 3 based on percussion onsets passed.
 
-static PixelColor Palette(int count, int limit, int onsetsPassed, float alphaModifier)
+static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier)
 {
     // TODO: Set alpha based on volume (of particular notes?)
 
@@ -612,11 +621,13 @@ static PixelColor Palette(int count, int limit, int onsetsPassed, float alphaMod
     else
     {
         // TODO: Fade different colors based on what note
+        float bonusAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
         PixelColor selectedColor = rollingInTheDeepColors[(count + onsetsPassed) % rollingInTheDeepColors.size()];
         if (alphaModifier >= 1 || alphaModifier <= 0)
         {
             alphaModifier = 1.0;
         }
+        alphaModifier = bonusAlphaModifier * alphaModifier;
         color.red = static_cast<unsigned char>(int(selectedColor.red * alphaModifier));
         color.green = static_cast<unsigned char>(int(selectedColor.green * alphaModifier));
         color.blue = static_cast<unsigned char>(int(selectedColor.blue * alphaModifier));
