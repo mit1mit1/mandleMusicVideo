@@ -4,21 +4,21 @@
 #include <cmath>
 #include "math.h" // player.h must be in the current directory. or use relative or absolute path to it. e.g #include "include/player.h"
 
-#include <iostream>
+// #include <iostream>
 long double getXPosition(
     int xSquare,
-    long double xStepDistance,
-    long double centreX)
+    long double cr_left,
+    long double xStepDistance)
 {
-    return centreX + (xSquare - 0.5 * xResolution) * xStepDistance;
+    return cr_left + xSquare * xStepDistance;
 };
 
 long double getYPosition(
     int ySquare,
-    float yStepDistance,
-    float centreY)
+    long double ci_top,
+    long double yStepDistance)
 {
-    return centreY + (ySquare - 0.5 * yResolution) * yStepDistance;
+    return ci_top - ySquare * yStepDistance;
 };
 
 int Mandelbrot(long double cr, long double ci, int limit)
@@ -81,11 +81,11 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[xResolution]
                 PixelIndex interestingPoint;
                 interestingPoint.xIndex = x;
                 interestingPoint.yIndex = y;
-                std::cout << "Found interesting point (" << x << ", " << y << "), mandlenumber: " << mandleCounts[x][y] << ", unique neibours: " << uniqueNeighbours.size() << "\n";
-                for (int const &manldecountCompare : uniqueNeighbours)
-                {
-                    std::cout << manldecountCompare << ' ';
-                }
+                // std::cout << "Found interesting point (" << x << ", " << y << "), mandlenumber: " << mandleCounts[x][y] << ", unique neibours: " << uniqueNeighbours.size() << "\n";
+                // for (int const &manldecountCompare : uniqueNeighbours)
+                // {
+                //     std::cout << manldecountCompare << ' ';
+                // }
                 sufficientlyInterestingElements.push_back(interestingPoint);
             }
         }
@@ -113,15 +113,17 @@ Coordinate chooseClosestInterestingPoint(std::vector<PixelIndex> interestingPoin
                                          long double centreX,
                                          long double centreY,
                                          long double targetX,
-                                         long double targetY)
+                                         long double targetY,
+                                         long double cr_left,
+                                         long double ci_top)
 {
     long double closestDistanceSquared = 100000;
     Coordinate chosenInterestingPoint;
     Coordinate testInterestingPoint;
     for (unsigned int i = 0; i < interestingPoints.size(); i++)
     {
-        testInterestingPoint.realPart = getXPosition(interestingPoints[i].xIndex, xStepDistance, centreX);
-        testInterestingPoint.imaginaryPart = getYPosition(interestingPoints[i].yIndex, yStepDistance, centreY);
+        testInterestingPoint.realPart = getXPosition(interestingPoints[i].xIndex, cr_left, xStepDistance);
+        testInterestingPoint.imaginaryPart = getYPosition(interestingPoints[i].yIndex, ci_top, yStepDistance);
         long double testDistanceSquared = pow((testInterestingPoint.realPart - targetX), 2) + pow((testInterestingPoint.imaginaryPart - targetY), 2);
         if (testDistanceSquared < closestDistanceSquared)
         {
@@ -138,7 +140,9 @@ Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoint
                                         long double xStepDistance,
                                         long double yStepDistance,
                                         long double centreX,
-                                        long double centreY)
+                                        long double centreY,
+                                        long double cr_left,
+                                        long double ci_top)
 {
     PixelIndex chosenPixIndex;
     chosenPixIndex.xIndex = 0;
@@ -151,8 +155,8 @@ Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoint
     }
 
     Coordinate nextInterestingPoint;
-    nextInterestingPoint.realPart = getXPosition(chosenPixIndex.xIndex, xStepDistance, centreX);
-    nextInterestingPoint.imaginaryPart = getYPosition(chosenPixIndex.yIndex, yStepDistance, centreY);
+    nextInterestingPoint.realPart = getXPosition(chosenPixIndex.xIndex, cr_left, xStepDistance);
+    nextInterestingPoint.imaginaryPart = getYPosition(chosenPixIndex.yIndex, ci_top, yStepDistance);
     return nextInterestingPoint;
 }
 
@@ -165,7 +169,9 @@ Coordinate getInterestingPoint(
     int minXIndex,
     int maxXIndex,
     int minYIndex,
-    int maxYIndex)
+    int maxYIndex,
+    long double cr_left,
+    long double ci_top)
 {
     std::vector<PixelIndex> maxBoundaryElements = getInterestingPixelIndexes(mandleCounts,
                                                                              minXIndex,
@@ -176,7 +182,9 @@ Coordinate getInterestingPoint(
                                         xStepDistance,
                                         yStepDistance,
                                         centreX,
-                                        centreY);
+                                        centreY,
+                                        cr_left,
+                                        ci_top);
 }
 
 int getPitchSum(std::vector<AubioNote> notes)

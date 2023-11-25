@@ -190,7 +190,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
         bool deadEnd = false;
         int framesSinceDeadEnd = 0;
         const int framesToMoveCentres = 16;
-        const int incrementsToMoveCentres = 2 * sumAll(1, framesToMoveCentres / 2);
         const int pitchSum = getPitchSum(notes);
         const double averagePitch = pitchSum / notes.size();
         std::cout << " average pitch " << pitchSum << "\n  " << notes.size() << "\n  " << averagePitch << "\n  ";
@@ -239,22 +238,17 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
             long double ver_span = 4.0 / denom;
             long double hor_span = ver_span * (xResolution - 1.0) / (yResolution - 1.0);
             long double ci_top = ycenter + ver_span / 2.0;
-            long double ci_delta = ver_span / (yResolution - 1.0);
+            long double yStepDistance = ver_span / (yResolution - 1.0);
             long double cr_left = xcenter - hor_span / 2.0;
-            long double cr_delta = hor_span / (xResolution - 1.0);
-            // xcenter = xcenter + (nextCentre.realPart - xcenter) / 8;
-            // ycenter = ycenter + (nextCentre.realPart - ycenter) / 8;
-            int movementMultiplier = framesSinceChangeOfCentre;
-            if (framesSinceChangeOfCentre > framesToMoveCentres / 2)
+            long double xStepDistance = hor_span / (xResolution - 1.0);
+
+            if (framesSinceChangeOfCentre <= framesToMoveCentres)
             {
-                movementMultiplier = framesToMoveCentres - framesSinceChangeOfCentre;
+                // xcenter = nextCentre.realPart;
+                // ycenter = nextCentre.imaginaryPart;
+                xcenter = xcenter + ((nextCentre.realPart - xcenter) * framesSinceChangeOfCentre / framesToMoveCentres);
+                ycenter = ycenter + ((nextCentre.imaginaryPart - ycenter) * framesSinceChangeOfCentre / framesToMoveCentres);
             }
-            if (framesSinceChangeOfCentre >= framesToMoveCentres)
-            {
-                movementMultiplier = 0;
-            }
-            xcenter = xcenter + ((nextCentre.realPart - xcenter) * movementMultiplier / incrementsToMoveCentres);
-            ycenter = ycenter + ((nextCentre.imaginaryPart - ycenter) * movementMultiplier / incrementsToMoveCentres);
 
             int onsetsPassed = 1;
             for (double onsetTimestamp : onsetTimestamps)
@@ -287,10 +281,10 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
             }
             for (int x = 0; x < xResolution; ++x)
             {
-                long double cr = cr_left + x * cr_delta;
+                long double cr = getXPosition(x, cr_left, xStepDistance);
                 for (int y = 0; y < yResolution; ++y)
                 {
-                    long double ci = ci_top - y * ci_delta;
+                    long double ci = getYPosition(y, ci_top, yStepDistance);
                     int count = Mandelbrot(cr, ci, limit);
                     mandleCounts[x][y] = count;
                     uniqueMandleCounts.insert(count);
@@ -355,11 +349,13 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                         std::vector<PixelIndex> interestingPoints = getInterestingPixelIndexes(mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
                         if (interestingPoints.size() > 0)
                         {
-                            
+
                             std::cout << nextCentre.realPart << " - next real part  \n  ";
                             std::cout << nextCentre.imaginaryPart << " - next imaginary part \n  ";
+                            std::cout << xcenter << " - current real part  \n  ";
+                            std::cout << ycenter << " - current imaginary part \n  ";
                             Coordinate nextInterstingPoint = chooseRandomInterestingPoint(interestingPoints,
-                                                                                          cr_delta, ci_delta, xcenter, ycenter);
+                                                                                          xStepDistance, yStepDistance, xcenter, ycenter, cr_left, ci_top);
                             nextCentre.realPart = nextInterstingPoint.realPart;
                             nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
                         }
@@ -367,6 +363,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                         {
                             std::cout << nextCentre.realPart << "\n  ";
                             std::cout << nextCentre.imaginaryPart << " \n  ";
+                            std::cout << xcenter << " - current real part  \n  ";
+                            std::cout << ycenter << " - current imaginary part \n  ";
                             std::cout << "!!! NO INTERESTING POINTS, RANDOM CHOICE NOT GONNA WORK !!!";
                         }
                     }
@@ -393,11 +391,13 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                 if (interestingPoints.size() > 0)
                 {
                     Coordinate nextInterstingPoint = chooseClosestInterestingPoint(
-                        interestingPoints, cr_delta, ci_delta, xcenter, ycenter, nextCentre.realPart, nextCentre.imaginaryPart);
+                        interestingPoints, xStepDistance, yStepDistance, xcenter, ycenter, nextCentre.realPart, nextCentre.imaginaryPart, cr_left, ci_top);
 
                     std::cout << "Focussing on next interesting point:  \n  ";
                     std::cout << nextCentre.realPart << " - next real part  \n  ";
                     std::cout << nextCentre.imaginaryPart << " - next imaginary part \n  ";
+                    std::cout << xcenter << " - current real part  \n  ";
+                    std::cout << ycenter << " - current imaginary part \n  ";
                     nextCentre.realPart = nextInterstingPoint.realPart;
                     nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
                     deadEnd = false;
@@ -407,6 +407,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                     // TODO: Try lower and lower 'interesting' thresholds
                     std::cout << nextCentre.realPart << "\n  ";
                     std::cout << nextCentre.imaginaryPart << " \n  ";
+                    std::cout << xcenter << " - current real part  \n  ";
+                    std::cout << ycenter << " - current imaginary part \n  ";
                     std::cout << "!!! NO INTERESTING POINTS, FOCUS ON EXISTING POINT NOT GONNA WORK !!!";
                     deadEnd = true;
                     return 0;
