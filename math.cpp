@@ -4,6 +4,7 @@
 #include <cmath>
 #include "math.h" // player.h must be in the current directory. or use relative or absolute path to it. e.g #include "include/player.h"
 
+#include <iostream>
 long double getXPosition(
     int xSquare,
     long double xStepDistance,
@@ -39,7 +40,7 @@ int Mandelbrot(long double cr, long double ci, int limit)
     return count;
 }
 
-std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolution],
+std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[xResolution][yResolution],
                                                    int minXIndex,
                                                    int maxXIndex,
                                                    int minYIndex,
@@ -62,7 +63,7 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolutio
         maxYIndex = yResolution - 1;
     }
     std::vector<PixelIndex> sufficientlyInterestingElements{};
-    long unsigned int interestingPointThreshold = 3;
+    long unsigned int interestingPointThreshold = 5;
     for (int x = minXIndex; x < maxXIndex; x++)
     {
         for (int y = minYIndex; y < maxYIndex; y++)
@@ -80,7 +81,11 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolutio
                 PixelIndex interestingPoint;
                 interestingPoint.xIndex = x;
                 interestingPoint.yIndex = y;
-
+                std::cout << "Found interesting point (" << x << ", " << y << "), mandlenumber: " << mandleCounts[x][y] << ", unique neibours: " << uniqueNeighbours.size() << "\n";
+                for (int const &manldecountCompare : uniqueNeighbours)
+                {
+                    std::cout << manldecountCompare << ' ';
+                }
                 sufficientlyInterestingElements.push_back(interestingPoint);
             }
         }

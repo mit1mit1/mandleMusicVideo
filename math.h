@@ -25,7 +25,7 @@ Coordinate getInterestingPoint(int mandleCounts[][yResolution], long double xSte
                                int maxXIndex,
                                int minYIndex,
                                int maxYIndex);
-std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[][yResolution],
+std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[xResolution][yResolution],
                                                    int minXIndex,
                                                    int maxXIndex,
                                                    int minYIndex,
