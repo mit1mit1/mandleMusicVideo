@@ -32,8 +32,9 @@
 #include "lodepng.h"
 #include <algorithm>
 #include <fstream>
-#include "math.h"
+#include "aubioParser.h"
 #include "colors.h"
+#include "math.h"
 
 class VideoFrame
 {
@@ -69,12 +70,9 @@ public:
     }
 };
 
-static std::vector<AubioNote> ParseAubioNoteFile(const char *filename);
-static std::vector<float> ParseOnsetSecondsFile(const char *filename);
 static int PrintUsage();
 static int GenerateZoomFrames(const char *outdir, int numframes, long double xcenter, long double ycenter, long double zoom, int framespersecond, std::vector<float> onsetTimestamps, std::vector<AubioNote> notes);
 static double GetTimestampSeconds(int framenumber, int framespersecond);
-static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors);
 
 int main(int argc, const char *argv[])
 {
@@ -109,57 +107,6 @@ int main(int argc, const char *argv[])
     }
 
     return PrintUsage();
-}
-
-static std::vector<AubioNote> ParseAubioNoteFile(const char *filename)
-{
-    std::ifstream infile(filename);
-    std::cout << " Got the file ";
-
-    float x1, x2, x3;
-
-    std::vector<AubioNote> notes{};
-
-    while (infile >> x1 >> x2 >> x3)
-    {
-        AubioNote lineNote;
-        lineNote.pitch = x1;
-        lineNote.startSeconds = x2;
-        lineNote.endSeconds = x3;
-        notes.push_back(lineNote);
-    }
-
-    std::cout << "First Note: ";
-    std::cout << notes.front().startSeconds << " start sec  " << notes.front().endSeconds << " end sec  " << notes.front().pitch << " pitch ";
-
-    std::cout << "Last Note: ";
-    std::cout << notes.back().startSeconds << " start sec  " << notes.back().endSeconds << " end sec  " << notes.back().pitch << " pitch ";
-
-    return notes;
-}
-
-// TODO for both onsets and notes keep track of total number of notes and get the average length between notes
-static std::vector<float> ParseOnsetSecondsFile(const char *filename)
-{
-    std::ifstream infile(filename);
-    std::cout << " Got the file ";
-
-    float x1;
-
-    std::vector<float> onsets{};
-
-    while (infile >> x1)
-    {
-        onsets.push_back(x1);
-    }
-
-    std::cout << "First Onset: ";
-    std::cout << onsets.front() << "  sec  ";
-
-    std::cout << "Last Onset: ";
-    std::cout << onsets.back() << " sec  ";
-
-    return onsets;
 }
 
 static int PrintUsage()
@@ -422,37 +369,4 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
         fprintf(stderr, "EXCEPTION: %s\n", message);
         return 1;
     }
-}
-
-// TODO more create colors - e.g. setting pallette to a length of 12
-// setting the first three elements based on track 1's pitch,
-// the next three based on track 2's pitch,
-// the third three based on track 3's pitch,
-// and the final 3 based on percussion onsets passed.
-
-static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors)
-{
-    // TODO: Set alpha based on volume (of particular notes?
-    PixelColor color;
-    color.alpha = 255;
-    if (count >= limit)
-    {
-        color.red = color.green = color.blue = 0;
-    }
-    else
-    {
-        // TODO: Fade different colors based on what note
-        float bonusAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
-        PixelColor selectedColor = availableColors[(count + onsetsPassed) % availableColors.size()];
-        if (alphaModifier >= 1 || alphaModifier <= 0)
-        {
-            alphaModifier = 1.0;
-        }
-        alphaModifier = bonusAlphaModifier * alphaModifier;
-        color.red = static_cast<unsigned char>(int(selectedColor.red * alphaModifier));
-        color.green = static_cast<unsigned char>(int(selectedColor.green * alphaModifier));
-        color.blue = static_cast<unsigned char>(int(selectedColor.blue * alphaModifier));
-    }
-
-    return color;
 }

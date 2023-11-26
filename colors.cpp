@@ -254,24 +254,61 @@ std::vector<PixelColor> getColors()
     };
 
     std::vector<PixelColor> colors = {};
-    const int colorsBetween = 5;
+    const int colorsBetween = 32;
 
     for (unsigned int i = 0; i < rollingInTheDeepColors.size(); i++)
     {
+        unsigned int compareI = i + 1;
         colors.push_back(rollingInTheDeepColors[i]);
-        if (i < rollingInTheDeepColors.size() - 1)
+        if (compareI >= rollingInTheDeepColors.size())
         {
-            for (int k = 1; k < colorsBetween; k++)
-            {
-                PixelColor intermediateColor;
-                intermediateColor.red = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].red) + (static_cast<unsigned int>(rollingInTheDeepColors[i + 1].red) - static_cast<unsigned int>(rollingInTheDeepColors[i].red)) * k / colorsBetween);
-                intermediateColor.green = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].green) + (static_cast<unsigned int>(rollingInTheDeepColors[i + 1].green) - static_cast<unsigned int>(rollingInTheDeepColors[i].green)) * k / colorsBetween);
-                intermediateColor.blue = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].blue) + (static_cast<unsigned int>(rollingInTheDeepColors[i + 1].blue) - static_cast<unsigned int>(rollingInTheDeepColors[i].blue)) * k / colorsBetween);
-                intermediateColor.alpha = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].alpha) + (static_cast<unsigned int>(rollingInTheDeepColors[i + 1].alpha) - static_cast<unsigned int>(rollingInTheDeepColors[i].alpha)) * k / colorsBetween);
-                colors.push_back(intermediateColor);
-            }
+            compareI = 0;
+        }
+        for (int k = 1; k < colorsBetween; k++)
+        {
+            PixelColor intermediateColor;
+            intermediateColor.red = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].red) + (static_cast<unsigned int>(rollingInTheDeepColors[compareI].red) - static_cast<unsigned int>(rollingInTheDeepColors[i].red)) * k / colorsBetween);
+            intermediateColor.green = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].green) + (static_cast<unsigned int>(rollingInTheDeepColors[compareI].green) - static_cast<unsigned int>(rollingInTheDeepColors[i].green)) * k / colorsBetween);
+            intermediateColor.blue = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].blue) + (static_cast<unsigned int>(rollingInTheDeepColors[compareI].blue) - static_cast<unsigned int>(rollingInTheDeepColors[i].blue)) * k / colorsBetween);
+            intermediateColor.alpha = static_cast<unsigned char>(static_cast<unsigned int>(rollingInTheDeepColors[i].alpha) + (static_cast<unsigned int>(rollingInTheDeepColors[compareI].alpha) - static_cast<unsigned int>(rollingInTheDeepColors[i].alpha)) * k / colorsBetween);
+            colors.push_back(intermediateColor);
         }
     }
 
     return colors;
+}
+
+
+// TODO more create colors - e.g. setting pallette to a length of 12
+// setting the first three elements based on track 1's pitch,
+// the next three based on track 2's pitch,
+// the third three based on track 3's pitch,
+// and the final 3 based on percussion onsets passed.
+
+PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors)
+{
+    // TODO: Set alpha based on volume (of particular notes?
+    PixelColor color;
+    color.alpha = 255;
+    if (count >= limit)
+    {
+        color.red = color.green = color.blue = 0;
+    }
+    else
+    {
+        // TODO: Fade different colors based on what note
+        // TODO: Keep track of previous fade, and slowly transition fade (so can increase to 90% fade without triggering epilepsy)
+        float bonusAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
+        PixelColor selectedColor = availableColors[(count + onsetsPassed) % availableColors.size()];
+        if (alphaModifier >= 1 || alphaModifier <= 0)
+        {
+            alphaModifier = 1.0;
+        }
+        alphaModifier = bonusAlphaModifier * alphaModifier;
+        color.red = static_cast<unsigned char>(int(selectedColor.red * alphaModifier));
+        color.green = static_cast<unsigned char>(int(selectedColor.green * alphaModifier));
+        color.blue = static_cast<unsigned char>(int(selectedColor.blue * alphaModifier));
+    }
+
+    return color;
 }
