@@ -2,6 +2,7 @@
 #define MANDLEAUBIO_H
 
 #include "structs.h"
+#include <vector>
 
 std::vector<AubioNote> ParseAubioNoteFile(const char *filename);
 std::vector<float> ParseOnsetSecondsFile(const char *filename);
