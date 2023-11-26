@@ -6,8 +6,8 @@
     Copyright (c) 2019 Don Cross <cosinekitty@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
+    of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <fstream>
 #include "math.h"
+#include "colors.h"
 
 class VideoFrame
 {
@@ -73,7 +74,7 @@ static std::vector<float> ParseOnsetSecondsFile(const char *filename);
 static int PrintUsage();
 static int GenerateZoomFrames(const char *outdir, int numframes, long double xcenter, long double ycenter, long double zoom, int framespersecond, std::vector<float> onsetTimestamps, std::vector<AubioNote> notes);
 static double GetTimestampSeconds(int framenumber, int framespersecond);
-static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier);
+static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors);
 
 int main(int argc, const char *argv[])
 {
@@ -187,9 +188,10 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 {
     try
     {
+        std::vector<PixelColor> availableColors = getColors();
         bool deadEnd = false;
         int framesSinceDeadEnd = 0;
-        const int framesToMoveCentres = 16;
+        const int framesToMoveCentres = 24;
         const int pitchSum = getPitchSum(notes);
         const double averagePitch = pitchSum / notes.size();
         std::cout << " average pitch " << pitchSum << "\n  " << notes.size() << "\n  " << averagePitch << "\n  ";
@@ -244,8 +246,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 
             if (framesSinceChangeOfCentre <= framesToMoveCentres)
             {
-                // xcenter = nextCentre.realPart;
-                // ycenter = nextCentre.imaginaryPart;
                 xcenter = xcenter + ((nextCentre.realPart - xcenter) * framesSinceChangeOfCentre / framesToMoveCentres);
                 ycenter = ycenter + ((nextCentre.imaginaryPart - ycenter) * framesSinceChangeOfCentre / framesToMoveCentres);
             }
@@ -288,7 +288,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                     int count = Mandelbrot(cr, ci, limit);
                     mandleCounts[x][y] = count;
                     uniqueMandleCounts.insert(count);
-                    PixelColor color = Palette(count, limit, onsetsPassed, currentPitch, alphaModifier);
+                    PixelColor color = Palette(count, limit, onsetsPassed, currentPitch, alphaModifier, availableColors);
                     frame.SetPixel(x, y, color);
                 }
             }
@@ -430,171 +430,9 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
 // the third three based on track 3's pitch,
 // and the final 3 based on percussion onsets passed.
 
-static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier)
+static PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors)
 {
-    // TODO: Set alpha based on volume (of particular notes?)
-
-    // Rolling in the deep colors
-
-    // e8d6cb rgb(232, 214, 203)
-    PixelColor col_e8d6cb;
-    col_e8d6cb.red = static_cast<unsigned char>(232);
-    col_e8d6cb.green = static_cast<unsigned char>(214);
-    col_e8d6cb.blue = static_cast<unsigned char>(203);
-    col_e8d6cb.alpha = static_cast<unsigned char>(255);
-    // d0ada7 rgb(208, 173, 167)
-    PixelColor col_d0ada7;
-    col_d0ada7.red = static_cast<unsigned char>(208);
-    col_d0ada7.green = static_cast<unsigned char>(173);
-    col_d0ada7.blue = static_cast<unsigned char>(167);
-    col_d0ada7.alpha = static_cast<unsigned char>(255);
-    // ad6a6c rgb(173, 106, 108)
-    PixelColor col_ad6a6c;
-    col_ad6a6c.red = static_cast<unsigned char>(173);
-    col_ad6a6c.green = static_cast<unsigned char>(106);
-    col_ad6a6c.blue = static_cast<unsigned char>(108);
-    col_ad6a6c.alpha = static_cast<unsigned char>(255);
-    // 5d2e46 rgb(93, 46, 70)
-    PixelColor col_5d2e46;
-    col_5d2e46.red = static_cast<unsigned char>(93);
-    col_5d2e46.green = static_cast<unsigned char>(46);
-    col_5d2e46.blue = static_cast<unsigned char>(70);
-    col_5d2e46.alpha = static_cast<unsigned char>(255);
-    // b58db6 rgb(181, 141, 182)
-    PixelColor col_b58db6;
-    col_b58db6.red = static_cast<unsigned char>(181);
-    col_b58db6.green = static_cast<unsigned char>(141);
-    col_b58db6.blue = static_cast<unsigned char>(182);
-    col_b58db6.alpha = static_cast<unsigned char>(255);
-
-    // c5afa0 rgb(197, 175, 160)
-    PixelColor col_c5afa0;
-    col_c5afa0.red = static_cast<unsigned char>(197);
-    col_c5afa0.green = static_cast<unsigned char>(175);
-    col_c5afa0.blue = static_cast<unsigned char>(160);
-    col_c5afa0.alpha = static_cast<unsigned char>(255);
-    // e9bcb7 rgb(233, 188, 183)
-    PixelColor col_e9bcb7;
-    col_e9bcb7.red = static_cast<unsigned char>(233);
-    col_e9bcb7.green = static_cast<unsigned char>(188);
-    col_e9bcb7.blue = static_cast<unsigned char>(183);
-    col_e9bcb7.alpha = static_cast<unsigned char>(255);
-    // ab756b rgb(171, 117, 107)
-    PixelColor col_ab756b;
-    col_ab756b.red = static_cast<unsigned char>(171);
-    col_ab756b.green = static_cast<unsigned char>(117);
-    col_ab756b.blue = static_cast<unsigned char>(107);
-    col_ab756b.alpha = static_cast<unsigned char>(255);
-
-    // 0081af rgb(0, 129, 175)
-    PixelColor col_0081af;
-    col_0081af.red = static_cast<unsigned char>(0);
-    col_0081af.green = static_cast<unsigned char>(129);
-    col_0081af.blue = static_cast<unsigned char>(175);
-    col_0081af.alpha = static_cast<unsigned char>(255);
-    // 00abe7 rgb(0, 171, 231)
-    PixelColor col_00abe7;
-    col_00abe7.red = static_cast<unsigned char>(0);
-    col_00abe7.green = static_cast<unsigned char>(171);
-    col_00abe7.blue = static_cast<unsigned char>(231);
-    col_00abe7.alpha = static_cast<unsigned char>(255);
-    // 2dc7ff rgb(45, 199, 255)
-    PixelColor col_2dc7ff;
-    col_2dc7ff.red = static_cast<unsigned char>(45);
-    col_2dc7ff.green = static_cast<unsigned char>(199);
-    col_2dc7ff.blue = static_cast<unsigned char>(255);
-    col_2dc7ff.alpha = static_cast<unsigned char>(255);
-
-    // 06070e rgb(6, 7, 14)
-    PixelColor col_06070e;
-    col_06070e.red = static_cast<unsigned char>(6);
-    col_06070e.green = static_cast<unsigned char>(7);
-    col_06070e.blue = static_cast<unsigned char>(14);
-    col_06070e.alpha = static_cast<unsigned char>(255);
-    // 29524a rgb(41, 82, 74)
-    PixelColor col_29524a;
-    col_29524a.red = static_cast<unsigned char>(41);
-    col_29524a.green = static_cast<unsigned char>(82);
-    col_29524a.blue = static_cast<unsigned char>(74);
-    col_29524a.alpha = static_cast<unsigned char>(255);
-    // 94a187 rgb(148, 161, 135)
-    PixelColor col_94a187;
-    col_94a187.red = static_cast<unsigned char>(148);
-    col_94a187.green = static_cast<unsigned char>(161);
-    col_94a187.blue = static_cast<unsigned char>(135);
-    col_94a187.alpha = static_cast<unsigned char>(255);
-    // 93acb5 rgb(147, 172, 181)
-    PixelColor col_93acb5;
-    col_93acb5.red = static_cast<unsigned char>(147);
-    col_93acb5.green = static_cast<unsigned char>(172);
-    col_93acb5.blue = static_cast<unsigned char>(181);
-    col_93acb5.alpha = static_cast<unsigned char>(255);
-    // 96c5f7 rgb(150, 197, 247)
-    PixelColor col_96c5f7;
-    col_96c5f7.red = static_cast<unsigned char>(150);
-    col_96c5f7.green = static_cast<unsigned char>(197);
-    col_96c5f7.blue = static_cast<unsigned char>(247);
-    col_96c5f7.alpha = static_cast<unsigned char>(255);
-    // a9d3ff rgb(169, 211, 255)
-    PixelColor col_a9d3ff;
-    col_a9d3ff.red = static_cast<unsigned char>(169);
-    col_a9d3ff.green = static_cast<unsigned char>(211);
-    col_a9d3ff.blue = static_cast<unsigned char>(255);
-    col_a9d3ff.alpha = static_cast<unsigned char>(255);
-
-    // f2f4ff rgb(242, 244, 255)
-    PixelColor col_f2f4ff;
-    col_f2f4ff.red = static_cast<unsigned char>(242);
-    col_f2f4ff.green = static_cast<unsigned char>(244);
-    col_f2f4ff.blue = static_cast<unsigned char>(255);
-    col_f2f4ff.alpha = static_cast<unsigned char>(255);
-
-    // ead2ac rgb(234, 210, 172)
-    PixelColor col_ead2ac;
-    col_ead2ac.red = static_cast<unsigned char>(234);
-    col_ead2ac.green = static_cast<unsigned char>(210);
-    col_ead2ac.blue = static_cast<unsigned char>(172);
-    col_ead2ac.alpha = static_cast<unsigned char>(255);
-    // eaba6b rgb(234, 186, 107)
-    PixelColor col_eaba6b;
-    col_eaba6b.red = static_cast<unsigned char>(234);
-    col_eaba6b.green = static_cast<unsigned char>(186);
-    col_eaba6b.blue = static_cast<unsigned char>(107);
-    col_eaba6b.alpha = static_cast<unsigned char>(255);
-
-    // 8ab0ab rgb(138, 176, 171)
-    PixelColor col_8ab0ab;
-    col_8ab0ab.red = static_cast<unsigned char>(138);
-    col_8ab0ab.green = static_cast<unsigned char>(176);
-    col_8ab0ab.blue = static_cast<unsigned char>(171);
-    col_8ab0ab.alpha = static_cast<unsigned char>(255);
-    // 3e505b rgb(62, 80, 91)
-    PixelColor col_3e505b;
-    col_3e505b.red = static_cast<unsigned char>(62);
-    col_3e505b.green = static_cast<unsigned char>(80);
-    col_3e505b.blue = static_cast<unsigned char>(91);
-    col_3e505b.alpha = static_cast<unsigned char>(255);
-    // 26413c rgb(38, 65, 60)
-    PixelColor col_26413c;
-    col_26413c.red = static_cast<unsigned char>(38);
-    col_26413c.green = static_cast<unsigned char>(65);
-    col_26413c.blue = static_cast<unsigned char>(60);
-    col_26413c.alpha = static_cast<unsigned char>(255);
-    // 1a1d1a rgb(26, 29, 26)
-    PixelColor col_1a1d1a;
-    col_1a1d1a.red = static_cast<unsigned char>(26);
-    col_1a1d1a.green = static_cast<unsigned char>(29);
-    col_1a1d1a.blue = static_cast<unsigned char>(26);
-    col_1a1d1a.alpha = static_cast<unsigned char>(255);
-    // 03120e rgb(3, 18, 14)
-    PixelColor col_03120e;
-    col_03120e.red = static_cast<unsigned char>(3);
-    col_03120e.green = static_cast<unsigned char>(18);
-    col_03120e.blue = static_cast<unsigned char>(14);
-    col_03120e.alpha = static_cast<unsigned char>(255);
-
-    std::vector<PixelColor> rollingInTheDeepColors = {col_e8d6cb, col_d0ada7, col_ad6a6c, col_5d2e46, col_b58db6, col_c5afa0, col_e9bcb7, col_ab756b, col_0081af, col_00abe7, col_2dc7ff, col_06070e, col_29524a, col_94a187, col_93acb5, col_96c5f7, col_a9d3ff, col_f2f4ff, col_ead2ac, col_eaba6b, col_8ab0ab, col_3e505b, col_26413c, col_1a1d1a, col_03120e};
-
+    // TODO: Set alpha based on volume (of particular notes?
     PixelColor color;
     color.alpha = 255;
     if (count >= limit)
@@ -605,7 +443,7 @@ static PixelColor Palette(int count, int limit, int onsetsPassed, float currentP
     {
         // TODO: Fade different colors based on what note
         float bonusAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
-        PixelColor selectedColor = rollingInTheDeepColors[(count + onsetsPassed) % rollingInTheDeepColors.size()];
+        PixelColor selectedColor = availableColors[(count + onsetsPassed) % availableColors.size()];
         if (alphaModifier >= 1 || alphaModifier <= 0)
         {
             alphaModifier = 1.0;

@@ -9,7 +9,7 @@ Fail()
 
 # Compile the source code for mandelzoom. Optimize for speed.
 echo "Building C++ code..."
-g++ -Wall -Werror -Ofast -o mandelzoom mandelzoom.cpp math.cpp lodepng.cpp || Fail "Error building C++ code."
+g++ -Wall -Werror -Ofast -o mandelzoom mandelzoom.cpp math.cpp colors.cpp lodepng.cpp || Fail "Error building C++ code."
 
 # Destroy the "movie" directory and its contents, if it exists.
 rm -rf movie || Fail "Error deleting movie directory."

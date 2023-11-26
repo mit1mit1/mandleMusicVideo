@@ -63,7 +63,7 @@ std::vector<PixelIndex> getInterestingPixelIndexes(int mandleCounts[xResolution]
         maxYIndex = yResolution - 1;
     }
     std::vector<PixelIndex> sufficientlyInterestingElements{};
-    long unsigned int interestingPointThreshold = 5;
+    long unsigned int interestingPointThreshold = 3;
     for (int x = minXIndex; x < maxXIndex; x++)
     {
         for (int y = minYIndex; y < maxYIndex; y++)
