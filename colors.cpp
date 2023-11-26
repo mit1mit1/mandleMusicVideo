@@ -278,14 +278,13 @@ std::vector<PixelColor> getColors()
     return colors;
 }
 
-
 // TODO more create colors - e.g. setting pallette to a length of 12
 // setting the first three elements based on track 1's pitch,
 // the next three based on track 2's pitch,
 // the third three based on track 3's pitch,
 // and the final 3 based on percussion onsets passed.
 
-PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors)
+PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float previousPitch, int framesSincePitchChange, float alphaModifier, std::vector<PixelColor> availableColors)
 {
     // TODO: Set alpha based on volume (of particular notes?
     PixelColor color;
@@ -298,7 +297,14 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, f
     {
         // TODO: Fade different colors based on what note
         // TODO: Keep track of previous fade, and slowly transition fade (so can increase to 90% fade without triggering epilepsy)
-        float bonusAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
+        const int framesToChangeFade = 6;
+        if (framesSincePitchChange > framesToChangeFade)
+        {
+            framesSincePitchChange = framesToChangeFade;
+        }
+        float previousBonusAlphaModified = 1 - (count * previousPitch * 0.593284783 - floor(count * previousPitch * 0.593284783)) * 0.3;
+        float currentAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
+        float bonusAlphaModifier = previousBonusAlphaModified + (currentAlphaModifier - previousBonusAlphaModified) * framesSincePitchChange / framesToChangeFade;
         PixelColor selectedColor = availableColors[(count + onsetsPassed) % availableColors.size()];
         if (alphaModifier >= 1 || alphaModifier <= 0)
         {

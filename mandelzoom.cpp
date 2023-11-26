@@ -156,6 +156,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
         // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
         long double smoothMultiplier = pow(zoom, 1.0 / (numframes - 1.0));
         float alphaModifier = 1.0;
+        float previousPitch = defaultPitch;
         float currentPitch = defaultPitch;
         float currentNoteLength = 0;
         long double pitchMultiplier = 0.04 * currentPitch / averagePitch;
@@ -235,7 +236,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                     int count = Mandelbrot(cr, ci, limit);
                     mandleCounts[x][y] = count;
                     uniqueMandleCounts.insert(count);
-                    PixelColor color = Palette(count, limit, onsetsPassed, currentPitch, alphaModifier, availableColors);
+                    PixelColor color = Palette(count, limit, onsetsPassed, currentPitch, previousPitch, framesSinceChangeOfCentre, alphaModifier, availableColors);
                     frame.SetPixel(x, y, color);
                 }
             }
@@ -286,6 +287,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                         std::cout << checkNote.startSeconds << ", end seconds: ";
                         std::cout << checkNote.endSeconds << "\n  ";
                         std::cout << "Changed pitch so setting new centre \n";
+                        previousPitch = currentPitch;
                         currentPitch = checkNote.pitch;
                         isSilent = false;
                         currentNoteLength = checkNote.endSeconds - checkNote.startSeconds;
@@ -323,6 +325,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                 isSilent = true;
                 if (currentPitch != defaultPitch)
                 {
+                    previousPitch = currentPitch;
                     currentPitch = defaultPitch;
                     currentNoteLength = 0;
                 }

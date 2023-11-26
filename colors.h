@@ -4,6 +4,6 @@
 #include "structs.h"
 
 std::vector<PixelColor> getColors();
-PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float alphaModifier, std::vector<PixelColor> availableColors);
+PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float previousPitch, int framesSincePitchChange, float alphaModifier, std::vector<PixelColor> availableColors);
 
 #endif
