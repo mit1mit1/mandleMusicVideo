@@ -25,7 +25,11 @@ Coordinate chooseRandomInterestingPoint(std::vector<PixelIndex> interestingPoint
                                         long double centreY,
                                         long double cr_left,
                                         long double ci_top);
-Coordinate getInterestingPoint(int mandleCounts[][yResolution], long double xStepDistance, long double yStepDistance, long double centreX, long double centreY,
+Coordinate getInterestingPoint(int mandleCounts[][yResolution],
+                               long double xStepDistance,
+                               long double yStepDistance,
+                               long double centreX,
+                               long double centreY,
                                int minXIndex,
                                int maxXIndex,
                                int minYIndex,

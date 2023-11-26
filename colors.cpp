@@ -4,15 +4,10 @@
 
 std::vector<PixelColor> getColors()
 {
-
     // Rolling in the deep colors
 
     // e8d6cb rgb(232, 214, 203)
-    PixelColor col_e8d6cb;
-    col_e8d6cb.red = static_cast<unsigned char>(232);
-    col_e8d6cb.green = static_cast<unsigned char>(208);
-    col_e8d6cb.blue = static_cast<unsigned char>(197);
-    col_e8d6cb.alpha = static_cast<unsigned char>(255);
+    // PixelColor col_e8d6cb{.red = 232, .green = 208, .blue = 197, .alpha = 255};
     // // e8d6cb rgb(232, 214, 203)
     // PixelColor col_e8d6cb2;
     // col_e8d6cb2.red = static_cast<unsigned char>(225);
@@ -217,7 +212,7 @@ std::vector<PixelColor> getColors()
     col_03120e.alpha = static_cast<unsigned char>(255);
 
     std::vector<PixelColor> rollingInTheDeepColors = {
-        col_e8d6cb,
+         PixelColor{.red = 232, .green = 208, .blue = 197, .alpha = 255},
         // col_e8d6cb2,
         // col_e8d6cb3,
         // col_e8d6cb4,
@@ -284,7 +279,7 @@ std::vector<PixelColor> getColors()
 // the third three based on track 3's pitch,
 // and the final 3 based on percussion onsets passed.
 
-PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float previousPitch, int framesSincePitchChange, float alphaModifier, std::vector<PixelColor> availableColors)
+PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, float previousPitch, int framesSincePitchChange, float alphaModifier, std::vector<PixelColor> availableColors, PixelColor currentColor)
 {
     // TODO: Set alpha based on volume (of particular notes?
     PixelColor color;
@@ -311,9 +306,10 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, f
             alphaModifier = 1.0;
         }
         alphaModifier = bonusAlphaModifier * alphaModifier;
-        color.red = static_cast<unsigned char>(int(selectedColor.red * alphaModifier));
-        color.green = static_cast<unsigned char>(int(selectedColor.green * alphaModifier));
-        color.blue = static_cast<unsigned char>(int(selectedColor.blue * alphaModifier));
+        // TODO - make midpoint of previous pixel
+        color.red = static_cast<unsigned char>(selectedColor.red * alphaModifier);
+        color.green = static_cast<unsigned char>(selectedColor.green * alphaModifier);
+        color.blue = static_cast<unsigned char>(selectedColor.blue * alphaModifier);
     }
 
     return color;
