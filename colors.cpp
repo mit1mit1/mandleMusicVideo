@@ -204,12 +204,6 @@ std::vector<PixelColor> getColors()
     col_1a1d1a.green = static_cast<unsigned char>(29);
     col_1a1d1a.blue = static_cast<unsigned char>(26);
     col_1a1d1a.alpha = static_cast<unsigned char>(255);
-    // 03120e rgb(3, 18, 14)
-    PixelColor col_03120e;
-    col_03120e.red = static_cast<unsigned char>(3);
-    col_03120e.green = static_cast<unsigned char>(18);
-    col_03120e.blue = static_cast<unsigned char>(14);
-    col_03120e.alpha = static_cast<unsigned char>(255);
 
     std::vector<PixelColor> rollingInTheDeepColors = {
          PixelColor{.red = 232, .green = 208, .blue = 197, .alpha = 255},
@@ -245,7 +239,7 @@ std::vector<PixelColor> getColors()
         col_3e505b,
         col_26413c,
         col_1a1d1a,
-        col_03120e,
+         PixelColor{.red = 3, .green = 18, .blue = 14, .alpha = 255},
     };
 
     std::vector<PixelColor> colors = {};
@@ -297,15 +291,16 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch, f
         {
             framesSincePitchChange = framesToChangeFade;
         }
-        float previousBonusAlphaModified = 1 - (count * previousPitch * 0.593284783 - floor(count * previousPitch * 0.593284783)) * 0.3;
-        float currentAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
-        float bonusAlphaModifier = previousBonusAlphaModified + (currentAlphaModifier - previousBonusAlphaModified) * framesSincePitchChange / framesToChangeFade;
+        // float previousBonusAlphaModified = 1 - (count * previousPitch * 0.593284783 - floor(count * previousPitch * 0.593284783)) * 0.3;
+        // float currentAlphaModifier = 1 - (count * currentPitch * 0.593284783 - floor(count * currentPitch * 0.593284783)) * 0.3;
+        // float bonusAlphaModifier = previousBonusAlphaModified + (currentAlphaModifier - previousBonusAlphaModified) * framesSincePitchChange / framesToChangeFade;
         PixelColor selectedColor = availableColors[(count + onsetsPassed) % availableColors.size()];
         if (alphaModifier >= 1 || alphaModifier <= 0)
         {
             alphaModifier = 1.0;
         }
-        alphaModifier = bonusAlphaModifier * alphaModifier;
+        // alphaModifier = bonusAlphaModifier * alphaModifier;
+        alphaModifier = 1.0 * alphaModifier;
         // TODO - make midpoint of previous pixel
         color.red = static_cast<unsigned char>(selectedColor.red * alphaModifier);
         color.green = static_cast<unsigned char>(selectedColor.green * alphaModifier);

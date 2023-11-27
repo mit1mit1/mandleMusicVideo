@@ -311,6 +311,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
                     currentPitch = checkNote.pitch;
                     isSilent = false;
                     currentNoteLength = checkNote.endSeconds - checkNote.startSeconds;
+                    // TODO: restrict shorter time notes to smaller intervals - so you don't have to move as fast to get there before
+                    // the note ends
                     int minXIndex = 1;
                     int maxXIndex = xResolution - 1;
                     int minYIndex = 1;
