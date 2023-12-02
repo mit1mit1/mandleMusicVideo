@@ -92,34 +92,28 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
     if (framesSincePitchChange > framesToChangeFade) {
       framesSincePitchChange = framesToChangeFade;
     }
-    float previousBonusAlphaModified =
-        1 - (count * previousPitch * 0.593284783 -
-             floor(count * previousPitch * 0.593284783)) *
-                0.3;
+    // float previousBonusAlphaModified =
+    //     1 - (count * previousPitch * 0.593284783 -
+    //          floor(count * previousPitch * 0.593284783));
     float currentAlphaModifier =
         1 - (count * currentPitch * 0.593284783 -
-             floor(count * currentPitch * 0.593284783)) *
-                0.3;
-    float bonusAlphaModifier =
-        previousBonusAlphaModified +
-        (currentAlphaModifier - previousBonusAlphaModified) *
-            framesSincePitchChange / framesToChangeFade;
+             floor(count * currentPitch * 0.593284783));
+    // float bonusAlphaModifier =
+    //     previousBonusAlphaModified +
+    //     (currentAlphaModifier - previousBonusAlphaModified) *
+    //         framesSincePitchChange / framesToChangeFade;
     PixelColor selectedColor =
         availableColors[(count + onsetsPassed * 7) % availableColors.size()];
     if (alphaModifier >= 1 || alphaModifier <= 0) {
       alphaModifier = 1.0;
     }
-    alphaModifier = bonusAlphaModifier * alphaModifier;
-    alphaModifier = alphaModifier;
+    // alphaModifier = alphaModifier;
     color.red = static_cast<unsigned char>(
-        currentColor.red +
-        (currentColor.red - selectedColor.red * alphaModifier) * 0.5);
+        currentColor.red * 0.9 + (selectedColor.red * alphaModifier) * 0.1);
     color.green = static_cast<unsigned char>(
-        currentColor.green +
-        (currentColor.green - selectedColor.green * alphaModifier) * 0.5);
+        currentColor.green * 0.9 + (selectedColor.green * alphaModifier) * 0.1);
     color.blue = static_cast<unsigned char>(
-        currentColor.blue +
-        (currentColor.blue - selectedColor.blue * alphaModifier) * 0.5);
+        currentColor.blue * 0.9 + (selectedColor.blue * alphaModifier) * 0.1);
   }
 
   return color;
