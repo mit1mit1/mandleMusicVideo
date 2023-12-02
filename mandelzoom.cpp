@@ -199,7 +199,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes, long double xce
         framesSinceChangeOfCentre++;
         if (limit < maxLimit)
         {
-            limit = limit * 1.001;
+            limit = limit * 1.008;
         }
         double timestamp = GetTimestampSeconds(f, framespersecond);
 
