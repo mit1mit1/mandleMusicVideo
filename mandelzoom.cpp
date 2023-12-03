@@ -171,7 +171,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   int limit = minLimit;
   // Below provides a smooth zoom all the way to the specified max zoom
   // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
-  long double smoothMultiplier = pow(zoom, 1.0 / (numframes * 2 - 1.0));
+  long double smoothMultiplier = pow(zoom, 1.0 / (numframes * 5 - 1.0));
   float alphaModifier = 1.0;
   float previousPitch = defaultPitch;
   float currentPitch = defaultPitch;
@@ -195,7 +195,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
     framesSinceDeadEnd++;
     framesSinceChangeOfCentre++;
     if (limit < maxLimit) {
-      limit = limit * 1.008;
+      limit = limit * 1.012;
     }
     double timestamp = GetTimestampSeconds(f, framespersecond);
 

@@ -92,11 +92,11 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
     }
     // alphaModifier = alphaModifier;
     color.red = static_cast<unsigned char>(
-        currentColor.red * 0.8 + (selectedColor.red * alphaModifier) * 0.2);
+        currentColor.red * 0.6 + (selectedColor.red * alphaModifier) * 0.4);
     color.green = static_cast<unsigned char>(
-        currentColor.green * 0.8 + (selectedColor.green * alphaModifier) * 0.2);
+        currentColor.green * 0.6 + (selectedColor.green * alphaModifier) * 0.4);
     color.blue = static_cast<unsigned char>(
-        currentColor.blue * 0.8 + (selectedColor.blue * alphaModifier) * 0.2);
+        currentColor.blue * 0.6 + (selectedColor.blue * alphaModifier) * 0.4);
   }
 
   return color;
