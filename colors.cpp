@@ -91,12 +91,16 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
       alphaModifier = 1.0;
     }
     // alphaModifier = alphaModifier;
+    float blurRatio = 1.0;
     color.red = static_cast<unsigned char>(
-        currentColor.red * 0.6 + (selectedColor.red * alphaModifier) * 0.4);
+        currentColor.red * (1.0 - blurRatio) +
+        (selectedColor.red * alphaModifier) * blurRatio);
     color.green = static_cast<unsigned char>(
-        currentColor.green * 0.6 + (selectedColor.green * alphaModifier) * 0.4);
+        currentColor.green * (1.0 - blurRatio) +
+        (selectedColor.green * alphaModifier) * blurRatio);
     color.blue = static_cast<unsigned char>(
-        currentColor.blue * 0.6 + (selectedColor.blue * alphaModifier) * 0.4);
+        currentColor.blue * (1.0 - blurRatio) +
+        (selectedColor.blue * alphaModifier) * blurRatio);
   }
 
   return color;
