@@ -25,3 +25,19 @@
   //     PixelColor{.red = 26, .green = 29, .blue = 26, .alpha = 255},
   //     PixelColor{.red = 3, .green = 18, .blue = 14, .alpha = 255},
   // };
+
+  std::vector<PixelColor> drWhoColors = {
+      PixelColor{.red = 255, .green = 237, .blue = 231, .alpha = 255},
+      PixelColor{.red = 254, .green = 228, .blue = 213, .alpha = 255},
+      PixelColor{.red = 242, .green = 146, .blue = 147, .alpha = 255},
+      PixelColor{.red = 197, .green = 86, .blue = 137, .alpha = 255},
+      PixelColor{.red = 142, .green = 107, .blue = 187, .alpha = 255},
+      PixelColor{.red = 87, .green = 46, .blue = 140, .alpha = 255},
+      PixelColor{.red = 69, .green = 26, .blue = 142, .alpha = 255},
+      PixelColor{.red = 143, .green = 25, .blue = 111, .alpha = 255},
+      PixelColor{.red = 200, .green = 117, .blue = 135, .alpha = 255},
+      PixelColor{.red = 254, .green = 238, .blue = 215, .alpha = 255},
+      PixelColor{.red = 146, .green = 115, .blue = 182, .alpha = 255},
+      PixelColor{.red = 178, .green = 96, .blue = 180, .alpha = 255},
+
+  };

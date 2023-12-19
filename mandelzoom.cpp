@@ -142,14 +142,14 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
                               std::vector<float> onsetTimestamps,
                               std::vector<AubioNote> notes) {
   std::vector<PixelColor> availableColors = getColors();
-  bool deadEnd = false;
+  bool reverseDeadEnd = false;
   int framesSinceDeadEnd = 0;
   const int framesToMoveCentres = 48;
-  const int pitchSum = getPitchSum(notes);
+  const double pitchSum = getPitchSum(notes) * 1.0;
   const double averagePitch = pitchSum / notes.size();
   std::cout << " average pitch " << pitchSum << "\n  " << notes.size() << "\n  "
             << averagePitch << "\n  ";
-  const double defaultPitch = averagePitch / 30 * (-1);
+  const double defaultPitch = averagePitch / 600 * (-1);
   bool isSilent = true;
   std::cout << " silent pitch " << defaultPitch;
   // Create a video frame buffer with 720p resolution (1280x720).
@@ -171,17 +171,19 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   int limit = minLimit;
   // Below provides a smooth zoom all the way to the specified max zoom
   // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
-  long double smoothMultiplier = pow(zoom, 1.0 / (numframes * 5 - 1.0));
+  long double smoothMultiplier = pow(zoom, 1.0 / (numframes * framespersecond - 1.0));
+  std::cout << " initial smooth multiplier " << smoothMultiplier << "\n  ";
+
   float alphaModifier = 1.0;
   float previousPitch = defaultPitch;
   float currentPitch = defaultPitch;
   float currentNoteLength = 0;
-  long double pitchMultiplier = 0.04 * currentPitch / averagePitch;
+  long double pitchMultiplier = 0.08 * currentPitch / averagePitch;
   long double targetPitchMultiplier = pitchMultiplier;
   std::cout << " initial pitch multiplier " << pitchMultiplier << "\n  ";
   std::cout << " initial target pitch multiplier " << targetPitchMultiplier
             << "\n  ";
-  long double denom = 1.0;
+  long double denom = 12.0;
   Coordinate nextCentre = {};
   nextCentre.realPart = xcenter;
   nextCentre.imaginaryPart = ycenter;
@@ -189,9 +191,9 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   std::set<int> uniqueMandleCounts;
 
   int mandleCounts[xResolution][yResolution];
-  int deadEndMultiplier = 1;
-
-  for (int f = 0; f < numframes; ++f) {
+  const int startTimeSeconds = 0;
+  // Generate part 2 of video
+  for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
     framesSinceDeadEnd++;
     framesSinceChangeOfCentre++;
     if (limit < maxLimit) {
@@ -253,16 +255,17 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
         currentFrame.SetPixel(x, y, color);
       }
     }
-    if (uniqueMandleCounts.size() <= 4) {
+    if (uniqueMandleCounts.size() <= 4 &&
+        framesSinceDeadEnd > framespersecond) {
       framesSinceDeadEnd = 0;
-      deadEndMultiplier = 0.9;
-    } else if (framesSinceDeadEnd > 45) {
-      deadEndMultiplier = 1.0;
+      std::cout << "!!! Hit dead end - reversing!!!";
+      reverseDeadEnd = !reverseDeadEnd;
     }
 
     // Create the output PNG filename in the format "outdir/frame_12345.png".
     char number[20];
-    snprintf(number, sizeof(number), "%05d", f);
+    snprintf(number, sizeof(number), "%05d",
+             f - startTimeSeconds * framespersecond);
     std::string filename = std::string(outdir) + "/frame_" + number + ".png";
 
     // Save the video frame as a PNG file.
@@ -271,13 +274,11 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
       return error;
 
     // Increase the zoom magnification for the next frame.
-    if (deadEnd) {
-      denom = denom /
-              ((1 + pitchMultiplier) * smoothMultiplier * deadEndMultiplier);
-    } else {
-      denom = denom *
-              ((1 + pitchMultiplier) * smoothMultiplier * deadEndMultiplier);
+    long double multiplier = ((1 + pitchMultiplier) * smoothMultiplier);
+    if (reverseDeadEnd) {
+      multiplier = 1 / multiplier;
     }
+    denom = denom * multiplier;
 
     bool noteIsPlaying = false;
     // Check changes from pitches
@@ -360,7 +361,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
         std::cout << ycenter << " - current imaginary part \n  ";
         nextCentre.realPart = nextInterstingPoint.realPart;
         nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
-        deadEnd = false;
       } else {
         // TODO: Try lower and lower 'interesting' thresholds
         std::cout << nextCentre.realPart << "\n  ";
@@ -369,8 +369,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
         std::cout << ycenter << " - current imaginary part \n  ";
         std::cout << "!!! NO INTERESTING POINTS, FOCUS ON EXISTING POINT NOT "
                      "GONNA WORK !!!";
-        deadEnd = true;
-        return 0;
       }
     }
   }

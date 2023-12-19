@@ -3,47 +3,43 @@
 #include <vector>
 
 std::vector<PixelColor> getColors() {
-  std::vector<PixelColor> drWhoColors = {
-      PixelColor{.red = 255, .green = 237, .blue = 231, .alpha = 255},
-      PixelColor{.red = 254, .green = 228, .blue = 213, .alpha = 255},
-      PixelColor{.red = 242, .green = 146, .blue = 147, .alpha = 255},
-      PixelColor{.red = 197, .green = 86, .blue = 137, .alpha = 255},
-      PixelColor{.red = 142, .green = 107, .blue = 187, .alpha = 255},
-      PixelColor{.red = 87, .green = 46, .blue = 140, .alpha = 255},
-      PixelColor{.red = 69, .green = 26, .blue = 142, .alpha = 255},
-      PixelColor{.red = 143, .green = 25, .blue = 111, .alpha = 255},
-      PixelColor{.red = 200, .green = 117, .blue = 135, .alpha = 255},
-      PixelColor{.red = 254, .green = 238, .blue = 215, .alpha = 255},
-      PixelColor{.red = 146, .green = 115, .blue = 182, .alpha = 255},
-      PixelColor{.red = 178, .green = 96, .blue = 180, .alpha = 255},
-
+  std::vector<PixelColor> seedColors = {
+      PixelColor{.red = 10, .green = 4, .blue = 4, .alpha = 255},
+      PixelColor{.red = 8, .green = 2, .blue = 2, .alpha = 255},
+      PixelColor{.red = 21, .green = 9, .blue = 11, .alpha = 255},
+      PixelColor{.red = 62, .green = 21, .blue = 19, .alpha = 255},
+      PixelColor{.red = 10, .green = 19, .blue = 2, .alpha = 255},
+      PixelColor{.red = 149, .green = 23, .blue = 24, .alpha = 255},
+      PixelColor{.red = 200, .green = 16, .blue = 19, .alpha = 255},
+      PixelColor{.red = 228, .green = 18, .blue = 19, .alpha = 255},
+      PixelColor{.red = 255, .green = 13, .blue = 41, .alpha = 255},
+      PixelColor{.red = 57, .green = 8, .blue = 14, .alpha = 255},
   };
 
   std::vector<PixelColor> colors = {};
   const int colorsBetween = 10;
 
-  for (unsigned int i = 0; i < drWhoColors.size(); i++) {
+  for (unsigned int i = 0; i < seedColors.size(); i++) {
     unsigned int compareI = i + 1;
-    colors.push_back(drWhoColors[i]);
-    if (compareI >= drWhoColors.size()) {
+    colors.push_back(seedColors[i]);
+    if (compareI >= seedColors.size()) {
       compareI = 0;
     }
     for (int k = 1; k < colorsBetween; k++) {
       PixelColor intermediateColor;
       intermediateColor.red = static_cast<unsigned char>(
-          drWhoColors[i].red +
-          (drWhoColors[compareI].red - drWhoColors[i].red) * k / colorsBetween);
+          seedColors[i].red +
+          (seedColors[compareI].red - seedColors[i].red) * k / colorsBetween);
       intermediateColor.green = static_cast<unsigned char>(
-          drWhoColors[i].green +
-          (drWhoColors[compareI].green - drWhoColors[i].green) * k /
+          seedColors[i].green +
+          (seedColors[compareI].green - seedColors[i].green) * k /
               colorsBetween);
       intermediateColor.blue = static_cast<unsigned char>(
-          drWhoColors[i].blue +
-          (drWhoColors[compareI].blue - drWhoColors[i].blue) * k /
-              colorsBetween);
+          seedColors[i].blue +
+          (seedColors[compareI].blue - seedColors[i].blue) * k / colorsBetween);
       intermediateColor.alpha = static_cast<unsigned char>(
-          drWhoColors[i].alpha +
-          (drWhoColors[compareI].alpha - drWhoColors[i].alpha) * k /
+          seedColors[i].alpha +
+          (seedColors[compareI].alpha - seedColors[i].alpha) * k /
               colorsBetween);
       colors.push_back(intermediateColor);
     }
@@ -62,6 +58,10 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    float previousPitch, int framesSincePitchChange,
                    float alphaModifier, std::vector<PixelColor> availableColors,
                    PixelColor currentColor) {
+  const int colorJump = 3;
+  const float alphaSeed =  0.0;
+  alphaModifier = 1.0;
+
   // TODO: Set alpha based on volume (of particular notes?
   PixelColor color;
   color.alpha = 255;
@@ -79,14 +79,16 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
     //     1 - (count * previousPitch * 0.593284783 -
     //          floor(count * previousPitch * 0.593284783));
     float currentAlphaModifier =
-        1 - (count * currentPitch * 0.593284783 -
-             floor(count * currentPitch * 0.593284783));
+        1 - (count * currentPitch * alphaSeed -
+             floor(count * currentPitch * alphaSeed));
     // float bonusAlphaModifier =
     //     previousBonusAlphaModified +
     //     (currentAlphaModifier - previousBonusAlphaModified) *
     //         framesSincePitchChange / framesToChangeFade;
+    // TODO: Make onsets passed move forwards and backwards ?
     PixelColor selectedColor =
-        availableColors[(count + onsetsPassed * 7) % availableColors.size()];
+        availableColors[(count + onsetsPassed * colorJump) %
+                        availableColors.size()];
     if (alphaModifier >= 1 || alphaModifier <= 0) {
       alphaModifier = 1.0;
     }
