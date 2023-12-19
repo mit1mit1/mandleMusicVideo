@@ -8,7 +8,8 @@
 std::vector<PixelColor> getColors();
 PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    float previousPitch, int framesSincePitchChange,
-                   float alphaModifier, std::vector<PixelColor> availableColors,
+                   int framesSinceLastOnsetPassed, float alphaModifier,
+                   std::vector<PixelColor> availableColors,
                    PixelColor currentColor);
 
 // inline constexpr colorVector

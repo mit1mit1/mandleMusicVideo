@@ -144,6 +144,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   std::vector<PixelColor> availableColors = getColors();
   bool reverseDeadEnd = false;
   int framesSinceDeadEnd = 0;
+  int framesSinceLastOnsetPassed = 0;
   const int framesToMoveCentres = 48;
   const double pitchSum = getPitchSum(notes) * 1.0;
   const double averagePitch = pitchSum / notes.size();
@@ -189,6 +190,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   nextCentre.imaginaryPart = ycenter;
   int framesSinceChangeOfCentre = 0;
   std::set<int> uniqueMandleCounts;
+  int lastOnsetsPassed = 0;
 
   int mandleCounts[xResolution][yResolution];
   const int startTimeSeconds = 0;
@@ -223,6 +225,12 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
         onsetsPassed++;
       }
     }
+    if (onsetsPassed != lastOnsetsPassed) {
+      lastOnsetsPassed = onsetsPassed;
+      framesSinceLastOnsetPassed = 0;
+    } else {
+      framesSinceLastOnsetPassed++;
+    }
 
     targetPitchMultiplier = 0.04 * currentPitch / averagePitch;
     pitchMultiplier =
@@ -250,7 +258,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
         uniqueMandleCounts.insert(count);
         PixelColor color =
             Palette(count, limit, onsetsPassed, currentPitch, previousPitch,
-                    framesSinceChangeOfCentre, alphaModifier, availableColors,
+                    framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier, availableColors,
                     currentFrame.GetPixel(x, y));
         currentFrame.SetPixel(x, y, color);
       }

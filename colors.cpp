@@ -17,7 +17,7 @@ std::vector<PixelColor> getColors() {
   };
 
   std::vector<PixelColor> colors = {};
-  const int colorsBetween = 10;
+  const int colorsBetween = 6;
 
   for (unsigned int i = 0; i < seedColors.size(); i++) {
     unsigned int compareI = i + 1;
@@ -56,10 +56,11 @@ std::vector<PixelColor> getColors() {
 
 PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    float previousPitch, int framesSincePitchChange,
-                   float alphaModifier, std::vector<PixelColor> availableColors,
+                   int framesSinceLastOnsetPassed, float alphaModifier,
+                   std::vector<PixelColor> availableColors,
                    PixelColor currentColor) {
   const int colorJump = 3;
-  const float alphaSeed =  0.0;
+  const float alphaSeed = 0.0;
   alphaModifier = 1.0;
 
   // TODO: Set alpha based on volume (of particular notes?
@@ -78,17 +79,38 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
     // float previousBonusAlphaModified =
     //     1 - (count * previousPitch * 0.593284783 -
     //          floor(count * previousPitch * 0.593284783));
-    float currentAlphaModifier =
-        1 - (count * currentPitch * alphaSeed -
-             floor(count * currentPitch * alphaSeed));
+    float currentAlphaModifier = 1 - (count * currentPitch * alphaSeed -
+                                      floor(count * currentPitch * alphaSeed));
     // float bonusAlphaModifier =
     //     previousBonusAlphaModified +
     //     (currentAlphaModifier - previousBonusAlphaModified) *
     //         framesSincePitchChange / framesToChangeFade;
     // TODO: Make onsets passed move forwards and backwards ?
+
+    PixelColor previousOffsetColor =
+        availableColors[(count + (onsetsPassed - 1) * colorJump) %
+                        availableColors.size()];
     PixelColor selectedColor =
         availableColors[(count + onsetsPassed * colorJump) %
                         availableColors.size()];
+
+    float smoothColorChangeRatio = framesSinceLastOnsetPassed * 0.2;
+    if (smoothColorChangeRatio > 1.0) {
+      smoothColorChangeRatio = 1.0;
+    }
+    if (smoothColorChangeRatio < 0.0) {
+      smoothColorChangeRatio = 0.0;
+    }
+    selectedColor.red = static_cast<unsigned char>(
+        selectedColor.red * smoothColorChangeRatio +
+        previousOffsetColor.red * (1.0 - smoothColorChangeRatio));
+    selectedColor.green = static_cast<unsigned char>(
+        selectedColor.green * smoothColorChangeRatio +
+        previousOffsetColor.green * (1.0 - smoothColorChangeRatio));
+    selectedColor.blue = static_cast<unsigned char>(
+        selectedColor.blue * smoothColorChangeRatio +
+        previousOffsetColor.blue * (1.0 - smoothColorChangeRatio));
+
     if (alphaModifier >= 1 || alphaModifier <= 0) {
       alphaModifier = 1.0;
     }
