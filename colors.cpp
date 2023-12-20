@@ -4,16 +4,16 @@
 
 std::vector<PixelColor> getColors() {
   std::vector<PixelColor> seedColors = {
-      PixelColor{.red = 10, .green = 4, .blue = 4, .alpha = 255},
-      PixelColor{.red = 8, .green = 2, .blue = 2, .alpha = 255},
-      PixelColor{.red = 21, .green = 9, .blue = 11, .alpha = 255},
-      PixelColor{.red = 62, .green = 21, .blue = 19, .alpha = 255},
-      PixelColor{.red = 10, .green = 19, .blue = 2, .alpha = 255},
-      PixelColor{.red = 149, .green = 23, .blue = 24, .alpha = 255},
-      PixelColor{.red = 200, .green = 16, .blue = 19, .alpha = 255},
-      PixelColor{.red = 228, .green = 18, .blue = 19, .alpha = 255},
-      PixelColor{.red = 255, .green = 13, .blue = 41, .alpha = 255},
-      PixelColor{.red = 57, .green = 8, .blue = 14, .alpha = 255},
+      PixelColor{.red = 253, .green = 240, .blue = 10, .alpha = 255},
+      PixelColor{.red = 252, .green = 197, .blue = 0, .alpha = 255},
+      PixelColor{.red = 251, .green = 111, .blue = 4, .alpha = 255},
+      PixelColor{.red = 209, .green = 2, .blue = 1, .alpha = 255},
+      PixelColor{.red = 33, .green = 53, .blue = 56, .alpha = 255},
+      PixelColor{.red = 24, .green = 19, .blue = 162, .alpha = 255},
+      PixelColor{.red = 62, .green = 146, .blue = 229, .alpha = 255},
+      PixelColor{.red = 99, .green = 228, .blue = 221, .alpha = 255},
+      PixelColor{.red = 241, .green = 242, .blue = 248, .alpha = 255},
+      PixelColor{.red = 239, .green = 233, .blue = 185, .alpha = 255},
   };
 
   std::vector<PixelColor> colors = {};
