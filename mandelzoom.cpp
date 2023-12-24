@@ -166,7 +166,6 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
     }
   }
 
-  // TODO: increase limit as we get deeper
   const int maxLimit = 16000;
   const int minLimit = 1600;
   int limit = minLimit;

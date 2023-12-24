@@ -17,7 +17,7 @@ std::vector<PixelColor> getColors() {
   };
 
   std::vector<PixelColor> colors = {};
-  const int colorsBetween = 6;
+  const int colorsBetween = 32;
 
   for (unsigned int i = 0; i < seedColors.size(); i++) {
     unsigned int compareI = i + 1;
@@ -48,6 +48,35 @@ std::vector<PixelColor> getColors() {
   return colors;
 }
 
+static double ZigZag(double x) {
+  double y = fmod(fabs(x), 2.0);
+  if (y > 1.0)
+    y = 1.0 - y;
+  return y;
+}
+
+static int getWavyOnsets(int onsetsPassed) {
+  if (onsetsPassed % 8 == 0) {
+    return onsetsPassed - 1;
+  }
+  if (onsetsPassed % 8 == 1) {
+    return onsetsPassed - 3;
+  }
+  if (onsetsPassed % 8 == 2) {
+    return onsetsPassed - 5;
+  }
+  if (onsetsPassed % 8 == 4) {
+    return onsetsPassed - 4;
+  }
+  if (onsetsPassed % 8 == 5) {
+    return onsetsPassed - 3;
+  }
+  if (onsetsPassed % 8 == 6) {
+    return onsetsPassed - 1;
+  }
+  return onsetsPassed;
+}
+
 // TODO more create colors - e.g. setting pallette to a length of 12
 // setting the first three elements based on track 1's pitch,
 // the next three based on track 2's pitch,
@@ -59,15 +88,25 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    int framesSinceLastOnsetPassed, float alphaModifier,
                    std::vector<PixelColor> availableColors,
                    PixelColor currentColor) {
-  const int colorJump = 3;
+  const int onsetColorJump = 3;
   const float alphaSeed = 0.0;
   alphaModifier = 1.0;
+
+  onsetsPassed = getWavyOnsets(onsetsPassed);
 
   // TODO: Set alpha based on volume (of particular notes?
   PixelColor color;
   color.alpha = 255;
   if (count >= limit) {
-    color.red = color.green = color.blue = 0;
+    color.green = color.blue = 5;
+    double red = 50.0 * ZigZag(0.0342 * onsetsPassed);
+    if (red > 50.0) {
+      red = fmod(red, 50.0);
+    }
+    if (red > 0.0) {
+      red = 0.0;
+    }
+    color.red = static_cast<unsigned char>(red);
   } else {
     // TODO: Fade different colors based on what note
     // TODO: Keep track of previous fade, and slowly transition fade (so can
@@ -85,13 +124,12 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
     //     previousBonusAlphaModified +
     //     (currentAlphaModifier - previousBonusAlphaModified) *
     //         framesSincePitchChange / framesToChangeFade;
-    // TODO: Make onsets passed move forwards and backwards ?
 
     PixelColor previousOffsetColor =
-        availableColors[(count + (onsetsPassed - 1) * colorJump) %
+        availableColors[(count + (onsetsPassed - 1) * onsetColorJump) %
                         availableColors.size()];
     PixelColor selectedColor =
-        availableColors[(count + onsetsPassed * colorJump) %
+        availableColors[(count + onsetsPassed * onsetColorJump) %
                         availableColors.size()];
 
     float smoothColorChangeRatio = framesSinceLastOnsetPassed * 0.2;
