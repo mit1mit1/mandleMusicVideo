@@ -183,7 +183,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   std::cout << " initial pitch multiplier " << pitchMultiplier << "\n  ";
   std::cout << " initial target pitch multiplier " << targetPitchMultiplier
             << "\n  ";
-  long double denom = 12.0;
+  long double denom = 24.0;
   Coordinate nextCentre = {};
   nextCentre.realPart = xcenter;
   nextCentre.imaginaryPart = ycenter;
@@ -279,9 +279,11 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
     int error = currentFrame.SavePng(filename.c_str());
     if (error)
       return error;
+  
+    long double accelerationMultiplier = 0.0001 * f;
 
     // Increase the zoom magnification for the next frame.
-    long double multiplier = ((1 + pitchMultiplier) * smoothMultiplier);
+    long double multiplier = ((1 + pitchMultiplier + accelerationMultiplier) * smoothMultiplier);
     if (reverseDeadEnd) {
       multiplier = 1 / multiplier;
     }
