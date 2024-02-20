@@ -187,6 +187,8 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
   Ripple ripple1;
   ripple1.xCenter = xResolution / 3;
   ripple1.yCenter = yResolution / 2;
+  ripple1.speed = 1;
+  ripple1.thickness = 3;
   PixelColor perimColor1;
   perimColor1.red = 5;
   perimColor1.green = 10;
@@ -197,6 +199,8 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
   Ripple ripple2;
   ripple2.xCenter = 2 * xResolution / 3;
   ripple2.yCenter = yResolution / 2;
+  ripple2.speed = 5;
+  ripple2.thickness = 5;
   PixelColor perimColor2;
   perimColor2.red = 20;
   perimColor2.green = 10;
@@ -207,7 +211,6 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
   std::vector<Ripple> ripples = {ripple1, ripple2};
 
   std::vector<PixelColor> availableColors = getColors();
-  const int baseThickness = 5;
   // Create a video frame buffer with 720p resolution (1280x720).
   PixelColor blankColor;
   blankColor.red = 0;
@@ -225,9 +228,6 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
   const int startTimeSeconds = 0;
   // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
-    int radius = f + 1;
-    int thickness =
-        (baseThickness + (radius / 2)) * baseThickness + (radius / 2);
 
     double timestamp = GetTimestampSeconds(f, framespersecond);
     std::cout << " current timestamp " << timestamp << "\n  ";
@@ -236,9 +236,12 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
       for (int y = 0; y < yResolution; ++y) {
         currentFrame.BrightenPixel(x, y, 0.75);
         for (Ripple ripple : ripples) {
+          int radius = f * ripple.speed + 1;
+          int thickness =
+              (ripple.thickness + (radius / 2)) * ripple.thickness + (radius / 2);
           const int distFromPerimeterSquared =
               (x - ripple.xCenter) * (x - ripple.xCenter) +
-              (y - ripple.yCenter) * (y - ripple.yCenter) - f * f;
+              (y - ripple.yCenter) * (y - ripple.yCenter) - radius * radius;
           if (distFromPerimeterSquared < thickness &&
               distFromPerimeterSquared > -thickness) {
             std::cout << " setting perimeter " << timestamp << "\n  ";

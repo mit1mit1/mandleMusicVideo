@@ -13,6 +13,8 @@ struct Ripple
 {
     int xCenter;
     int yCenter;
+    int speed;
+    int thickness;
     PixelColor addColor;
 };
 
