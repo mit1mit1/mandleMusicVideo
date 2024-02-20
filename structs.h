@@ -9,6 +9,13 @@ struct PixelColor
     unsigned char alpha;
 };
 
+struct Ripple
+{
+    int xCenter;
+    int yCenter;
+    PixelColor addColor;
+};
+
 struct Coordinate
 {
     double realPart;

@@ -49,10 +49,10 @@ public:
 
   void BrightenPixel(int x, int y, float multiple) {
     int index = 4 * (y * width + x);
-    buffer[index] = (int)buffer[index] * multiple;
-    buffer[index + 1] = (int)buffer[index + 1] * multiple;
-    buffer[index + 2] = (int)buffer[index + 2] * multiple;
-    buffer[index + 3] = (int)buffer[index + 3] * multiple;
+    buffer[index] = (int)(buffer[index] * multiple);
+    buffer[index + 1] = (int)(buffer[index + 1] * multiple);
+    buffer[index + 2] = (int)(buffer[index + 2] * multiple);
+    buffer[index + 3] = (int)(buffer[index + 3] * multiple);
   }
 
   void AddPixel(int x, int y, PixelColor color) {
@@ -184,18 +184,35 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
                                     long double zoom, int framespersecond,
                                     std::vector<float> onsetTimestamps,
                                     std::vector<AubioNote> notes) {
+  Ripple ripple1;
+  ripple1.xCenter = xResolution / 3;
+  ripple1.yCenter = yResolution / 2;
+  PixelColor perimColor1;
+  perimColor1.red = 5;
+  perimColor1.green = 10;
+  perimColor1.blue = 20;
+  perimColor1.alpha = 0;
+  ripple1.addColor = perimColor1;
+
+  Ripple ripple2;
+  ripple2.xCenter = 2 * xResolution / 3;
+  ripple2.yCenter = yResolution / 2;
+  PixelColor perimColor2;
+  perimColor2.red = 20;
+  perimColor2.green = 10;
+  perimColor2.blue = 10;
+  perimColor2.alpha = 0;
+  ripple2.addColor = perimColor2;
+
+  std::vector<Ripple> ripples = {ripple1, ripple2};
+
   std::vector<PixelColor> availableColors = getColors();
+  const int baseThickness = 5;
   // Create a video frame buffer with 720p resolution (1280x720).
   PixelColor blankColor;
   blankColor.red = 0;
   blankColor.green = 0;
   blankColor.blue = 0;
-  blankColor.alpha = 0;
-
-  PixelColor perimColor;
-  blankColor.red = 5;
-  blankColor.green = 20;
-  blankColor.blue = 80;
   blankColor.alpha = 0;
 
   VideoFrame currentFrame(xResolution, yResolution);
@@ -204,12 +221,13 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
       currentFrame.SetPixel(x, y, blankColor);
     }
   }
-  const int rippleCentreX = xResolution / 2;
-  const int rippleCentreY = yResolution / 2;
 
   const int startTimeSeconds = 0;
   // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
+    int radius = f + 1;
+    int thickness =
+        (baseThickness + (radius / 2)) * baseThickness + (radius / 2);
 
     double timestamp = GetTimestampSeconds(f, framespersecond);
     std::cout << " current timestamp " << timestamp << "\n  ";
@@ -217,13 +235,16 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
         currentFrame.BrightenPixel(x, y, 0.75);
-        const int distFromPerimeterSquared =
-            (x - rippleCentreX) * (x - rippleCentreX) +
-            (y - rippleCentreY) * (y - rippleCentreY) - f * f;
-        if (distFromPerimeterSquared < 9 && distFromPerimeterSquared > -9) {
-          std::cout << " setting perimeter " << timestamp << "\n  ";
+        for (Ripple ripple : ripples) {
+          const int distFromPerimeterSquared =
+              (x - ripple.xCenter) * (x - ripple.xCenter) +
+              (y - ripple.yCenter) * (y - ripple.yCenter) - f * f;
+          if (distFromPerimeterSquared < thickness &&
+              distFromPerimeterSquared > -thickness) {
+            std::cout << " setting perimeter " << timestamp << "\n  ";
 
-          currentFrame.AddPixel(x, y, perimColor);
+            currentFrame.AddPixel(x, y, ripple.addColor);
+          }
         }
       }
     }
