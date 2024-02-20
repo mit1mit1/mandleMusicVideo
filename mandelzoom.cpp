@@ -53,6 +53,15 @@ public:
     buffer[index + 1] = (int)(buffer[index + 1] * multiple);
     buffer[index + 2] = (int)(buffer[index + 2] * multiple);
     buffer[index + 3] = (int)(buffer[index + 3] * multiple);
+
+    for (int k = 0; k < 4; ++k) {
+      if (buffer[index + k] < 0) {
+        buffer[index + k] = 0;
+      }
+      if (buffer[index + k] > 255) {
+        buffer[index + k] = 255;
+      }
+    }
   }
 
   void AddPixel(int x, int y, PixelColor color) {
@@ -121,9 +130,10 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
                                     long double xcenter, long double ycenter,
                                     long double zoom, int framespersecond,
                                     std::vector<float> onsetTimestamps,
-                                    std::vector<AubioNote> notes);
+                                    std::vector<std::vector<AubioNote>> notes);
 
 static double GetTimestampSeconds(int framenumber, int framespersecond);
+static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp);
 
 int main(int argc, const char *argv[]) {
   std::cout << std::setprecision(13) << std::fixed;
@@ -147,14 +157,18 @@ int main(int argc, const char *argv[]) {
       fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
       return 1;
     }
-    std::vector<AubioNote> fingerNotes =
+    std::vector<AubioNote> fingerNotes1 =
         ParseAubioNoteFile("./pitchedInstrument1Notes.txt");
+    std::vector<AubioNote> fingerNotes2 =
+        ParseAubioNoteFile("./pitchedInstrument2Notes.txt");
+    std::vector<std::vector<AubioNote>> fingerNotesVec = {fingerNotes1,
+                                                          fingerNotes2};
     std::vector<float> percussionOnsets =
         ParseOnsetSecondsFile("./rhythmInstrument1Onsets.txt");
 
     return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
                                     framespersecond, percussionOnsets,
-                                    fingerNotes);
+                                    fingerNotesVec);
   }
   return PrintUsage();
 }
@@ -179,36 +193,24 @@ static double GetTimestampSeconds(int framenumber, int framespersecond) {
   return ((double)framenumber) / ((double)framespersecond);
 }
 
-static int GenerateRippleZoomFrames(const char *outdir, int numframes,
-                                    long double xcenter, long double ycenter,
-                                    long double zoom, int framespersecond,
-                                    std::vector<float> onsetTimestamps,
-                                    std::vector<AubioNote> notes) {
-  Ripple ripple1;
-  ripple1.xCenter = xResolution / 3;
-  ripple1.yCenter = yResolution / 2;
-  ripple1.speed = 1;
-  ripple1.thickness = 3;
-  PixelColor perimColor1;
-  perimColor1.red = 5;
-  perimColor1.green = 10;
-  perimColor1.blue = 20;
-  perimColor1.alpha = 0;
-  ripple1.addColor = perimColor1;
+static int GenerateRippleZoomFrames(
+    const char *outdir, int numframes, long double xcenter, long double ycenter,
+    long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
+    std::vector<std::vector<AubioNote>> notesVec) {
 
-  Ripple ripple2;
-  ripple2.xCenter = 2 * xResolution / 3;
-  ripple2.yCenter = yResolution / 2;
-  ripple2.speed = 5;
-  ripple2.thickness = 5;
-  PixelColor perimColor2;
-  perimColor2.red = 20;
-  perimColor2.green = 10;
-  perimColor2.blue = 10;
-  perimColor2.alpha = 0;
-  ripple2.addColor = perimColor2;
+  // Ripple ripple2;
+  // ripple2.xCenter = 2 * xResolution / 3;
+  // ripple2.yCenter = yResolution / 2;
+  // ripple2.speed = 5;
+  // ripple2.thickness = 5;
+  // PixelColor perimColor2;
+  // perimColor2.red = 20;
+  // perimColor2.green = 10;
+  // perimColor2.blue = 10;
+  // perimColor2.alpha = 0;
+  // ripple2.addColor = perimColor2;
 
-  std::vector<Ripple> ripples = {ripple1, ripple2};
+  // std::vector<Ripple> ripples = {ripple1, ripple2};
 
   std::vector<PixelColor> availableColors = getColors();
   // Create a video frame buffer with 720p resolution (1280x720).
@@ -228,23 +230,45 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
   const int startTimeSeconds = 0;
   // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
-
     double timestamp = GetTimestampSeconds(f, framespersecond);
     std::cout << " current timestamp " << timestamp << "\n  ";
+    std::vector<Ripple> ripples = {};
+    for (unsigned int i = 0; i < notesVec.size(); ++i) {
+      std::vector<AubioNote> notes = notesVec[i];
+      AubioNote currentNote = getCurrentNote(notes, timestamp);
+      if (currentNote.startSeconds != -1) {
+
+        std::cout << " setting new ripple at " << timestamp << "\n  ";
+        Ripple newRipple;
+        newRipple.xCenter = (xResolution * (i + 1)) / (notesVec.size() + 1);
+        newRipple.yCenter = yResolution / 2;
+        newRipple.speed = 1 + i * 2;
+        newRipple.thickness = 4 + i;
+        newRipple.startFrame = currentNote.startSeconds * framespersecond;
+        PixelColor perimColor1;
+        perimColor1.red = (int)currentNote.pitch / 2;
+        perimColor1.green = (int)currentNote.pitch / 3;
+        perimColor1.blue = (int)currentNote.pitch / 1;
+        perimColor1.alpha = 0;
+        newRipple.addColor = perimColor1;
+        ripples.push_back(newRipple);
+      }
+    }
+    // }
 
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
         currentFrame.BrightenPixel(x, y, 0.75);
         for (Ripple ripple : ripples) {
-          int radius = f * ripple.speed + 1;
-          int thickness =
-              (ripple.thickness + (radius / 2)) * ripple.thickness + (radius / 2);
+          int framesSinceRippleStart = f - ripple.startFrame;
+          int radius = framesSinceRippleStart * ripple.speed + 1;
+          int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
+                          (radius / 2);
           const int distFromPerimeterSquared =
               (x - ripple.xCenter) * (x - ripple.xCenter) +
               (y - ripple.yCenter) * (y - ripple.yCenter) - radius * radius;
           if (distFromPerimeterSquared < thickness &&
               distFromPerimeterSquared > -thickness) {
-            std::cout << " setting perimeter " << timestamp << "\n  ";
 
             currentFrame.AddPixel(x, y, ripple.addColor);
           }
@@ -265,6 +289,23 @@ static int GenerateRippleZoomFrames(const char *outdir, int numframes,
   }
 
   return 0;
+}
+
+static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp) {
+  bool noteIsPlaying = false;
+  // Check changes from pitches
+  for (unsigned int i = 0; i < notes.size(); i++) {
+    AubioNote checkNote = notes[i];
+    if (checkNote.startSeconds < timestamp &&
+        checkNote.endSeconds > timestamp) {
+      return checkNote;
+    }
+  }
+  AubioNote fakeNote = {};
+  fakeNote.endSeconds = -1;
+  fakeNote.startSeconds = -1;
+  fakeNote.pitch = -1;
+  return fakeNote;
 }
 
 static int GenerateMandleZoomFrames(const char *outdir, int numframes,
