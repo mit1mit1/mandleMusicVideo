@@ -47,12 +47,46 @@ public:
   VideoFrame(int _width, int _height)
       : width(_width), height(_height), buffer(4 * _width * _height, 255) {}
 
+  void BrightenPixel(int x, int y, float multiple) {
+    int index = 4 * (y * width + x);
+    buffer[index] = (int)buffer[index] * multiple;
+    buffer[index + 1] = (int)buffer[index + 1] * multiple;
+    buffer[index + 2] = (int)buffer[index + 2] * multiple;
+    buffer[index + 3] = (int)buffer[index + 3] * multiple;
+  }
+
+  void AddPixel(int x, int y, PixelColor color) {
+    int index = 4 * (y * width + x);
+    buffer[index] = buffer[index] + color.red;
+    buffer[index + 1] = buffer[index + 1] + color.green;
+    buffer[index + 2] = buffer[index + 2] + color.blue;
+    buffer[index + 3] = buffer[index + 3] + color.alpha;
+
+    for (int k = 0; k < 4; ++k) {
+      if (buffer[index + k] < 0) {
+        buffer[index + k] = 0;
+      }
+      if (buffer[index + k] > 255) {
+        buffer[index + k] = 255;
+      }
+    }
+  }
+
   void SetPixel(int x, int y, PixelColor color) {
     int index = 4 * (y * width + x);
     buffer[index] = color.red;
     buffer[index + 1] = color.green;
     buffer[index + 2] = color.blue;
     buffer[index + 3] = color.alpha;
+
+    for (int k = 0; k < 4; ++k) {
+      if (buffer[index + k] < 0) {
+        buffer[index + k] = 0;
+      }
+      if (buffer[index + k] > 255) {
+        buffer[index + k] = 255;
+      }
+    }
   }
 
   PixelColor GetPixel(int x, int y) {
@@ -76,11 +110,19 @@ public:
 };
 
 static int PrintUsage();
-static int GenerateZoomFrames(const char *outdir, int numframes,
-                              long double xcenter, long double ycenter,
-                              long double zoom, int framespersecond,
-                              std::vector<float> onsetTimestamps,
-                              std::vector<AubioNote> notes);
+
+static int GenerateMandleZoomFrames(const char *outdir, int numframes,
+                                    long double xcenter, long double ycenter,
+                                    long double zoom, int framespersecond,
+                                    std::vector<float> onsetTimestamps,
+                                    std::vector<AubioNote> notes);
+
+static int GenerateRippleZoomFrames(const char *outdir, int numframes,
+                                    long double xcenter, long double ycenter,
+                                    long double zoom, int framespersecond,
+                                    std::vector<float> onsetTimestamps,
+                                    std::vector<AubioNote> notes);
+
 static double GetTimestampSeconds(int framenumber, int framespersecond);
 
 int main(int argc, const char *argv[]) {
@@ -110,8 +152,9 @@ int main(int argc, const char *argv[]) {
     std::vector<float> percussionOnsets =
         ParseOnsetSecondsFile("./rhythmInstrument1Onsets.txt");
 
-    return GenerateZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
-                              framespersecond, percussionOnsets, fingerNotes);
+    return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
+                                    framespersecond, percussionOnsets,
+                                    fingerNotes);
   }
   return PrintUsage();
 }
@@ -136,11 +179,75 @@ static double GetTimestampSeconds(int framenumber, int framespersecond) {
   return ((double)framenumber) / ((double)framespersecond);
 }
 
-static int GenerateZoomFrames(const char *outdir, int numframes,
-                              long double xcenter, long double ycenter,
-                              long double zoom, int framespersecond,
-                              std::vector<float> onsetTimestamps,
-                              std::vector<AubioNote> notes) {
+static int GenerateRippleZoomFrames(const char *outdir, int numframes,
+                                    long double xcenter, long double ycenter,
+                                    long double zoom, int framespersecond,
+                                    std::vector<float> onsetTimestamps,
+                                    std::vector<AubioNote> notes) {
+  std::vector<PixelColor> availableColors = getColors();
+  // Create a video frame buffer with 720p resolution (1280x720).
+  PixelColor blankColor;
+  blankColor.red = 0;
+  blankColor.green = 0;
+  blankColor.blue = 0;
+  blankColor.alpha = 0;
+
+  PixelColor perimColor;
+  blankColor.red = 5;
+  blankColor.green = 20;
+  blankColor.blue = 80;
+  blankColor.alpha = 0;
+
+  VideoFrame currentFrame(xResolution, yResolution);
+  for (unsigned int x = 0; x < xResolution; x++) {
+    for (unsigned int y = 0; y < yResolution; y++) {
+      currentFrame.SetPixel(x, y, blankColor);
+    }
+  }
+  const int rippleCentreX = xResolution / 2;
+  const int rippleCentreY = yResolution / 2;
+
+  const int startTimeSeconds = 0;
+  // Generate the frames
+  for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
+
+    double timestamp = GetTimestampSeconds(f, framespersecond);
+    std::cout << " current timestamp " << timestamp << "\n  ";
+
+    for (int x = 0; x < xResolution; ++x) {
+      for (int y = 0; y < yResolution; ++y) {
+        currentFrame.BrightenPixel(x, y, 0.75);
+        const int distFromPerimeterSquared =
+            (x - rippleCentreX) * (x - rippleCentreX) +
+            (y - rippleCentreY) * (y - rippleCentreY) - f * f;
+        if (distFromPerimeterSquared < 9 && distFromPerimeterSquared > -9) {
+          std::cout << " setting perimeter " << timestamp << "\n  ";
+
+          currentFrame.AddPixel(x, y, perimColor);
+        }
+      }
+    }
+
+    // Create the output PNG filename in the format "outdir/frame_12345.png".
+    char number[20];
+    snprintf(number, sizeof(number), "%05d",
+             f - startTimeSeconds * framespersecond);
+    std::string filename = std::string(outdir) + "/frame_" + number + ".png";
+
+    // Save the video frame as a PNG file.
+    int error = currentFrame.SavePng(filename.c_str());
+    if (error)
+      return error;
+  }
+
+  return 0;
+}
+
+static int GenerateMandleZoomFrames(const char *outdir, int numframes,
+                                    long double xcenter, long double ycenter,
+                                    long double zoom, int framespersecond,
+                                    std::vector<float> onsetTimestamps,
+                                    std::vector<AubioNote> notes) {
   std::vector<PixelColor> availableColors = getColors();
   bool reverseDeadEnd = false;
   int framesSinceDeadEnd = 0;
@@ -171,7 +278,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
   int limit = minLimit;
   // Below provides a smooth zoom all the way to the specified max zoom
   // double multiplier = pow(zoom, 1.0 / (numframes - 1.0));
-  long double smoothMultiplier = pow(zoom, 1.0 / (numframes * framespersecond - 1.0));
+  long double smoothMultiplier =
+      pow(zoom, 1.0 / (numframes * framespersecond - 1.0));
   std::cout << " initial smooth multiplier " << smoothMultiplier << "\n  ";
 
   float alphaModifier = 1.0;
@@ -193,7 +301,7 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
 
   int mandleCounts[xResolution][yResolution];
   const int startTimeSeconds = 0;
-  // Generate part 2 of video
+  // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
     framesSinceDeadEnd++;
     framesSinceChangeOfCentre++;
@@ -255,10 +363,10 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
         int count = Mandelbrot(cr, ci, limit);
         mandleCounts[x][y] = count;
         uniqueMandleCounts.insert(count);
-        PixelColor color =
-            Palette(count, limit, onsetsPassed, currentPitch, previousPitch,
-                    framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier, availableColors,
-                    currentFrame.GetPixel(x, y));
+        PixelColor color = Palette(
+            count, limit, onsetsPassed, currentPitch, previousPitch,
+            framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
+            alphaModifier, availableColors, currentFrame.GetPixel(x, y));
         currentFrame.SetPixel(x, y, color);
       }
     }
@@ -279,11 +387,12 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
     int error = currentFrame.SavePng(filename.c_str());
     if (error)
       return error;
-  
+
     long double accelerationMultiplier = 0.00005 * f;
 
     // Increase the zoom magnification for the next frame.
-    long double multiplier = ((1 + pitchMultiplier + accelerationMultiplier) * smoothMultiplier);
+    long double multiplier =
+        ((1 + pitchMultiplier + accelerationMultiplier) * smoothMultiplier);
     if (reverseDeadEnd) {
       multiplier = 1 / multiplier;
     }
@@ -356,8 +465,8 @@ static int GenerateZoomFrames(const char *outdir, int numframes,
       int maxYIndex = yResolution - 1;
       std::vector<PixelIndex> interestingPoints = getInterestingPixelIndexes(
           mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
-      // get interesting point from near target centre if pitch is unchanged (so
-      // we constantly add precision as we zoom)
+      // get interesting point from near target centre if pitch is unchanged
+      // (so we constantly add precision as we zoom)
       if (interestingPoints.size() > 0) {
         Coordinate nextInterstingPoint = chooseClosestInterestingPoint(
             interestingPoints, xStepDistance, yStepDistance, xcenter, ycenter,
