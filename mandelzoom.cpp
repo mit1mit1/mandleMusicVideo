@@ -157,18 +157,21 @@ int main(int argc, const char *argv[]) {
       fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
       return 1;
     }
-    std::vector<AubioNote> fingerNotes1 =
-        ParseAubioNoteFile("./pitchedInstrument1Notes.txt");
-    std::vector<AubioNote> fingerNotes2 =
-        ParseAubioNoteFile("./pitchedInstrument2Notes.txt");
-    std::vector<std::vector<AubioNote>> fingerNotesVec = {fingerNotes1,
-                                                          fingerNotes2};
+    // Add some extra time to fade out the note?
+    std::vector<AubioNote> pitchedNotes1 =
+        ParseAubioNoteFile("./pitchedInstrument1Notes.txt", 0.0);
+    std::vector<AubioNote> pitchedNotes2 =
+        ParseAubioNoteFile("./pitchedInstrument2Notes.txt", 0.0);
+    std::vector<AubioNote> pitchedNotes3 =
+        ParseAubioNoteFile("./pitchedInstrument3Notes.txt", 0.0);
+    std::vector<std::vector<AubioNote>> pitchedNotesVec = {
+        pitchedNotes1, pitchedNotes2, pitchedNotes3};
     std::vector<float> percussionOnsets =
         ParseOnsetSecondsFile("./rhythmInstrument1Onsets.txt");
 
     return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
                                     framespersecond, percussionOnsets,
-                                    fingerNotesVec);
+                                    pitchedNotesVec);
   }
   return PrintUsage();
 }
@@ -231,7 +234,16 @@ static int GenerateRippleZoomFrames(
   // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
     double timestamp = GetTimestampSeconds(f, framespersecond);
+
     std::cout << " current timestamp " << timestamp << "\n  ";
+
+    int onsetsPassed = 1;
+    for (double onsetTimestamp : onsetTimestamps) {
+      if (timestamp > onsetTimestamp) {
+        onsetsPassed++;
+      }
+    }
+
     std::vector<Ripple> ripples = {};
     for (unsigned int i = 0; i < notesVec.size(); ++i) {
       std::vector<AubioNote> notes = notesVec[i];
@@ -242,13 +254,20 @@ static int GenerateRippleZoomFrames(
         Ripple newRipple;
         newRipple.xCenter = (xResolution * (i + 1)) / (notesVec.size() + 1);
         newRipple.yCenter = yResolution / 2;
-        newRipple.speed = 1 + i * 2;
+        newRipple.speed =
+            15 + 15 / (currentNote.startSeconds - currentNote.endSeconds);
         newRipple.thickness = 4 + i;
         newRipple.startFrame = currentNote.startSeconds * framespersecond;
         PixelColor perimColor1;
-        perimColor1.red = (int)currentNote.pitch / 2;
-        perimColor1.green = (int)currentNote.pitch / 3;
-        perimColor1.blue = (int)currentNote.pitch / 1;
+        perimColor1.red =
+            (int)(currentNote.pitch *
+                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 + 1));
+        perimColor1.green =
+            (int)(currentNote.pitch *
+                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 + 1));
+        perimColor1.blue =
+            (int)(currentNote.pitch *
+                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 + 1));
         perimColor1.alpha = 0;
         newRipple.addColor = perimColor1;
         ripples.push_back(newRipple);

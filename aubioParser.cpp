@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-std::vector<AubioNote> ParseAubioNoteFile(const char *filename)
+std::vector<AubioNote> ParseAubioNoteFile(const char *filename, float extraSeconds)
 {
     std::ifstream infile(filename);
     std::cout << " Got the file ";
@@ -18,7 +18,7 @@ std::vector<AubioNote> ParseAubioNoteFile(const char *filename)
         AubioNote lineNote;
         lineNote.pitch = x1;
         lineNote.startSeconds = x2;
-        lineNote.endSeconds = x3;
+        lineNote.endSeconds = x3 + extraSeconds;
         notes.push_back(lineNote);
     }
 

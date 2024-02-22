@@ -4,7 +4,7 @@
 #include "structs.h"
 #include <vector>
 
-std::vector<AubioNote> ParseAubioNoteFile(const char *filename);
+std::vector<AubioNote> ParseAubioNoteFile(const char *filename, float extraSeconds);
 std::vector<float> ParseOnsetSecondsFile(const char *filename);
 
 #endif
