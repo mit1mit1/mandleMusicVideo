@@ -201,7 +201,6 @@ static int GenerateRippleZoomFrames(
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
     std::vector<std::vector<AubioNote>> notesVec) {
 
-
   std::vector<PixelColor> availableColors = getColors();
   // Create a video frame buffer with 720p resolution (1280x720).
   PixelColor blankColor;
@@ -239,8 +238,12 @@ static int GenerateRippleZoomFrames(
 
         std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple;
-        newRipple.xCenter = (xResolution * (i + 1)) / (notesVec.size() + 1);
-        newRipple.yCenter = yResolution / 2;
+        newRipple.xCenter =
+            (int)((xResolution * (i + 1)) / (notesVec.size() + 1) +
+                  (int)currentNote.pitch * 17 % xResolution) -
+            xResolution / 2;
+        newRipple.yCenter =
+            yResolution / 4 + (int)currentNote.pitch / 200 % (yResolution / 2);
         int speedBonus =
             (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
         if (speedBonus > 6) {
