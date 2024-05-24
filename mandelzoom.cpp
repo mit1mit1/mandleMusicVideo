@@ -254,20 +254,30 @@ static int GenerateRippleZoomFrames(
         Ripple newRipple;
         newRipple.xCenter = (xResolution * (i + 1)) / (notesVec.size() + 1);
         newRipple.yCenter = yResolution / 2;
-        newRipple.speed =
-            15 + 15 / (currentNote.startSeconds - currentNote.endSeconds);
-        newRipple.thickness = 4 + i;
+        int speedBonus =
+            (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
+        if (speedBonus > 6) {
+          speedBonus = 6;
+        }
+        newRipple.speed = 6 + speedBonus;
+        newRipple.thickness = 4;
         newRipple.startFrame = currentNote.startSeconds * framespersecond;
         PixelColor perimColor1;
+        // perimColor1.red = 30;
+        // perimColor1.green = 50;
+        // perimColor1.blue = 100;
         perimColor1.red =
             (int)(currentNote.pitch *
-                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 + 1));
+                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 +
+                  1));
         perimColor1.green =
             (int)(currentNote.pitch *
-                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 + 1));
+                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 5 +
+                  1));
         perimColor1.blue =
             (int)(currentNote.pitch *
-                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 + 1));
+                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 7 +
+                  1));
         perimColor1.alpha = 0;
         newRipple.addColor = perimColor1;
         ripples.push_back(newRipple);
