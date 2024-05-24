@@ -201,19 +201,6 @@ static int GenerateRippleZoomFrames(
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
     std::vector<std::vector<AubioNote>> notesVec) {
 
-  // Ripple ripple2;
-  // ripple2.xCenter = 2 * xResolution / 3;
-  // ripple2.yCenter = yResolution / 2;
-  // ripple2.speed = 5;
-  // ripple2.thickness = 5;
-  // PixelColor perimColor2;
-  // perimColor2.red = 20;
-  // perimColor2.green = 10;
-  // perimColor2.blue = 10;
-  // perimColor2.alpha = 0;
-  // ripple2.addColor = perimColor2;
-
-  // std::vector<Ripple> ripples = {ripple1, ripple2};
 
   std::vector<PixelColor> availableColors = getColors();
   // Create a video frame buffer with 720p resolution (1280x720).
@@ -259,25 +246,28 @@ static int GenerateRippleZoomFrames(
         if (speedBonus > 6) {
           speedBonus = 6;
         }
-        newRipple.speed = 6 + speedBonus;
-        newRipple.thickness = 4;
+        newRipple.speed = 3 + speedBonus;
+        newRipple.thickness = 90;
         newRipple.startFrame = currentNote.startSeconds * framespersecond;
         PixelColor perimColor1;
         // perimColor1.red = 30;
         // perimColor1.green = 50;
         // perimColor1.blue = 100;
         perimColor1.red =
-            (int)(currentNote.pitch *
-                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 +
-                  1));
+            (int)((currentNote.pitch *
+                   (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 +
+                    1)) *
+                  0.25);
         perimColor1.green =
-            (int)(currentNote.pitch *
-                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 5 +
-                  1));
+            (int)((currentNote.pitch *
+                   (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 5 +
+                    1)) *
+                  0.25);
         perimColor1.blue =
-            (int)(currentNote.pitch *
-                  (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 7 +
-                  1));
+            (int)((currentNote.pitch *
+                   (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 7 +
+                    1)) *
+                  0.25);
         perimColor1.alpha = 0;
         newRipple.addColor = perimColor1;
         ripples.push_back(newRipple);
@@ -287,17 +277,17 @@ static int GenerateRippleZoomFrames(
 
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
-        currentFrame.BrightenPixel(x, y, 0.75);
+        currentFrame.BrightenPixel(x, y, 0.90);
         for (Ripple ripple : ripples) {
           int framesSinceRippleStart = f - ripple.startFrame;
-          int radius = framesSinceRippleStart * ripple.speed + 1;
+          int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
                           (radius / 2);
-          const int distFromPerimeterSquared =
+          const int distFromCentreSquared =
               (x - ripple.xCenter) * (x - ripple.xCenter) +
-              (y - ripple.yCenter) * (y - ripple.yCenter) - radius * radius;
-          if (distFromPerimeterSquared < thickness &&
-              distFromPerimeterSquared > -thickness) {
+              (y - ripple.yCenter) * (y - ripple.yCenter);
+          if (distFromCentreSquared > radius * radius - thickness &&
+              distFromCentreSquared < radius * radius) {
 
             currentFrame.AddPixel(x, y, ripple.addColor);
           }
