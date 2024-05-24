@@ -239,11 +239,13 @@ static int GenerateRippleZoomFrames(
         std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple;
         newRipple.xCenter =
-            (int)((xResolution * (i + 1)) / (notesVec.size() + 1) +
-                  (int)currentNote.pitch * 17 % xResolution) -
-            xResolution / 2;
-        newRipple.yCenter =
-            yResolution / 4 + (int)currentNote.pitch / 200 % (yResolution / 2);
+            (int)((xResolution * (i + 0.25)) / (notesVec.size() + 1) +
+                  (int)currentNote.pitch * 17 %
+                      (xResolution / (2 * notesVec.size())));
+        // TODO replace 200 with max pitch
+        newRipple.yCenter = yResolution / 4 + (int)currentNote.pitch *
+                                                  yResolution / 200 %
+                                                  (yResolution / 2);
         int speedBonus =
             (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
         if (speedBonus > 6) {
