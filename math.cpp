@@ -147,6 +147,48 @@ Coordinate getInterestingPoint(int mandleCounts[][yResolution],
                                       ci_top);
 }
 
+int getMaxPitch(std::vector<AubioNote> notes) {
+  int maxPitch = notes[0].pitch;
+  for (unsigned int i = 1; i < notes.size(); i++) {
+    if (notes[i].pitch > maxPitch) {
+      maxPitch = notes[i].pitch;
+    }
+  }
+  return maxPitch;
+}
+
+int getMinPitch(std::vector<AubioNote> notes) {
+  int minPitch = notes[0].pitch;
+  for (unsigned int i = 1; i < notes.size(); i++) {
+    if (notes[i].pitch < minPitch) {
+      minPitch = notes[i].pitch;
+    }
+  }
+  return minPitch;
+}
+
+int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec) {
+  int maxMaxPitch = getMaxPitch(notesVec[0]);
+  for (unsigned int i = 1; i < notesVec.size(); i++) {
+    int newMaxPitch = getMaxPitch(notesVec[i]);
+    if (newMaxPitch > maxMaxPitch) {
+      maxMaxPitch = newMaxPitch;
+    }
+  }
+  return maxMaxPitch;
+}
+
+int getMinMinPitch(std::vector<std::vector<AubioNote>> notesVec) {
+  int minMinPitch = getMinPitch(notesVec[0]);
+  for (unsigned int i = 1; i < notesVec.size(); i++) {
+    int newMinPitch = getMinPitch(notesVec[i]);
+    if (newMinPitch < minMinPitch) {
+      minMinPitch = newMinPitch;
+    }
+  }
+  return minMinPitch;
+}
+
 int getPitchSum(std::vector<AubioNote> notes) {
   int pitchSum = 0;
   for (unsigned int i = 0; i < notes.size(); i++) {

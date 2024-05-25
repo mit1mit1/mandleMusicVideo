@@ -34,5 +34,9 @@ long double getXPosition(int xSquare, long double cr_left,
 long double getYPosition(int ySquare, long double ci_top,
                          long double yStepDistance);
 int getPitchSum(std::vector<AubioNote> notes);
+int getMinPitch(std::vector<AubioNote> notes);
+int getMaxPitch(std::vector<AubioNote> notes);
+int getMinMinPitch(std::vector<std::vector<AubioNote>> notesVec);
+int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec);
 int sumAll(int start, int end);
 #endif

@@ -201,6 +201,15 @@ static int GenerateRippleZoomFrames(
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
     std::vector<std::vector<AubioNote>> notesVec) {
 
+  std::vector<int> maxPitches{};
+  std::vector<int> minPitches{};
+  std::vector<int> pitchRanges{};
+  for (unsigned int i = 0; i < notesVec.size(); i++) {
+    maxPitches.push_back(getMaxPitch(notesVec[i]));
+    minPitches.push_back(getMinPitch(notesVec[i]));
+    pitchRanges.push_back((maxPitches[i] - minPitches[i]));
+  }
+
   std::vector<PixelColor> availableColors = getColors();
   // Create a video frame buffer with 720p resolution (1280x720).
   PixelColor blankColor;
@@ -208,6 +217,8 @@ static int GenerateRippleZoomFrames(
   blankColor.green = 0;
   blankColor.blue = 0;
   blankColor.alpha = 0;
+
+  const int scrollSpeed = 3;
 
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++) {
@@ -239,13 +250,15 @@ static int GenerateRippleZoomFrames(
         std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple;
         newRipple.xCenter =
-            (int)((xResolution * (i + 0.25)) / (notesVec.size() + 1) +
-                  (int)currentNote.pitch * 17 %
-                      (xResolution / (2 * notesVec.size())));
+            (int)(((xResolution * (i + 0.25)) / (notesVec.size())) +
+                  (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
+                        7 * xResolution / 31) %
+                      (int)(xResolution / (2 * notesVec.size())));
         // TODO replace 200 with max pitch
-        newRipple.yCenter = yResolution / 4 + (int)currentNote.pitch *
-                                                  yResolution / 200 %
-                                                  (yResolution / 2);
+        newRipple.yCenter =
+             9 * yResolution / 10 -
+            (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
+                  (8 * yResolution / 10));
         int speedBonus =
             (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
         if (speedBonus > 6) {
@@ -255,9 +268,6 @@ static int GenerateRippleZoomFrames(
         newRipple.thickness = 90;
         newRipple.startFrame = currentNote.startSeconds * framespersecond;
         PixelColor perimColor1;
-        // perimColor1.red = 30;
-        // perimColor1.green = 50;
-        // perimColor1.blue = 100;
         perimColor1.red =
             (int)((currentNote.pitch *
                    (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 +
@@ -288,8 +298,9 @@ static int GenerateRippleZoomFrames(
           int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
                           (radius / 2);
+          int movedXCenter = ripple.xCenter - framesSinceRippleStart * scrollSpeed;
           const int distFromCentreSquared =
-              (x - ripple.xCenter) * (x - ripple.xCenter) +
+              (x - movedXCenter) * (x - movedXCenter) +
               (y - ripple.yCenter) * (y - ripple.yCenter);
           if (distFromCentreSquared > radius * radius - thickness &&
               distFromCentreSquared < radius * radius) {
