@@ -100,6 +100,39 @@ public:
     }
   }
 
+  void CombinePixel(int x, int y, float multiple, PixelColor targetColor,
+                    int maxSaturation) {
+    int index = 4 * (y * width + x);
+    buffer[index] = (int)(buffer[index] * multiple);
+    if (buffer[index] < maxSaturation) {
+      buffer[index] += (int)((1 - multiple) * targetColor.red);
+    };
+
+    buffer[index + 1] = (int)(buffer[index + 1] * multiple);
+    if (buffer[index + 1] < maxSaturation) {
+      buffer[index + 1] += (int)((1 - multiple) * targetColor.green);
+    };
+
+    buffer[index + 2] = (int)(buffer[index + 2] * multiple);
+    if (buffer[index + 2] < maxSaturation) {
+      buffer[index + 2] += (int)((1 - multiple) * targetColor.blue);
+    }
+
+    buffer[index + 3] = (int)(buffer[index + 3] * multiple);
+    if (buffer[index + 3] < maxSaturation) {
+      buffer[index + 3] += (int)((1 - multiple) * targetColor.alpha);
+    }
+
+    for (int k = 0; k < 4; ++k) {
+      if (buffer[index + k] < 0) {
+        buffer[index + k] = 0;
+      }
+      if (buffer[index + k] > 255) {
+        buffer[index + k] = 255;
+      }
+    }
+  }
+
   void AddPixel(int x, int y, PixelColor color) {
     int index = 4 * (y * width + x);
     buffer[index] = buffer[index] + color.red;
@@ -252,16 +285,21 @@ static int GenerateRippleZoomFrames(
   blankColor.green = 0;
   blankColor.blue = 0;
   blankColor.alpha = 0;
-  const int blankColorMaxSaturation = 20;
-  const int onsetColorChangeLength = 5;
+  PixelColor backgroundColor;
+  backgroundColor.red = 0;
+  backgroundColor.green = 0;
+  backgroundColor.blue = 0;
+  backgroundColor.alpha = 0;
+  const int backgroundColorMaxSaturation = 20;
+  const int onsetColorChangeLength = 4;
 
-  const int scrollSpeedX = 5;
+  const int scrollSpeedX = 7;
   const int scrollSpeedY = 0;
 
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++) {
     for (unsigned int y = 0; y < yResolution; y++) {
-      currentFrame.SetPixel(x, y, blankColor);
+      currentFrame.SetPixel(x, y, backgroundColor);
     }
   }
 
@@ -273,37 +311,41 @@ static int GenerateRippleZoomFrames(
     std::cout << " current timestamp " << timestamp << "\n  ";
 
     int onsetsPassed = 1;
+    int lastOnsetTimestamp = -2 * onsetColorChangeLength;
     for (double onsetTimestamp : onsetTimestamps) {
       if (timestamp > onsetTimestamp) {
         onsetsPassed++;
-        if (timestamp < onsetTimestamp + onsetColorChangeLength) {
-          if (onsetsPassed % 2 == 0 &&
-              blankColor.red < blankColorMaxSaturation) {
-            blankColor.red = blankColor.red + onsetsPassed % 3;
-          } else {
-            blankColor.red = blankColor.red - onsetsPassed % 3;
-          }
-          if (onsetsPassed % 2 == 0 &&
-              blankColor.blue < blankColorMaxSaturation) {
-            blankColor.blue = blankColor.blue + 3;
-          } else {
-            blankColor.blue = blankColor.blue - 3;
-          }
-          if (onsetsPassed % 2 == 0 &&
-              blankColor.green < blankColorMaxSaturation) {
-            blankColor.green = blankColor.green + 2;
-          } else {
-            blankColor.green = blankColor.green - 2;
-          }
-          if (onsetsPassed % 2 == 0 &&
-              blankColor.alpha < blankColorMaxSaturation) {
-            blankColor.alpha = blankColor.alpha + onsetsPassed % 11;
-          } else {
-            blankColor.alpha = blankColor.alpha - onsetsPassed % 11;
-          }
-        }
+        lastOnsetTimestamp = onsetTimestamp;
       }
     }
+    // TODO: Use background color
+    if (timestamp < lastOnsetTimestamp + onsetColorChangeLength) {
+      if (onsetsPassed % 2 == 0 &&
+          backgroundColor.red < backgroundColorMaxSaturation - 1) {
+        backgroundColor.red = backgroundColor.red + 1;
+      } else {
+        backgroundColor.red = backgroundColor.red - 1;
+      }
+      if (onsetsPassed % 2 == 0 &&
+          backgroundColor.blue < backgroundColorMaxSaturation - 3) {
+        backgroundColor.blue = backgroundColor.blue + 3;
+      } else {
+        backgroundColor.blue = backgroundColor.blue - 3;
+      }
+      if (onsetsPassed % 2 == 0 &&
+          backgroundColor.green < backgroundColorMaxSaturation - 2) {
+        backgroundColor.green = backgroundColor.green + 2;
+      } else {
+        backgroundColor.green = backgroundColor.green - 2;
+      }
+      if (onsetsPassed % 2 == 0 &&
+          backgroundColor.alpha < backgroundColorMaxSaturation - 3) {
+        backgroundColor.alpha = backgroundColor.alpha + 3;
+      } else {
+        backgroundColor.alpha = backgroundColor.alpha - 3;
+      }
+    }
+
     currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
 
     std::vector<Ripple> ripples = {};
