@@ -251,6 +251,8 @@ static int GenerateRippleZoomFrames(
   blankColor.green = 0;
   blankColor.blue = 0;
   blankColor.alpha = 0;
+  const int blankColorMaxSaturation = 25;
+  const int onsetColorChangeLength = 10;
 
   const int scrollSpeedX = 11;
   const int scrollSpeedY = 0;
@@ -273,6 +275,23 @@ static int GenerateRippleZoomFrames(
     for (double onsetTimestamp : onsetTimestamps) {
       if (timestamp > onsetTimestamp) {
         onsetsPassed++;
+        if (timestamp < onsetTimestamp + onsetColorChangeLength) {
+          if (blankColor.red < blankColorMaxSaturation) {
+            blankColor.red = blankColor.red + 2;
+          } else {
+            blankColor.red = blankColor.red - 2;
+          }
+          if (blankColor.blue < blankColorMaxSaturation) {
+            blankColor.blue = blankColor.blue + 1;
+          } else {
+            blankColor.blue = blankColor.blue - 1;
+          }
+          if (blankColor.green < blankColorMaxSaturation) {
+            blankColor.green = blankColor.green + 3;
+          } else {
+            blankColor.green = blankColor.green - 3;
+          }
+        }
       }
     }
 
@@ -284,12 +303,13 @@ static int GenerateRippleZoomFrames(
 
         std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple;
-        // TODO: Since we are scrolling on x axis now maybe don't keep instruments in x quadrants - use color instead?
+        // TODO: Since we are scrolling on x axis now maybe don't keep
+        // instruments in x quadrants - use color instead?
         newRipple.xCenter =
-            (int)(((xResolution * (i + 0.25)) / (notesVec.size())) +
-                  (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
-                        7 * xResolution / 31) %
-                      (int)(xResolution / (2 * notesVec.size())));
+            (int)(xResolution / 4) +
+            (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
+                  (i + 3) * 7 * xResolution / 31) %
+                (int)(xResolution / (2));
         newRipple.yCenter =
             9 * yResolution / 10 -
             (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
@@ -303,21 +323,15 @@ static int GenerateRippleZoomFrames(
         newRipple.thickness = 90;
         newRipple.startFrame = currentNote.startSeconds * framespersecond;
         PixelColor perimColor1;
-        perimColor1.red =
-            (int)((currentNote.pitch *
-                   (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 3 +
-                    1)) *
-                  0.25);
-        perimColor1.green =
-            (int)((currentNote.pitch *
-                   (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 5 +
-                    1)) *
-                  0.25);
-        perimColor1.blue =
-            (int)((currentNote.pitch *
-                   (((i + 1) + onsetsPassed + (i + 1) * onsetsPassed) % 7 +
-                    1)) *
-                  0.25);
+        perimColor1.red = (int)((currentNote.pitch *
+                                 (((i + 1) + 11 + (i + 1) * 11) % 3 + 1)) *
+                                0.25);
+        perimColor1.green = (int)((currentNote.pitch *
+                                   (((i + 1) + 11 + (i + 1) * 11) % 5 + 1)) *
+                                  0.25);
+        perimColor1.blue = (int)((currentNote.pitch *
+                                  (((i + 1) + 11 + (i + 1) * 11) % 7 + 1)) *
+                                 0.25);
         perimColor1.alpha = 0;
         newRipple.addColor = perimColor1;
         ripples.push_back(newRipple);
@@ -328,7 +342,6 @@ static int GenerateRippleZoomFrames(
     currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
-        // TODO scroll the previously generated stuff as well?
         currentFrame.BrightenPixel(x, y, 0.90);
         for (Ripple ripple : ripples) {
           int framesSinceRippleStart = f - ripple.startFrame;
