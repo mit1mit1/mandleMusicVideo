@@ -65,8 +65,10 @@ public:
         int changingIndex = 4 * (adjustedY * width + adjustedX);
         int referenceIndex = 4 * ((adjustedY + yScrollSpeed) * width +
                                   (adjustedX + xScrollSpeed));
-        if (referenceIndex >= 4 * yResolution * xResolution ||
-            referenceIndex <= 0) {
+        if (adjustedX + xScrollSpeed >= xResolution ||
+            adjustedX + xScrollSpeed < 0 ||
+            adjustedY + yScrollSpeed >= yResolution ||
+            adjustedY + yScrollSpeed < 0) {
           buffer[changingIndex] = blankColor.red;
           buffer[changingIndex + 1] = blankColor.green;
           buffer[changingIndex + 2] = blankColor.blue;
@@ -191,7 +193,6 @@ int main(int argc, const char *argv[]) {
       fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
       return 1;
     }
-    // Add some extra time to fade out the note?
     std::vector<AubioNote> pitchedNotes1 =
         ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
     std::vector<AubioNote> pitchedNotes2 =
@@ -251,10 +252,10 @@ static int GenerateRippleZoomFrames(
   blankColor.green = 0;
   blankColor.blue = 0;
   blankColor.alpha = 0;
-  const int blankColorMaxSaturation = 25;
-  const int onsetColorChangeLength = 10;
+  const int blankColorMaxSaturation = 20;
+  const int onsetColorChangeLength = 5;
 
-  const int scrollSpeedX = 11;
+  const int scrollSpeedX = 5;
   const int scrollSpeedY = 0;
 
   VideoFrame currentFrame(xResolution, yResolution);
@@ -276,24 +277,34 @@ static int GenerateRippleZoomFrames(
       if (timestamp > onsetTimestamp) {
         onsetsPassed++;
         if (timestamp < onsetTimestamp + onsetColorChangeLength) {
-          if (blankColor.red < blankColorMaxSaturation) {
-            blankColor.red = blankColor.red + 2;
+          if (onsetsPassed % 2 == 0 &&
+              blankColor.red < blankColorMaxSaturation) {
+            blankColor.red = blankColor.red + onsetsPassed % 3;
           } else {
-            blankColor.red = blankColor.red - 2;
+            blankColor.red = blankColor.red - onsetsPassed % 3;
           }
-          if (blankColor.blue < blankColorMaxSaturation) {
-            blankColor.blue = blankColor.blue + 1;
+          if (onsetsPassed % 2 == 0 &&
+              blankColor.blue < blankColorMaxSaturation) {
+            blankColor.blue = blankColor.blue + 3;
           } else {
-            blankColor.blue = blankColor.blue - 1;
+            blankColor.blue = blankColor.blue - 3;
           }
-          if (blankColor.green < blankColorMaxSaturation) {
-            blankColor.green = blankColor.green + 3;
+          if (onsetsPassed % 2 == 0 &&
+              blankColor.green < blankColorMaxSaturation) {
+            blankColor.green = blankColor.green + 2;
           } else {
-            blankColor.green = blankColor.green - 3;
+            blankColor.green = blankColor.green - 2;
+          }
+          if (onsetsPassed % 2 == 0 &&
+              blankColor.alpha < blankColorMaxSaturation) {
+            blankColor.alpha = blankColor.alpha + onsetsPassed % 11;
+          } else {
+            blankColor.alpha = blankColor.alpha - onsetsPassed % 11;
           }
         }
       }
     }
+    currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
 
     std::vector<Ripple> ripples = {};
     for (unsigned int i = 0; i < notesVec.size(); ++i) {
@@ -306,7 +317,7 @@ static int GenerateRippleZoomFrames(
         // TODO: Since we are scrolling on x axis now maybe don't keep
         // instruments in x quadrants - use color instead?
         newRipple.xCenter =
-            (int)(xResolution / 4) +
+            (int)(xResolution / 3) +
             (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
                   (i + 3) * 7 * xResolution / 31) %
                 (int)(xResolution / (2));
@@ -337,12 +348,10 @@ static int GenerateRippleZoomFrames(
         ripples.push_back(newRipple);
       }
     }
-    // }
 
-    currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
-        currentFrame.BrightenPixel(x, y, 0.90);
+        currentFrame.BrightenPixel(x, y, 0.92);
         for (Ripple ripple : ripples) {
           int framesSinceRippleStart = f - ripple.startFrame;
           int radius = framesSinceRippleStart * ripple.speed + 5;
