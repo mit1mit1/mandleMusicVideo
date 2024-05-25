@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/mandelzoom.cpp.o -c /home/midly/apps/mandelMusicalZoom/mandelzoom.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/mandelzoom.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/aubioParser.cpp.o -c /home/midly/apps/mandelMusicalZoom/aubioParser.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/aubioParser.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/colors.cpp.o -c /home/midly/apps/mandelMusicalZoom/colors.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/colors.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/lodepng.cpp.o -c /home/midly/apps/mandelMusicalZoom/lodepng.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/lodepng.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/math.cpp.o -c /home/midly/apps/mandelMusicalZoom/math.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/math.cpp"
+}
+]

@@ -159,15 +159,15 @@ int main(int argc, const char *argv[]) {
     }
     // Add some extra time to fade out the note?
     std::vector<AubioNote> pitchedNotes1 =
-        ParseAubioNoteFile("./pitchedInstrument1Notes.txt", 0.0);
+        ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
     std::vector<AubioNote> pitchedNotes2 =
-        ParseAubioNoteFile("./pitchedInstrument2Notes.txt", 0.0);
+        ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
     std::vector<AubioNote> pitchedNotes3 =
-        ParseAubioNoteFile("./pitchedInstrument3Notes.txt", 0.0);
+        ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
     std::vector<std::vector<AubioNote>> pitchedNotesVec = {
         pitchedNotes1, pitchedNotes2, pitchedNotes3};
     std::vector<float> percussionOnsets =
-        ParseOnsetSecondsFile("./rhythmInstrument1Onsets.txt");
+        ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
 
     return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
                                     framespersecond, percussionOnsets,
@@ -218,7 +218,7 @@ static int GenerateRippleZoomFrames(
   blankColor.blue = 0;
   blankColor.alpha = 0;
 
-  const int scrollSpeed = 3;
+  const int scrollSpeed = 11;
 
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++) {
@@ -256,7 +256,7 @@ static int GenerateRippleZoomFrames(
                       (int)(xResolution / (2 * notesVec.size())));
         // TODO replace 200 with max pitch
         newRipple.yCenter =
-             9 * yResolution / 10 -
+            9 * yResolution / 10 -
             (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
                   (8 * yResolution / 10));
         int speedBonus =
@@ -298,7 +298,8 @@ static int GenerateRippleZoomFrames(
           int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
                           (radius / 2);
-          int movedXCenter = ripple.xCenter - framesSinceRippleStart * scrollSpeed;
+          int movedXCenter =
+              ripple.xCenter - framesSinceRippleStart * scrollSpeed;
           const int distFromCentreSquared =
               (x - movedXCenter) * (x - movedXCenter) +
               (y - ripple.yCenter) * (y - ripple.yCenter);

@@ -3,3 +3,5 @@ mandelzoom
 movie/
 output/
 input/
+CMakeFiles/
+.cache/
