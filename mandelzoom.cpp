@@ -47,6 +47,40 @@ public:
   VideoFrame(int _width, int _height)
       : width(_width), height(_height), buffer(4 * _width * _height, 255) {}
 
+  void ScrollPixels(int xScrollSpeed, int yScrollSpeed, PixelColor blankColor) {
+    int xScrollMultiplier = 1;
+    int yScrollMultiplier = 1;
+    if (xScrollSpeed < 0) {
+      xScrollMultiplier = xScrollMultiplier * -1;
+    }
+    if (yScrollSpeed < 0) {
+      yScrollMultiplier = yScrollMultiplier * -1;
+    }
+    for (int x = 0; x < xResolution; ++x) {
+      for (int y = 0; y < yResolution; ++y) {
+        int adjustedX = -(xResolution - 1) * (-1 + xScrollMultiplier) / 2 +
+                        x * xScrollMultiplier;
+        int adjustedY = -(yResolution - 1) * (-1 + yScrollMultiplier) / 2 +
+                        y * yScrollMultiplier;
+        int changingIndex = 4 * (adjustedY * width + adjustedX);
+        int referenceIndex = 4 * ((adjustedY + yScrollSpeed) * width +
+                                  (adjustedX + xScrollSpeed));
+        if (referenceIndex >= 4 * yResolution * xResolution ||
+            referenceIndex <= 0) {
+          buffer[changingIndex] = blankColor.red;
+          buffer[changingIndex + 1] = blankColor.green;
+          buffer[changingIndex + 2] = blankColor.blue;
+          buffer[changingIndex + 3] = blankColor.alpha;
+        } else {
+          buffer[changingIndex] = buffer[referenceIndex];
+          buffer[changingIndex + 1] = buffer[referenceIndex + 1];
+          buffer[changingIndex + 2] = buffer[referenceIndex + 2];
+          buffer[changingIndex + 3] = buffer[referenceIndex + 3];
+        }
+      }
+    }
+  }
+
   void BrightenPixel(int x, int y, float multiple) {
     int index = 4 * (y * width + x);
     buffer[index] = (int)(buffer[index] * multiple);
@@ -218,7 +252,8 @@ static int GenerateRippleZoomFrames(
   blankColor.blue = 0;
   blankColor.alpha = 0;
 
-  const int scrollSpeed = 11;
+  const int scrollSpeedX = 11;
+  const int scrollSpeedY = 0;
 
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++) {
@@ -249,12 +284,12 @@ static int GenerateRippleZoomFrames(
 
         std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple;
+        // TODO: Since we are scrolling on x axis now maybe don't keep instruments in x quadrants - use color instead?
         newRipple.xCenter =
             (int)(((xResolution * (i + 0.25)) / (notesVec.size())) +
                   (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
                         7 * xResolution / 31) %
                       (int)(xResolution / (2 * notesVec.size())));
-        // TODO replace 200 with max pitch
         newRipple.yCenter =
             9 * yResolution / 10 -
             (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
@@ -290,19 +325,23 @@ static int GenerateRippleZoomFrames(
     }
     // }
 
+    currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
+        // TODO scroll the previously generated stuff as well?
         currentFrame.BrightenPixel(x, y, 0.90);
         for (Ripple ripple : ripples) {
           int framesSinceRippleStart = f - ripple.startFrame;
           int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
                           (radius / 2);
-          int movedXCenter =
-              ripple.xCenter - framesSinceRippleStart * scrollSpeed;
+          int scrolledXCenter =
+              ripple.xCenter - framesSinceRippleStart * scrollSpeedX;
+          int scrolledYCenter =
+              ripple.yCenter - framesSinceRippleStart * scrollSpeedY;
           const int distFromCentreSquared =
-              (x - movedXCenter) * (x - movedXCenter) +
-              (y - ripple.yCenter) * (y - ripple.yCenter);
+              (x - scrolledXCenter) * (x - scrolledXCenter) +
+              (y - scrolledYCenter) * (y - scrolledYCenter);
           if (distFromCentreSquared > radius * radius - thickness &&
               distFromCentreSquared < radius * radius) {
 
