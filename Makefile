@@ -129,6 +129,30 @@ mandelzoom/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/build
 .PHONY : mandelzoom/fast
 
+art.o: art.cpp.o
+.PHONY : art.o
+
+# target to build an object file
+art.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.cpp.o
+.PHONY : art.cpp.o
+
+art.i: art.cpp.i
+.PHONY : art.i
+
+# target to preprocess a source file
+art.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.cpp.i
+.PHONY : art.cpp.i
+
+art.s: art.cpp.s
+.PHONY : art.s
+
+# target to generate assembly for a file
+art.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.cpp.s
+.PHONY : art.cpp.s
+
 aubioParser.o: aubioParser.cpp.o
 .PHONY : aubioParser.o
 
@@ -258,6 +282,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... mandelzoom"
+	@echo "... art.o"
+	@echo "... art.i"
+	@echo "... art.s"
 	@echo "... aubioParser.o"
 	@echo "... aubioParser.i"
 	@echo "... aubioParser.s"

@@ -22,6 +22,7 @@
    IN THE SOFTWARE.
 */
 
+#include "art.h"
 #include "aubioParser.h"
 #include "colors.h"
 #include "lodepng.h"
@@ -355,38 +356,10 @@ static int GenerateRippleZoomFrames(
       if (currentNote.startSeconds != -1) {
 
         std::cout << " setting new ripple at " << timestamp << "\n  ";
-        Ripple newRipple;
-        // TODO: Since we are scrolling on x axis now maybe don't keep
-        // instruments in x quadrants - use color instead?
-        newRipple.xCenter =
-            (int)(xResolution / 3) +
-            (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
-                  (i + 3) * 7 * xResolution / 31) %
-                (int)(xResolution / (2));
-        newRipple.yCenter =
-            9 * yResolution / 10 -
-            (int)(((currentNote.pitch - minPitches[i]) / pitchRanges[i]) *
-                  (8 * yResolution / 10));
-        int speedBonus =
-            (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
-        if (speedBonus > 6) {
-          speedBonus = 6;
-        }
-        newRipple.speed = 3 + speedBonus;
-        newRipple.thickness = 90;
-        newRipple.startFrame = currentNote.startSeconds * framespersecond;
-        PixelColor perimColor1;
-        perimColor1.red = (int)((currentNote.pitch *
-                                 (((i + 1) + 11 + (i + 1) * 11) % 3 + 1)) *
-                                0.25);
-        perimColor1.green = (int)((currentNote.pitch *
-                                   (((i + 1) + 11 + (i + 1) * 11) % 5 + 1)) *
-                                  0.25);
-        perimColor1.blue = (int)((currentNote.pitch *
-                                  (((i + 1) + 11 + (i + 1) * 11) % 7 + 1)) *
-                                 0.25);
-        perimColor1.alpha = 0;
-        newRipple.addColor = perimColor1;
+
+        Ripple newRipple = getNoteRippleSidescrolling(
+            0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
+            pitchRanges, framespersecond, i);
         ripples.push_back(newRipple);
       }
     }

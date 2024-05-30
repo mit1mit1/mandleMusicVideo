@@ -23,5 +23,10 @@
   "directory": "/home/midly/apps/mandelMusicalZoom",
   "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/math.cpp.o -c /home/midly/apps/mandelMusicalZoom/math.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/math.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/art.cpp.o -c /home/midly/apps/mandelMusicalZoom/art.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/art.cpp"
 }
 ]

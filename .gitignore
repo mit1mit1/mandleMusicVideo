@@ -5,3 +5,4 @@ output/
 input/
 CMakeFiles/
 .cache/
+build/

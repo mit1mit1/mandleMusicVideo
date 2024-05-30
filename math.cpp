@@ -1,4 +1,4 @@
-#include "math.h" // player.h must be in the current directory. or use relative or absolute path to it. e.g #include "include/player.h"
+#include "math.h" // math.h must be in the current directory. or use relative or absolute path to it. e.g #include "math/player.h"
 #include <cmath>
 #include <cstdlib>
 #include <set>

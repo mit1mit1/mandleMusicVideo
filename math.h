@@ -5,8 +5,6 @@
 #include "structs.h"
 #include <vector>
 
-// #include "stdafx.h"
-// #include <SFML/Graphics.hpp>
 
 int Mandelbrot(long double cr, long double ci, int limit);
 Coordinate chooseClosestInterestingPoint(
