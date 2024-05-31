@@ -185,10 +185,12 @@ static int GenerateRippleZoomFrames(
       if (currentNote.startSeconds != -1) {
 
         std::cout << " setting new ripple at " << timestamp << "\n  ";
+        Ripple newRipple = getNoteRippleCircleOfScales(
+            xResolution, yResolution, currentNote, framespersecond, i);
 
-        Ripple newRipple = getNoteRippleSidescrolling(
-            0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
-            pitchRanges, framespersecond, i);
+        // Ripple newRipple = getNoteRippleSidescrolling(
+        //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
+        //     pitchRanges, framespersecond, i);
         ripples.push_back(newRipple);
       }
     }
