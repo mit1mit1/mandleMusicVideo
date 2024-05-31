@@ -83,6 +83,14 @@ int main(int argc, const char *argv[]) {
         ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
     std::vector<AubioNote> pitchedNotes3 =
         ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
+    std::vector<AubioNote> pitchedNotes4 =
+        ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
+    std::vector<AubioNote> pitchedNotes5 =
+        ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
+    std::vector<AubioNote> pitchedNotes6 =
+        ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
+    std::vector<AubioNote> pitchedNotes7 =
+        ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
     std::vector<std::vector<AubioNote>> pitchedNotesVec = {
         pitchedNotes1, pitchedNotes2, pitchedNotes3};
     std::vector<float> percussionOnsets =
@@ -195,7 +203,7 @@ static int GenerateRippleZoomFrames(
       }
     }
 
-    currentFrame.BrightenAllPixels(0.8);
+    currentFrame.BrightenAllPixels(0.75);
 
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {

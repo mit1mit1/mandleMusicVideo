@@ -32,6 +32,7 @@ Ripple getNoteRippleCircleOfScales(int width, int height, AubioNote currentNote,
   return newRipple;
 }
 
+// TODO: Array of nice colors
 PixelColor getRippleColor(AubioNote currentNote, int instrumentNumber) {
   PixelColor rippleColor;
   rippleColor.red =
