@@ -25,6 +25,10 @@ public:
                      double spinSpeedRadiansPerFrame, double zoomMultiplierPerFrame,
                      PixelColor blankColor);
 
+  void CopyDiscreteSpunPixel(int sourceX, int sourceY, int originX, int originY,
+                     double spinSpeedRadiansPerFrame, double zoomMultiplierPerFrame,
+                     PixelColor blankColor);
+
   void CopyPixel(int sourceX, int sourceY, int destinationX, int destinationY,
                  PixelColor blankColor);
 

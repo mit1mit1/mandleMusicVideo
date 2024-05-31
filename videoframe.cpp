@@ -32,6 +32,9 @@ void VideoFrame::ScrollPixels(int xScrollSpeed, int yScrollSpeed,
   }
 };
 
+// TODO: add copy buffer and use proper algo (
+// https://stackoverflow.com/questions/299267/image-scaling-and-rotating-in-c-c
+// )
 void VideoFrame::CopySpunPixel(int destinationX, int destinationY, int originX,
                                int originY, double spinSpeedRadiansPerFrame,
                                double zoomMultiplierPerFrame,
@@ -57,7 +60,64 @@ void VideoFrame::CopySpunPixel(int destinationX, int destinationY, int originX,
   double sourceY = static_cast<int>(
       std::ceil(originY + std::sin(sourceRadians) * sourceLength));
 
-  // std::cout << "Copying to (" << destinationX << ", " << destinationY << ") from ("
+  // std::cout << "Copying to (" << destinationX << ", " << destinationY << ")
+  // from ("
+  //           << sourceX << ", " << sourceY << ") "
+  //           << " \n";
+  CopyPixel(sourceX, sourceY, destinationX, destinationY, blankColor);
+};
+
+// TODO: add copy buffer and use proper algo (
+// https://stackoverflow.com/questions/299267/image-scaling-and-rotating-in-c-c
+// )
+void VideoFrame::CopyDiscreteSpunPixel(int destinationX, int destinationY,
+                                       int originX, int originY,
+                                       double spinSpeedRadiansPerFrame,
+                                       double zoomMultiplierPerFrame,
+                                       PixelColor blankColor) {
+  if (destinationX == originX) {
+    return;
+  }
+  // std::cout << "Starting CopySpunPixel with " << destinationX << ", "
+  //           << destinationY << ", " << originX << ", " << originY << ", "
+  //           << " \n";
+  double angleRatio =
+      std::abs((destinationY - originY) / (destinationX - originX));
+  bool xPositiveDirection = (destinationX - originX) > 0;
+  bool yPositiveDirection = (destinationY - originY) > 0;
+  int sourceX, sourceY;
+
+  // TODO add more angle cases to have fun divergence
+  if (xPositiveDirection) {
+    if (angleRatio <= 1) {
+      sourceX = destinationX - 2;
+    } else {
+      sourceX = destinationX - 1;
+    }
+  } else {
+    if (angleRatio <= 1) {
+      sourceX = destinationX + 2;
+    } else {
+      sourceX = destinationX + 1;
+    }
+  }
+
+  if (yPositiveDirection) {
+    if (angleRatio >= 1) {
+      sourceY = destinationY - 2;
+    } else {
+      sourceY = destinationY - 1;
+    }
+  } else {
+    if (angleRatio >= 1) {
+      sourceY = destinationY + 2;
+    } else {
+      sourceY = destinationY + 1;
+    }
+  }
+
+  // std::cout << "Copying to (" << destinationX << ", " << destinationY << ")
+  // from ("
   //           << sourceX << ", " << sourceY << ") "
   //           << " \n";
   CopyPixel(sourceX, sourceY, destinationX, destinationY, blankColor);
@@ -68,38 +128,25 @@ void VideoFrame::SpinZoomPixels(double spinSpeedRadiansPerFrame,
                                 PixelColor blankColor) {
   int originX = width / 2;
   int originY = height / 2;
-  if (zoomMultiplierPerFrame > 1) {
-    for (int x = 0; x < width / 2; ++x) {
-      for (int y = 0; y < height / 2; ++y) {
-        // std::cout << "About to spin around (" << originX << ", " << originY
-        //           << "), from points (" << originX + x << ", " << originY + y
-        //           << ") "
-        //           << " \n";
-        CopySpunPixel(originX + x, originY + y, originX, originY,
-                      spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
-                      blankColor);
-        // std::cout << "About to spin around (" << originX << ", " << originY
-        //           << "), from points (" << originX - 1 - x << ", "
-        //           << originY - 1 - y << ") "
-        //           << " \n";
-        CopySpunPixel(originX - 1 - x, originY - 1 - y, originX, originY,
-                      spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
-                      blankColor);
-      }
+  for (int x = 0; x < width / 2; ++x) {
+    for (int y = 0; y < height / 2; ++y) {
+      CopyDiscreteSpunPixel(x, y, originX, originY, spinSpeedRadiansPerFrame,
+                            zoomMultiplierPerFrame, blankColor);
+      CopyDiscreteSpunPixel(width - 1 - x, height - 1 - y, originX, originY,
+                            spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
+                            blankColor);
     }
-  };
-
-  if (zoomMultiplierPerFrame < 1) {
-    for (int x = 0; x < width / 2; ++x) {
-      for (int y = 0; y < height / 2; ++y) {
-        CopySpunPixel(x, y, originX, originY, spinSpeedRadiansPerFrame,
-                      zoomMultiplierPerFrame, blankColor);
-        CopySpunPixel(width - 1 - x, height - 1 - y, originX, originY,
-                      spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
-                      blankColor);
-      }
+  }
+  for (int x = 0; x < width / 2; ++x) {
+    for (int y = 0; y < height / 2; ++y) {
+      CopyDiscreteSpunPixel(x, height - 1 - y, originX, originY,
+                            spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
+                            blankColor);
+      CopyDiscreteSpunPixel(width - 1 - x, y, originX, originY,
+                            spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
+                            blankColor);
     }
-  };
+  }
 };
 
 void VideoFrame::CopyPixel(int sourceX, int sourceY, int destinationX,
