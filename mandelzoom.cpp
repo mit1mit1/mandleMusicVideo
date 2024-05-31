@@ -57,31 +57,39 @@ public:
     if (yScrollSpeed < 0) {
       yScrollMultiplier = yScrollMultiplier * -1;
     }
-    for (int x = 0; x < xResolution; ++x) {
-      for (int y = 0; y < yResolution; ++y) {
-        int adjustedX = -(xResolution - 1) * (-1 + xScrollMultiplier) / 2 +
-                        x * xScrollMultiplier;
-        int adjustedY = -(yResolution - 1) * (-1 + yScrollMultiplier) / 2 +
-                        y * yScrollMultiplier;
-        int changingIndex = 4 * (adjustedY * width + adjustedX);
-        int referenceIndex = 4 * ((adjustedY + yScrollSpeed) * width +
-                                  (adjustedX + xScrollSpeed));
-        if (adjustedX + xScrollSpeed >= xResolution ||
-            adjustedX + xScrollSpeed < 0 ||
-            adjustedY + yScrollSpeed >= yResolution ||
-            adjustedY + yScrollSpeed < 0) {
-          buffer[changingIndex] = blankColor.red;
-          buffer[changingIndex + 1] = blankColor.green;
-          buffer[changingIndex + 2] = blankColor.blue;
-          buffer[changingIndex + 3] = blankColor.alpha;
-        } else {
-          buffer[changingIndex] = buffer[referenceIndex];
-          buffer[changingIndex + 1] = buffer[referenceIndex + 1];
-          buffer[changingIndex + 2] = buffer[referenceIndex + 2];
-          buffer[changingIndex + 3] = buffer[referenceIndex + 3];
-        }
+    for (int x = 0; x < width; ++x) {
+      for (int y = 0; y < height; ++y) {
+        int destinationX =
+            -(width - 1) * (-1 + xScrollMultiplier) / 2 + x * xScrollMultiplier;
+        int destinationY = -(height - 1) * (-1 + yScrollMultiplier) / 2 +
+                           y * yScrollMultiplier;
+        int sourceX = destinationX + xScrollSpeed;
+        int sourceY = destinationY + yScrollSpeed;
+
+        CopyPixel(sourceX, sourceY, destinationX, destinationY, blankColor);
       }
     }
+  }
+
+  void CopyPixel(int sourceX, int sourceY, int destinationX, int destinationY,
+                 PixelColor blankColor) {
+    if (destinationX < 0 || destinationX >= width || destinationY < 0 ||
+        destinationY >= height) {
+      return;
+    }
+    int destinationIndex = 4 * (destinationY * width + destinationX);
+    if (sourceX >= width || sourceX < 0 || sourceY >= height || sourceY < 0) {
+      buffer[destinationIndex] = blankColor.red;
+      buffer[destinationIndex + 1] = blankColor.green;
+      buffer[destinationIndex + 2] = blankColor.blue;
+      buffer[destinationIndex + 3] = blankColor.alpha;
+      return;
+    }
+    int sourceIndex = 4 * (sourceY * width + sourceX);
+    buffer[destinationIndex] = buffer[sourceIndex];
+    buffer[destinationIndex + 1] = buffer[sourceIndex + 1];
+    buffer[destinationIndex + 2] = buffer[sourceIndex + 2];
+    buffer[destinationIndex + 3] = buffer[sourceIndex + 3];
   }
 
   void BrightenPixel(int x, int y, float multiple) {
@@ -285,12 +293,12 @@ static int GenerateRippleZoomFrames(
   blankColor.red = 0;
   blankColor.green = 0;
   blankColor.blue = 0;
-  blankColor.alpha = 0;
+  blankColor.alpha = 1;
   PixelColor backgroundColor;
   backgroundColor.red = 0;
   backgroundColor.green = 0;
   backgroundColor.blue = 0;
-  backgroundColor.alpha = 0;
+  backgroundColor.alpha = 1;
   const int backgroundColorMaxSaturation = 20;
   const int onsetColorChangeLength = 4;
 
