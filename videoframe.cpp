@@ -1,6 +1,8 @@
 #include "videoframe.h"
 #include "lodepng.h"
 #include "structs.h"
+#include <cmath>
+#include <iostream>
 #include <vector>
 
 VideoFrame::VideoFrame(int _width, int _height)
@@ -30,8 +32,81 @@ void VideoFrame::ScrollPixels(int xScrollSpeed, int yScrollSpeed,
   }
 };
 
+void VideoFrame::CopySpunPixel(int destinationX, int destinationY, int originX,
+                               int originY, double spinSpeedRadiansPerFrame,
+                               double zoomMultiplierPerFrame,
+                               PixelColor blankColor) {
+  if (destinationX == originX) {
+    return;
+  }
+  // std::cout << "Starting CopySpunPixel with " << destinationX << ", "
+  //           << destinationY << ", " << originX << ", " << originY << ", "
+  //           << " \n";
+  double destinationRadians =
+      std::atan2((destinationY - originY), (destinationX - originX));
+  // std::cout << "Succeeded at getting atan " << destinationRadians << " \n";
+  double sourceRadians = destinationRadians - spinSpeedRadiansPerFrame;
+
+  // std::cout << "Succeeded at getting degrees \n";
+  double destinationLength = std::sqrt(std::pow((destinationX - originX), 2) +
+                                       std::pow((destinationY / originY), 2));
+  // std::cout << "Succeeded at getting length " << destinationLength << " \n";
+  double sourceLength = destinationLength / zoomMultiplierPerFrame;
+  double sourceX = static_cast<int>(
+      std::ceil(originX + std::cos(sourceRadians) * sourceLength));
+  double sourceY = static_cast<int>(
+      std::ceil(originY + std::sin(sourceRadians) * sourceLength));
+
+  // std::cout << "Copying to (" << destinationX << ", " << destinationY << ") from ("
+  //           << sourceX << ", " << sourceY << ") "
+  //           << " \n";
+  CopyPixel(sourceX, sourceY, destinationX, destinationY, blankColor);
+};
+
+void VideoFrame::SpinZoomPixels(double spinSpeedRadiansPerFrame,
+                                double zoomMultiplierPerFrame,
+                                PixelColor blankColor) {
+  int originX = width / 2;
+  int originY = height / 2;
+  if (zoomMultiplierPerFrame > 1) {
+    for (int x = 0; x < width / 2; ++x) {
+      for (int y = 0; y < height / 2; ++y) {
+        // std::cout << "About to spin around (" << originX << ", " << originY
+        //           << "), from points (" << originX + x << ", " << originY + y
+        //           << ") "
+        //           << " \n";
+        CopySpunPixel(originX + x, originY + y, originX, originY,
+                      spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
+                      blankColor);
+        // std::cout << "About to spin around (" << originX << ", " << originY
+        //           << "), from points (" << originX - 1 - x << ", "
+        //           << originY - 1 - y << ") "
+        //           << " \n";
+        CopySpunPixel(originX - 1 - x, originY - 1 - y, originX, originY,
+                      spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
+                      blankColor);
+      }
+    }
+  };
+
+  if (zoomMultiplierPerFrame < 1) {
+    for (int x = 0; x < width / 2; ++x) {
+      for (int y = 0; y < height / 2; ++y) {
+        CopySpunPixel(x, y, originX, originY, spinSpeedRadiansPerFrame,
+                      zoomMultiplierPerFrame, blankColor);
+        CopySpunPixel(width - 1 - x, height - 1 - y, originX, originY,
+                      spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
+                      blankColor);
+      }
+    }
+  };
+};
+
 void VideoFrame::CopyPixel(int sourceX, int sourceY, int destinationX,
                            int destinationY, PixelColor blankColor) {
+
+  //   std::cout << "copying pixel (" << sourceX << ", " << sourceY << ") -> ("
+  //             << destinationX << ", " << destinationY << ") \n";
   if (destinationX < 0 || destinationX >= width || destinationY < 0 ||
       destinationY >= height) {
     return;

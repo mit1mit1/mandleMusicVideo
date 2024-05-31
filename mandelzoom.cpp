@@ -144,8 +144,11 @@ static int GenerateRippleZoomFrames(
   const int backgroundColorMaxSaturation = 20;
   const double onsetColorChangeLength = 0.4;
 
-  const int scrollSpeedX = 7;
+  const int scrollSpeedX = 0;
   const int scrollSpeedY = 0;
+
+  const double spinSpeedRadiansPerFrame = 0.01;
+  const double zoomMultiplierPerFrame = 1.01;
 
   VideoFrame currentFrame(xResolution, yResolution);
   currentFrame.SetAllPixels(backgroundColor);
@@ -172,6 +175,8 @@ static int GenerateRippleZoomFrames(
     //     onsetsPassed, backgroundColor, backgroundColorMaxSaturation);
 
     currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
+    currentFrame.SpinZoomPixels(spinSpeedRadiansPerFrame,
+                                zoomMultiplierPerFrame, blankColor);
 
     std::vector<Ripple> ripples = {};
     for (unsigned int i = 0; i < notesVec.size(); ++i) {
@@ -193,7 +198,6 @@ static int GenerateRippleZoomFrames(
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
         for (Ripple ripple : ripples) {
-
           int framesSinceRippleStart = f - ripple.startFrame;
           int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
@@ -213,9 +217,6 @@ static int GenerateRippleZoomFrames(
         }
       }
     }
-
-    // colorRipples(xResolution, yResolution, ripples, f, scrollSpeedX,
-                //  scrollSpeedY, currentFrame);
 
     // Create the output PNG filename in the format "outdir/frame_12345.png".
     char number[20];
