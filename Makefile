@@ -273,6 +273,30 @@ math.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.cpp.s
 .PHONY : math.cpp.s
 
+videoframe.o: videoframe.cpp.o
+.PHONY : videoframe.o
+
+# target to build an object file
+videoframe.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.cpp.o
+.PHONY : videoframe.cpp.o
+
+videoframe.i: videoframe.cpp.i
+.PHONY : videoframe.i
+
+# target to preprocess a source file
+videoframe.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.cpp.i
+.PHONY : videoframe.cpp.i
+
+videoframe.s: videoframe.cpp.s
+.PHONY : videoframe.s
+
+# target to generate assembly for a file
+videoframe.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.cpp.s
+.PHONY : videoframe.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -300,6 +324,9 @@ help:
 	@echo "... math.o"
 	@echo "... math.i"
 	@echo "... math.s"
+	@echo "... videoframe.o"
+	@echo "... videoframe.i"
+	@echo "... videoframe.s"
 .PHONY : help
 
 

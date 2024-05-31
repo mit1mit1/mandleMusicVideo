@@ -38,164 +38,6 @@
 #include <set>
 #include <vector>
 
-class VideoFrame {
-private:
-  int width;
-  int height;
-  std::vector<unsigned char> buffer;
-
-public:
-  VideoFrame(int _width, int _height)
-      : width(_width), height(_height), buffer(4 * _width * _height, 255) {}
-
-  void ScrollPixels(int xScrollSpeed, int yScrollSpeed, PixelColor blankColor) {
-    int xScrollMultiplier = 1;
-    int yScrollMultiplier = 1;
-    if (xScrollSpeed < 0) {
-      xScrollMultiplier = xScrollMultiplier * -1;
-    }
-    if (yScrollSpeed < 0) {
-      yScrollMultiplier = yScrollMultiplier * -1;
-    }
-    for (int x = 0; x < width; ++x) {
-      for (int y = 0; y < height; ++y) {
-        int destinationX =
-            -(width - 1) * (-1 + xScrollMultiplier) / 2 + x * xScrollMultiplier;
-        int destinationY = -(height - 1) * (-1 + yScrollMultiplier) / 2 +
-                           y * yScrollMultiplier;
-        int sourceX = destinationX + xScrollSpeed;
-        int sourceY = destinationY + yScrollSpeed;
-
-        CopyPixel(sourceX, sourceY, destinationX, destinationY, blankColor);
-      }
-    }
-  }
-
-  void CopyPixel(int sourceX, int sourceY, int destinationX, int destinationY,
-                 PixelColor blankColor) {
-    if (destinationX < 0 || destinationX >= width || destinationY < 0 ||
-        destinationY >= height) {
-      return;
-    }
-    int destinationIndex = 4 * (destinationY * width + destinationX);
-    if (sourceX >= width || sourceX < 0 || sourceY >= height || sourceY < 0) {
-      buffer[destinationIndex] = blankColor.red;
-      buffer[destinationIndex + 1] = blankColor.green;
-      buffer[destinationIndex + 2] = blankColor.blue;
-      buffer[destinationIndex + 3] = blankColor.alpha;
-      return;
-    }
-    int sourceIndex = 4 * (sourceY * width + sourceX);
-    buffer[destinationIndex] = buffer[sourceIndex];
-    buffer[destinationIndex + 1] = buffer[sourceIndex + 1];
-    buffer[destinationIndex + 2] = buffer[sourceIndex + 2];
-    buffer[destinationIndex + 3] = buffer[sourceIndex + 3];
-  }
-
-  void BrightenPixel(int x, int y, float multiple) {
-    int index = 4 * (y * width + x);
-    buffer[index] = (int)(buffer[index] * multiple);
-    buffer[index + 1] = (int)(buffer[index + 1] * multiple);
-    buffer[index + 2] = (int)(buffer[index + 2] * multiple);
-    buffer[index + 3] = (int)(buffer[index + 3] * multiple);
-
-    for (int k = 0; k < 4; ++k) {
-      if (buffer[index + k] < 0) {
-        buffer[index + k] = 0;
-      }
-      if (buffer[index + k] > 255) {
-        buffer[index + k] = 255;
-      }
-    }
-  }
-
-  void CombinePixel(int x, int y, float multiple, PixelColor targetColor,
-                    int maxSaturation) {
-    int index = 4 * (y * width + x);
-    buffer[index] = (int)(buffer[index] * multiple);
-    if (buffer[index] < maxSaturation) {
-      buffer[index] += (int)((1 - multiple) * targetColor.red);
-    };
-
-    buffer[index + 1] = (int)(buffer[index + 1] * multiple);
-    if (buffer[index + 1] < maxSaturation) {
-      buffer[index + 1] += (int)((1 - multiple) * targetColor.green);
-    };
-
-    buffer[index + 2] = (int)(buffer[index + 2] * multiple);
-    if (buffer[index + 2] < maxSaturation) {
-      buffer[index + 2] += (int)((1 - multiple) * targetColor.blue);
-    }
-
-    buffer[index + 3] = (int)(buffer[index + 3] * multiple);
-    if (buffer[index + 3] < maxSaturation) {
-      buffer[index + 3] += (int)((1 - multiple) * targetColor.alpha);
-    }
-
-    for (int k = 0; k < 4; ++k) {
-      if (buffer[index + k] < 0) {
-        buffer[index + k] = 0;
-      }
-      if (buffer[index + k] > 255) {
-        buffer[index + k] = 255;
-      }
-    }
-  }
-
-  void AddPixel(int x, int y, PixelColor color) {
-    int index = 4 * (y * width + x);
-    buffer[index] = buffer[index] + color.red;
-    buffer[index + 1] = buffer[index + 1] + color.green;
-    buffer[index + 2] = buffer[index + 2] + color.blue;
-    buffer[index + 3] = buffer[index + 3] + color.alpha;
-
-    for (int k = 0; k < 4; ++k) {
-      if (buffer[index + k] < 0) {
-        buffer[index + k] = 0;
-      }
-      if (buffer[index + k] > 255) {
-        buffer[index + k] = 255;
-      }
-    }
-  }
-
-  void SetPixel(int x, int y, PixelColor color) {
-    int index = 4 * (y * width + x);
-    buffer[index] = color.red;
-    buffer[index + 1] = color.green;
-    buffer[index + 2] = color.blue;
-    buffer[index + 3] = color.alpha;
-
-    for (int k = 0; k < 4; ++k) {
-      if (buffer[index + k] < 0) {
-        buffer[index + k] = 0;
-      }
-      if (buffer[index + k] > 255) {
-        buffer[index + k] = 255;
-      }
-    }
-  }
-
-  PixelColor GetPixel(int x, int y) {
-    int index = 4 * (y * width + x);
-    PixelColor color;
-    color.red = buffer[index];
-    color.green = buffer[index + 1];
-    color.blue = buffer[index + 2];
-    color.alpha = buffer[index + 3];
-    return color;
-  }
-
-  int SavePng(const char *outFileName) {
-    unsigned error = lodepng::encode(outFileName, buffer, width, height);
-    if (error) {
-      fprintf(stderr, "ERROR: lodepng::encode returned %u\n", error);
-      return 1;
-    }
-    return 0;
-  }
-};
-
 static int PrintUsage();
 
 static int GenerateMandleZoomFrames(const char *outdir, int numframes,
@@ -300,17 +142,13 @@ static int GenerateRippleZoomFrames(
   backgroundColor.blue = 0;
   backgroundColor.alpha = 1;
   const int backgroundColorMaxSaturation = 20;
-  const int onsetColorChangeLength = 4;
+  const double onsetColorChangeLength = 0.4;
 
   const int scrollSpeedX = 7;
   const int scrollSpeedY = 0;
 
   VideoFrame currentFrame(xResolution, yResolution);
-  for (unsigned int x = 0; x < xResolution; x++) {
-    for (unsigned int y = 0; y < yResolution; y++) {
-      currentFrame.SetPixel(x, y, backgroundColor);
-    }
-  }
+  currentFrame.SetAllPixels(backgroundColor);
 
   const int startTimeSeconds = 0;
   // Generate the frames
@@ -320,40 +158,18 @@ static int GenerateRippleZoomFrames(
     std::cout << " current timestamp " << timestamp << "\n  ";
 
     int onsetsPassed = 1;
-    int lastOnsetTimestamp = -2 * onsetColorChangeLength;
+    double lastOnsetTimestamp = -2 * onsetColorChangeLength;
     for (double onsetTimestamp : onsetTimestamps) {
       if (timestamp > onsetTimestamp) {
         onsetsPassed++;
         lastOnsetTimestamp = onsetTimestamp;
       }
     }
-    // TODO: Use background color
-    if (timestamp < lastOnsetTimestamp + onsetColorChangeLength) {
-      if (onsetsPassed % 2 == 0 &&
-          backgroundColor.red < backgroundColorMaxSaturation - 1) {
-        backgroundColor.red = backgroundColor.red + 1;
-      } else {
-        backgroundColor.red = backgroundColor.red - 1;
-      }
-      if (onsetsPassed % 2 == 0 &&
-          backgroundColor.blue < backgroundColorMaxSaturation - 3) {
-        backgroundColor.blue = backgroundColor.blue + 3;
-      } else {
-        backgroundColor.blue = backgroundColor.blue - 3;
-      }
-      if (onsetsPassed % 2 == 0 &&
-          backgroundColor.green < backgroundColorMaxSaturation - 2) {
-        backgroundColor.green = backgroundColor.green + 2;
-      } else {
-        backgroundColor.green = backgroundColor.green - 2;
-      }
-      if (onsetsPassed % 2 == 0 &&
-          backgroundColor.alpha < backgroundColorMaxSaturation - 3) {
-        backgroundColor.alpha = backgroundColor.alpha + 3;
-      } else {
-        backgroundColor.alpha = backgroundColor.alpha - 3;
-      }
-    }
+
+    // TODO: Fix this doing color jumps
+    // backgroundColor = getNextBackgroundColor(
+    //     timestamp, lastOnsetTimestamp, onsetColorChangeLength,
+    //     onsetsPassed, backgroundColor, backgroundColorMaxSaturation);
 
     currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
 
@@ -372,10 +188,12 @@ static int GenerateRippleZoomFrames(
       }
     }
 
+    currentFrame.BrightenAllPixels(0.92);
+
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
-        currentFrame.BrightenPixel(x, y, 0.92);
         for (Ripple ripple : ripples) {
+
           int framesSinceRippleStart = f - ripple.startFrame;
           int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
@@ -395,6 +213,9 @@ static int GenerateRippleZoomFrames(
         }
       }
     }
+
+    // colorRipples(xResolution, yResolution, ripples, f, scrollSpeedX,
+                //  scrollSpeedY, currentFrame);
 
     // Create the output PNG filename in the format "outdir/frame_12345.png".
     char number[20];
