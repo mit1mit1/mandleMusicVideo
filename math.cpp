@@ -196,3 +196,49 @@ int getPitchSum(std::vector<AubioNote> notes) {
   }
   return pitchSum;
 }
+
+Coordinate getDiscreteZoomDiff(int destinationX, int destinationY, int originX,
+                               int originY) {
+  Coordinate zoomDiff;
+  if (destinationX == originX) {
+    zoomDiff.imaginaryPart = 1;
+    zoomDiff.realPart = 1;
+    return zoomDiff;
+  }
+
+  double angleRatio =
+      std::abs((destinationY - originY) / (destinationX - originX));
+  bool xPositiveDirection = (destinationX - originX) > 0;
+  bool yPositiveDirection = (destinationY - originY) > 0;
+  int sourceX, sourceY;
+
+  // TODO add more angle cases to have fun divergence
+  if (xPositiveDirection) {
+    if (angleRatio <= 1) {
+      zoomDiff.realPart = -2;
+    } else {
+      zoomDiff.realPart = -1;
+    }
+  } else {
+    if (angleRatio <= 1) {
+      zoomDiff.realPart = +2;
+    } else {
+      zoomDiff.realPart = +1;
+    }
+  }
+
+  if (yPositiveDirection) {
+    if (angleRatio >= 1) {
+      zoomDiff.imaginaryPart = -2;
+    } else {
+      zoomDiff.imaginaryPart = -1;
+    }
+  } else {
+    if (angleRatio >= 1) {
+      zoomDiff.imaginaryPart = +2;
+    } else {
+      zoomDiff.imaginaryPart = +1;
+    }
+  }
+  return zoomDiff;
+}

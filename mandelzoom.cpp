@@ -193,7 +193,7 @@ static int GenerateRippleZoomFrames(
       }
     }
 
-    currentFrame.BrightenAllPixels(0.92);
+    currentFrame.BrightenAllPixels(0.8);
 
     for (int x = 0; x < xResolution; ++x) {
       for (int y = 0; y < yResolution; ++y) {
@@ -202,10 +202,16 @@ static int GenerateRippleZoomFrames(
           int radius = framesSinceRippleStart * ripple.speed + 5;
           int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
                           (radius / 2);
+          // TODO: Extract discrete zoom and use it to move ripple centre as
+          // well
+          Coordinate zoomDiff = getDiscreteZoomDiff(
+              ripple.xCenter, ripple.yCenter, xResolution / 2, yResolution / 2);
           int scrolledXCenter =
-              ripple.xCenter - framesSinceRippleStart * scrollSpeedX;
+              ripple.xCenter -
+              framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart);
           int scrolledYCenter =
-              ripple.yCenter - framesSinceRippleStart * scrollSpeedY;
+              ripple.yCenter -
+              framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart);
           const int distFromCentreSquared =
               (x - scrolledXCenter) * (x - scrolledXCenter) +
               (y - scrolledYCenter) * (y - scrolledYCenter);

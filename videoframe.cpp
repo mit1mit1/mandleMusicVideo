@@ -1,5 +1,6 @@
 #include "videoframe.h"
 #include "lodepng.h"
+#include "math.h"
 #include "structs.h"
 #include <cmath>
 #include <iostream>
@@ -75,52 +76,11 @@ void VideoFrame::CopyDiscreteSpunPixel(int destinationX, int destinationY,
                                        double spinSpeedRadiansPerFrame,
                                        double zoomMultiplierPerFrame,
                                        PixelColor blankColor) {
-  if (destinationX == originX) {
-    return;
-  }
-  // std::cout << "Starting CopySpunPixel with " << destinationX << ", "
-  //           << destinationY << ", " << originX << ", " << originY << ", "
-  //           << " \n";
-  double angleRatio =
-      std::abs((destinationY - originY) / (destinationX - originX));
-  bool xPositiveDirection = (destinationX - originX) > 0;
-  bool yPositiveDirection = (destinationY - originY) > 0;
-  int sourceX, sourceY;
-
-  // TODO add more angle cases to have fun divergence
-  if (xPositiveDirection) {
-    if (angleRatio <= 1) {
-      sourceX = destinationX - 2;
-    } else {
-      sourceX = destinationX - 1;
-    }
-  } else {
-    if (angleRatio <= 1) {
-      sourceX = destinationX + 2;
-    } else {
-      sourceX = destinationX + 1;
-    }
-  }
-
-  if (yPositiveDirection) {
-    if (angleRatio >= 1) {
-      sourceY = destinationY - 2;
-    } else {
-      sourceY = destinationY - 1;
-    }
-  } else {
-    if (angleRatio >= 1) {
-      sourceY = destinationY + 2;
-    } else {
-      sourceY = destinationY + 1;
-    }
-  }
-
-  // std::cout << "Copying to (" << destinationX << ", " << destinationY << ")
-  // from ("
-  //           << sourceX << ", " << sourceY << ") "
-  //           << " \n";
-  CopyPixel(sourceX, sourceY, destinationX, destinationY, blankColor);
+  Coordinate zoomDiff =
+      getDiscreteZoomDiff(destinationX, destinationY, originX, originY);
+  CopyPixel(destinationX + zoomDiff.realPart,
+            destinationY + zoomDiff.imaginaryPart, destinationX, destinationY,
+            blankColor);
 };
 
 void VideoFrame::SpinZoomPixels(double spinSpeedRadiansPerFrame,

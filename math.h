@@ -5,7 +5,6 @@
 #include "structs.h"
 #include <vector>
 
-
 int Mandelbrot(long double cr, long double ci, int limit);
 Coordinate chooseClosestInterestingPoint(
     std::vector<PixelIndex> interestingPoints, long double xStepDistance,
@@ -23,6 +22,8 @@ Coordinate getInterestingPoint(int mandleCounts[][yResolution],
                                long double centreY, int minXIndex,
                                int maxXIndex, int minYIndex, int maxYIndex,
                                long double cr_left, long double ci_top);
+Coordinate getDiscreteZoomDiff(int destinationX, int destinationY, int originX,
+                               int originY);
 std::vector<PixelIndex>
 getInterestingPixelIndexes(int mandleCounts[xResolution][yResolution],
                            int minXIndex, int maxXIndex, int minYIndex,
