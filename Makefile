@@ -273,6 +273,54 @@ math.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.cpp.s
 .PHONY : math.cpp.s
 
+midi/src/MidiFile.o: midi/src/MidiFile.cpp.o
+.PHONY : midi/src/MidiFile.o
+
+# target to build an object file
+midi/src/MidiFile.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.o
+.PHONY : midi/src/MidiFile.cpp.o
+
+midi/src/MidiFile.i: midi/src/MidiFile.cpp.i
+.PHONY : midi/src/MidiFile.i
+
+# target to preprocess a source file
+midi/src/MidiFile.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.i
+.PHONY : midi/src/MidiFile.cpp.i
+
+midi/src/MidiFile.s: midi/src/MidiFile.cpp.s
+.PHONY : midi/src/MidiFile.s
+
+# target to generate assembly for a file
+midi/src/MidiFile.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.s
+.PHONY : midi/src/MidiFile.cpp.s
+
+midi/src/Options.o: midi/src/Options.cpp.o
+.PHONY : midi/src/Options.o
+
+# target to build an object file
+midi/src/Options.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.o
+.PHONY : midi/src/Options.cpp.o
+
+midi/src/Options.i: midi/src/Options.cpp.i
+.PHONY : midi/src/Options.i
+
+# target to preprocess a source file
+midi/src/Options.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.i
+.PHONY : midi/src/Options.cpp.i
+
+midi/src/Options.s: midi/src/Options.cpp.s
+.PHONY : midi/src/Options.s
+
+# target to generate assembly for a file
+midi/src/Options.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.s
+.PHONY : midi/src/Options.cpp.s
+
 videoframe.o: videoframe.cpp.o
 .PHONY : videoframe.o
 
@@ -324,6 +372,12 @@ help:
 	@echo "... math.o"
 	@echo "... math.i"
 	@echo "... math.s"
+	@echo "... midi/src/MidiFile.o"
+	@echo "... midi/src/MidiFile.i"
+	@echo "... midi/src/MidiFile.s"
+	@echo "... midi/src/Options.o"
+	@echo "... midi/src/Options.i"
+	@echo "... midi/src/Options.s"
 	@echo "... videoframe.o"
 	@echo "... videoframe.i"
 	@echo "... videoframe.s"

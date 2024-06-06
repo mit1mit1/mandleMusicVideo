@@ -27,6 +27,8 @@
 #include "colors.h"
 #include "lodepng.h"
 #include "math.h"
+#include "midi/include/MidiFile.h"
+#include "midi/include/Options.h"
 #include "structs.h"
 #include <algorithm>
 #include <cmath>
@@ -36,6 +38,7 @@
 #include <iomanip>
 #include <iostream>
 #include <set>
+#include <string>
 #include <vector>
 
 static int PrintUsage();
@@ -77,22 +80,48 @@ int main(int argc, const char *argv[]) {
       fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
       return 1;
     }
-    std::vector<AubioNote> pitchedNotes1 =
-        ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
-    std::vector<AubioNote> pitchedNotes2 =
-        ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
-    std::vector<AubioNote> pitchedNotes3 =
-        ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
-    std::vector<AubioNote> pitchedNotes4 =
-        ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
-    std::vector<AubioNote> pitchedNotes5 =
-        ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
-    std::vector<AubioNote> pitchedNotes6 =
-        ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
-    std::vector<AubioNote> pitchedNotes7 =
-        ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
-    std::vector<std::vector<AubioNote>> pitchedNotesVec = {
-        pitchedNotes1, pitchedNotes2, pitchedNotes3};
+
+    std::vector<AubioNote> demoAudioNotes =
+        ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
+    smf::Options options;
+    char midi1[] = "demoAudio.mid";
+    char *midiFiles[1];
+    midiFiles[0] = midi1;
+    options.process(1, midiFiles, 2);
+    if (options.getArgCount() != 1) {
+      std::cerr << "At least one MIDI filename is required.\n";
+      exit(1);
+    }
+    smf::MidiFile midifile;
+    midifile.read(options.getArg(1));
+    if (!midifile.status()) {
+      std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
+      exit(1);
+    }
+    midifile.joinTracks();
+    int track = 0;
+    for (int i = 0; i < midifile[track].size(); i++) {
+      if (!midifile[track][i].isNoteOn()) {
+        continue;
+      }
+      std::cout << midifile[track][i].seconds << '\t' << midifile[track][i][1]
+                << std::endl;
+    }
+    // std::vector<AubioNote> pitchedNotes1 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
+    // std::vector<AubioNote> pitchedNotes2 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
+    // std::vector<AubioNote> pitchedNotes3 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
+    // std::vector<AubioNote> pitchedNotes4 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
+    // std::vector<AubioNote> pitchedNotes5 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
+    // std::vector<AubioNote> pitchedNotes6 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
+    // std::vector<AubioNote> pitchedNotes7 =
+    //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
+    std::vector<std::vector<AubioNote>> pitchedNotesVec = {demoAudioNotes};
     std::vector<float> percussionOnsets =
         ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
 
