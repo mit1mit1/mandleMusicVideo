@@ -27,8 +27,9 @@
 #include "colors.h"
 #include "lodepng.h"
 #include "math.h"
-#include "midi/include/MidiFile.h"
-#include "midi/include/Options.h"
+#include "craigsapp-midifile/include/MidiFile.h"
+#include "craigsapp-midifile/include/Options.h"
+using namespace smf;
 #include "structs.h"
 #include <algorithm>
 #include <cmath>
@@ -83,7 +84,7 @@ int main(int argc, const char *argv[]) {
 
     std::vector<AubioNote> demoAudioNotes =
         ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
-    smf::Options options;
+    Options options;
     char midi1[] = "demoAudio.mid";
     char *midiFiles[1];
     midiFiles[0] = midi1;
@@ -92,7 +93,7 @@ int main(int argc, const char *argv[]) {
       std::cerr << "At least one MIDI filename is required.\n";
       exit(1);
     }
-    smf::MidiFile midifile;
+    MidiFile midifile;
     midifile.read(options.getArg(1));
     if (!midifile.status()) {
       std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;

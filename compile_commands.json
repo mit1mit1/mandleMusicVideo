@@ -1,47 +1,67 @@
 [
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/mandelzoom.cpp.o -c /home/midly/apps/mandelMusicalZoom/mandelzoom.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/mandelzoom.o -c /home/midly/apps/mandelMusicalZoom/mandelzoom.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/mandelzoom.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/aubioParser.cpp.o -c /home/midly/apps/mandelMusicalZoom/aubioParser.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/aubioParser.o -c /home/midly/apps/mandelMusicalZoom/aubioParser.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/aubioParser.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/colors.cpp.o -c /home/midly/apps/mandelMusicalZoom/colors.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/colors.o -c /home/midly/apps/mandelMusicalZoom/colors.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/colors.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/lodepng.cpp.o -c /home/midly/apps/mandelMusicalZoom/lodepng.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/lodepng.o -c /home/midly/apps/mandelMusicalZoom/lodepng.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/lodepng.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/math.cpp.o -c /home/midly/apps/mandelMusicalZoom/math.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/math.o -c /home/midly/apps/mandelMusicalZoom/math.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/math.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/art.cpp.o -c /home/midly/apps/mandelMusicalZoom/art.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/art.o -c /home/midly/apps/mandelMusicalZoom/art.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/art.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/videoframe.cpp.o -c /home/midly/apps/mandelMusicalZoom/videoframe.cpp",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/videoframe.o -c /home/midly/apps/mandelMusicalZoom/videoframe.cpp",
   "file": "/home/midly/apps/mandelMusicalZoom/videoframe.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.o -c /home/midly/apps/mandelMusicalZoom/midi/src/MidiFile.cpp",
-  "file": "/home/midly/apps/mandelMusicalZoom/midi/src/MidiFile.cpp"
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.o -c /home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/Binasc.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/Binasc.cpp"
 },
 {
   "directory": "/home/midly/apps/mandelMusicalZoom",
-  "command": "/usr/bin/c++    -o CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.o -c /home/midly/apps/mandelMusicalZoom/midi/src/Options.cpp",
-  "file": "/home/midly/apps/mandelMusicalZoom/midi/src/Options.cpp"
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.o -c /home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiEvent.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiEvent.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.o -c /home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiEventList.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiEventList.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.o -c /home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiFile.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiFile.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.o -c /home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiMessage.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/MidiMessage.cpp"
+},
+{
+  "directory": "/home/midly/apps/mandelMusicalZoom",
+  "command": "/usr/bin/c++  -I/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/include  -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.o -c /home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/Options.cpp",
+  "file": "/home/midly/apps/mandelMusicalZoom/craigsapp-midifile/src/Options.cpp"
 }
 ]

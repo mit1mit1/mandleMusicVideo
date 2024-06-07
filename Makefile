@@ -129,221 +129,200 @@ mandelzoom/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/build
 .PHONY : mandelzoom/fast
 
-art.o: art.cpp.o
+# target to build an object file
+art.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.o
 .PHONY : art.o
 
-# target to build an object file
-art.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.cpp.o
-.PHONY : art.cpp.o
-
-art.i: art.cpp.i
+# target to preprocess a source file
+art.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.i
 .PHONY : art.i
 
-# target to preprocess a source file
-art.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.cpp.i
-.PHONY : art.cpp.i
-
-art.s: art.cpp.s
+# target to generate assembly for a file
+art.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.s
 .PHONY : art.s
 
-# target to generate assembly for a file
-art.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/art.cpp.s
-.PHONY : art.cpp.s
-
-aubioParser.o: aubioParser.cpp.o
+# target to build an object file
+aubioParser.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/aubioParser.o
 .PHONY : aubioParser.o
 
-# target to build an object file
-aubioParser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/aubioParser.cpp.o
-.PHONY : aubioParser.cpp.o
-
-aubioParser.i: aubioParser.cpp.i
+# target to preprocess a source file
+aubioParser.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/aubioParser.i
 .PHONY : aubioParser.i
 
-# target to preprocess a source file
-aubioParser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/aubioParser.cpp.i
-.PHONY : aubioParser.cpp.i
-
-aubioParser.s: aubioParser.cpp.s
+# target to generate assembly for a file
+aubioParser.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/aubioParser.s
 .PHONY : aubioParser.s
 
-# target to generate assembly for a file
-aubioParser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/aubioParser.cpp.s
-.PHONY : aubioParser.cpp.s
-
-colors.o: colors.cpp.o
+# target to build an object file
+colors.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/colors.o
 .PHONY : colors.o
 
-# target to build an object file
-colors.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/colors.cpp.o
-.PHONY : colors.cpp.o
-
-colors.i: colors.cpp.i
+# target to preprocess a source file
+colors.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/colors.i
 .PHONY : colors.i
 
-# target to preprocess a source file
-colors.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/colors.cpp.i
-.PHONY : colors.cpp.i
-
-colors.s: colors.cpp.s
+# target to generate assembly for a file
+colors.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/colors.s
 .PHONY : colors.s
 
-# target to generate assembly for a file
-colors.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/colors.cpp.s
-.PHONY : colors.cpp.s
+# target to build an object file
+craigsapp-midifile/src/Binasc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.o
+.PHONY : craigsapp-midifile/src/Binasc.o
 
-lodepng.o: lodepng.cpp.o
+# target to preprocess a source file
+craigsapp-midifile/src/Binasc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.i
+.PHONY : craigsapp-midifile/src/Binasc.i
+
+# target to generate assembly for a file
+craigsapp-midifile/src/Binasc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.s
+.PHONY : craigsapp-midifile/src/Binasc.s
+
+# target to build an object file
+craigsapp-midifile/src/MidiEvent.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.o
+.PHONY : craigsapp-midifile/src/MidiEvent.o
+
+# target to preprocess a source file
+craigsapp-midifile/src/MidiEvent.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.i
+.PHONY : craigsapp-midifile/src/MidiEvent.i
+
+# target to generate assembly for a file
+craigsapp-midifile/src/MidiEvent.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.s
+.PHONY : craigsapp-midifile/src/MidiEvent.s
+
+# target to build an object file
+craigsapp-midifile/src/MidiEventList.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.o
+.PHONY : craigsapp-midifile/src/MidiEventList.o
+
+# target to preprocess a source file
+craigsapp-midifile/src/MidiEventList.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.i
+.PHONY : craigsapp-midifile/src/MidiEventList.i
+
+# target to generate assembly for a file
+craigsapp-midifile/src/MidiEventList.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.s
+.PHONY : craigsapp-midifile/src/MidiEventList.s
+
+# target to build an object file
+craigsapp-midifile/src/MidiFile.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.o
+.PHONY : craigsapp-midifile/src/MidiFile.o
+
+# target to preprocess a source file
+craigsapp-midifile/src/MidiFile.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.i
+.PHONY : craigsapp-midifile/src/MidiFile.i
+
+# target to generate assembly for a file
+craigsapp-midifile/src/MidiFile.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.s
+.PHONY : craigsapp-midifile/src/MidiFile.s
+
+# target to build an object file
+craigsapp-midifile/src/MidiMessage.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.o
+.PHONY : craigsapp-midifile/src/MidiMessage.o
+
+# target to preprocess a source file
+craigsapp-midifile/src/MidiMessage.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.i
+.PHONY : craigsapp-midifile/src/MidiMessage.i
+
+# target to generate assembly for a file
+craigsapp-midifile/src/MidiMessage.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.s
+.PHONY : craigsapp-midifile/src/MidiMessage.s
+
+# target to build an object file
+craigsapp-midifile/src/Options.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.o
+.PHONY : craigsapp-midifile/src/Options.o
+
+# target to preprocess a source file
+craigsapp-midifile/src/Options.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.i
+.PHONY : craigsapp-midifile/src/Options.i
+
+# target to generate assembly for a file
+craigsapp-midifile/src/Options.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.s
+.PHONY : craigsapp-midifile/src/Options.s
+
+# target to build an object file
+lodepng.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/lodepng.o
 .PHONY : lodepng.o
 
-# target to build an object file
-lodepng.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/lodepng.cpp.o
-.PHONY : lodepng.cpp.o
-
-lodepng.i: lodepng.cpp.i
+# target to preprocess a source file
+lodepng.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/lodepng.i
 .PHONY : lodepng.i
 
-# target to preprocess a source file
-lodepng.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/lodepng.cpp.i
-.PHONY : lodepng.cpp.i
-
-lodepng.s: lodepng.cpp.s
+# target to generate assembly for a file
+lodepng.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/lodepng.s
 .PHONY : lodepng.s
 
-# target to generate assembly for a file
-lodepng.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/lodepng.cpp.s
-.PHONY : lodepng.cpp.s
-
-mandelzoom.o: mandelzoom.cpp.o
+# target to build an object file
+mandelzoom.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/mandelzoom.o
 .PHONY : mandelzoom.o
 
-# target to build an object file
-mandelzoom.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/mandelzoom.cpp.o
-.PHONY : mandelzoom.cpp.o
-
-mandelzoom.i: mandelzoom.cpp.i
+# target to preprocess a source file
+mandelzoom.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/mandelzoom.i
 .PHONY : mandelzoom.i
 
-# target to preprocess a source file
-mandelzoom.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/mandelzoom.cpp.i
-.PHONY : mandelzoom.cpp.i
-
-mandelzoom.s: mandelzoom.cpp.s
+# target to generate assembly for a file
+mandelzoom.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/mandelzoom.s
 .PHONY : mandelzoom.s
 
-# target to generate assembly for a file
-mandelzoom.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/mandelzoom.cpp.s
-.PHONY : mandelzoom.cpp.s
-
-math.o: math.cpp.o
+# target to build an object file
+math.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.o
 .PHONY : math.o
 
-# target to build an object file
-math.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.cpp.o
-.PHONY : math.cpp.o
-
-math.i: math.cpp.i
+# target to preprocess a source file
+math.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.i
 .PHONY : math.i
 
-# target to preprocess a source file
-math.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.cpp.i
-.PHONY : math.cpp.i
-
-math.s: math.cpp.s
+# target to generate assembly for a file
+math.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.s
 .PHONY : math.s
 
-# target to generate assembly for a file
-math.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/math.cpp.s
-.PHONY : math.cpp.s
-
-midi/src/MidiFile.o: midi/src/MidiFile.cpp.o
-.PHONY : midi/src/MidiFile.o
-
 # target to build an object file
-midi/src/MidiFile.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.o
-.PHONY : midi/src/MidiFile.cpp.o
-
-midi/src/MidiFile.i: midi/src/MidiFile.cpp.i
-.PHONY : midi/src/MidiFile.i
-
-# target to preprocess a source file
-midi/src/MidiFile.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.i
-.PHONY : midi/src/MidiFile.cpp.i
-
-midi/src/MidiFile.s: midi/src/MidiFile.cpp.s
-.PHONY : midi/src/MidiFile.s
-
-# target to generate assembly for a file
-midi/src/MidiFile.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/MidiFile.cpp.s
-.PHONY : midi/src/MidiFile.cpp.s
-
-midi/src/Options.o: midi/src/Options.cpp.o
-.PHONY : midi/src/Options.o
-
-# target to build an object file
-midi/src/Options.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.o
-.PHONY : midi/src/Options.cpp.o
-
-midi/src/Options.i: midi/src/Options.cpp.i
-.PHONY : midi/src/Options.i
-
-# target to preprocess a source file
-midi/src/Options.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.i
-.PHONY : midi/src/Options.cpp.i
-
-midi/src/Options.s: midi/src/Options.cpp.s
-.PHONY : midi/src/Options.s
-
-# target to generate assembly for a file
-midi/src/Options.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/midi/src/Options.cpp.s
-.PHONY : midi/src/Options.cpp.s
-
-videoframe.o: videoframe.cpp.o
+videoframe.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.o
 .PHONY : videoframe.o
 
-# target to build an object file
-videoframe.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.cpp.o
-.PHONY : videoframe.cpp.o
-
-videoframe.i: videoframe.cpp.i
+# target to preprocess a source file
+videoframe.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.i
 .PHONY : videoframe.i
 
-# target to preprocess a source file
-videoframe.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.cpp.i
-.PHONY : videoframe.cpp.i
-
-videoframe.s: videoframe.cpp.s
-.PHONY : videoframe.s
-
 # target to generate assembly for a file
-videoframe.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.cpp.s
-.PHONY : videoframe.cpp.s
+videoframe.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/mandelzoom.dir/build.make CMakeFiles/mandelzoom.dir/videoframe.s
+.PHONY : videoframe.s
 
 # Help Target
 help:
@@ -363,6 +342,24 @@ help:
 	@echo "... colors.o"
 	@echo "... colors.i"
 	@echo "... colors.s"
+	@echo "... craigsapp-midifile/src/Binasc.o"
+	@echo "... craigsapp-midifile/src/Binasc.i"
+	@echo "... craigsapp-midifile/src/Binasc.s"
+	@echo "... craigsapp-midifile/src/MidiEvent.o"
+	@echo "... craigsapp-midifile/src/MidiEvent.i"
+	@echo "... craigsapp-midifile/src/MidiEvent.s"
+	@echo "... craigsapp-midifile/src/MidiEventList.o"
+	@echo "... craigsapp-midifile/src/MidiEventList.i"
+	@echo "... craigsapp-midifile/src/MidiEventList.s"
+	@echo "... craigsapp-midifile/src/MidiFile.o"
+	@echo "... craigsapp-midifile/src/MidiFile.i"
+	@echo "... craigsapp-midifile/src/MidiFile.s"
+	@echo "... craigsapp-midifile/src/MidiMessage.o"
+	@echo "... craigsapp-midifile/src/MidiMessage.i"
+	@echo "... craigsapp-midifile/src/MidiMessage.s"
+	@echo "... craigsapp-midifile/src/Options.o"
+	@echo "... craigsapp-midifile/src/Options.i"
+	@echo "... craigsapp-midifile/src/Options.s"
 	@echo "... lodepng.o"
 	@echo "... lodepng.i"
 	@echo "... lodepng.s"
@@ -372,12 +369,6 @@ help:
 	@echo "... math.o"
 	@echo "... math.i"
 	@echo "... math.s"
-	@echo "... midi/src/MidiFile.o"
-	@echo "... midi/src/MidiFile.i"
-	@echo "... midi/src/MidiFile.s"
-	@echo "... midi/src/Options.o"
-	@echo "... midi/src/Options.i"
-	@echo "... midi/src/Options.s"
 	@echo "... videoframe.o"
 	@echo "... videoframe.i"
 	@echo "... videoframe.s"
