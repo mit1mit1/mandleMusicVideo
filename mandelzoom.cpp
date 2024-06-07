@@ -25,10 +25,10 @@
 #include "art.h"
 #include "aubioParser.h"
 #include "colors.h"
-#include "lodepng.h"
-#include "math.h"
 #include "craigsapp-midifile/include/MidiFile.h"
 #include "craigsapp-midifile/include/Options.h"
+#include "lodepng.h"
+#include "math.h"
 using namespace smf;
 #include "structs.h"
 #include <algorithm>
@@ -50,11 +50,11 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                                     std::vector<float> onsetTimestamps,
                                     std::vector<AubioNote> notes);
 
-static int GenerateRippleZoomFrames(const char *outdir, int numframes,
-                                    long double xcenter, long double ycenter,
-                                    long double zoom, int framespersecond,
-                                    std::vector<float> onsetTimestamps,
-                                    std::vector<std::vector<AubioNote>> notes);
+static int GenerateRippleZoomFrames(
+    const char *outdir, int numframes, long double xcenter, long double ycenter,
+    long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
+    std::vector<std::vector<AubioNote>> aubioNotesVec,
+    std::vector<MidiNote> midiNotes);
 
 static double GetTimestampSeconds(int framenumber, int framespersecond);
 static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp);
@@ -85,10 +85,13 @@ int main(int argc, const char *argv[]) {
     std::vector<AubioNote> demoAudioNotes =
         ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    char midi1[] = "demoAudio.mid";
-    char *midiFiles[1];
-    midiFiles[0] = midi1;
-    options.process(1, midiFiles, 2);
+    std::vector<std::string> arguments = {"run", "./input/demoAudio.mid"};
+    std::vector<char *> fakeargv;
+    for (const auto &arg : arguments)
+      fakeargv.push_back((char *)arg.data());
+    fakeargv.push_back(nullptr);
+    std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
+    options.process(fakeargv.size() - 1, fakeargv.data(), 2);
     if (options.getArgCount() != 1) {
       std::cerr << "At least one MIDI filename is required.\n";
       exit(1);
@@ -100,13 +103,31 @@ int main(int argc, const char *argv[]) {
       exit(1);
     }
     midifile.joinTracks();
+    midifile.doTimeAnalysis();
+    midifile.linkNotePairs();
+
+    std::vector<MidiNote> midiNotes = {};
+
     int track = 0;
     for (int i = 0; i < midifile[track].size(); i++) {
       if (!midifile[track][i].isNoteOn()) {
         continue;
       }
-      std::cout << midifile[track][i].seconds << '\t' << midifile[track][i][1]
-                << std::endl;
+      std::cout << "Note start: " << midifile[track][i].seconds
+                << "; duration: " << midifile[track][i].getDurationInSeconds()
+                << "; P1 (pitch?): " << midifile[track][i].getP1()
+                << "; P2 (pitch?): " << midifile[track][i].getP2()
+                << "; P3 (pitch?): " << midifile[track][i].getP3() << '\t'
+                << "Track identifier?: " << midifile[track][i][1] << std::endl;
+      MidiNote newNote;
+
+      newNote.pitch = midifile[track][i].getP1();
+      newNote.volume = midifile[track][i].getP2();
+      newNote.startSeconds = midifile[track][i].seconds;
+      newNote.endSeconds = midifile[track][i].seconds +
+                           midifile[track][i].getDurationInSeconds();
+      newNote.trackNumber = i;
+      midiNotes.push_back(newNote);
     }
     // std::vector<AubioNote> pitchedNotes1 =
     //     ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
@@ -122,13 +143,13 @@ int main(int argc, const char *argv[]) {
     //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
     // std::vector<AubioNote> pitchedNotes7 =
     //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
-    std::vector<std::vector<AubioNote>> pitchedNotesVec = {demoAudioNotes};
+    std::vector<std::vector<AubioNote>> pitchedNotesVec = {};
     std::vector<float> percussionOnsets =
         ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
 
     return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
                                     framespersecond, percussionOnsets,
-                                    pitchedNotesVec);
+                                    pitchedNotesVec, midiNotes);
   }
   return PrintUsage();
 }
@@ -156,15 +177,16 @@ static double GetTimestampSeconds(int framenumber, int framespersecond) {
 static int GenerateRippleZoomFrames(
     const char *outdir, int numframes, long double xcenter, long double ycenter,
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
-    std::vector<std::vector<AubioNote>> notesVec) {
+    std::vector<std::vector<AubioNote>> aubioNotesVec,
+    std::vector<MidiNote> midiNotes) {
 
-  std::vector<int> maxPitches{};
-  std::vector<int> minPitches{};
-  std::vector<int> pitchRanges{};
-  for (unsigned int i = 0; i < notesVec.size(); i++) {
-    maxPitches.push_back(getMaxPitch(notesVec[i]));
-    minPitches.push_back(getMinPitch(notesVec[i]));
-    pitchRanges.push_back((maxPitches[i] - minPitches[i]));
+  std::vector<int> aubioMaxPitches{};
+  std::vector<int> aubioMinPitches{};
+  std::vector<int> aubioPitchRanges{};
+  for (unsigned int i = 0; i < aubioNotesVec.size(); i++) {
+    aubioMaxPitches.push_back(getMaxPitch(aubioNotesVec[i]));
+    aubioMinPitches.push_back(getMinPitch(aubioNotesVec[i]));
+    aubioPitchRanges.push_back((aubioMaxPitches[i] - aubioMinPitches[i]));
   }
 
   std::vector<PixelColor> availableColors = getColors();
@@ -217,14 +239,33 @@ static int GenerateRippleZoomFrames(
                                 zoomMultiplierPerFrame, blankColor);
 
     std::vector<Ripple> ripples = {};
-    for (unsigned int i = 0; i < notesVec.size(); ++i) {
-      std::vector<AubioNote> notes = notesVec[i];
+    for (unsigned int i = 0; i < aubioNotesVec.size(); ++i) {
+      std::vector<AubioNote> notes = aubioNotesVec[i];
       AubioNote currentNote = getCurrentNote(notes, timestamp);
       if (currentNote.startSeconds != -1) {
 
         std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
-            xResolution, yResolution, currentNote, framespersecond, i);
+            xResolution, yResolution, currentNote.pitch,
+            currentNote.startSeconds, currentNote.endSeconds, framespersecond,
+            i);
+
+        // Ripple newRipple = getNoteRippleSidescrolling(
+        //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
+        //     pitchRanges, framespersecond, i);
+        ripples.push_back(newRipple);
+      }
+    }
+
+    for (unsigned int i = 0; i < midiNotes.size(); ++i) {
+      MidiNote checkNote = midiNotes[i];
+      if (checkNote.startSeconds <= timestamp &&
+          checkNote.endSeconds >= timestamp) {
+
+        std::cout << " setting new ripple at " << timestamp << "\n  ";
+        Ripple newRipple = getNoteRippleCircleOfScales(
+            xResolution, yResolution, checkNote.pitch, checkNote.startSeconds,
+            checkNote.endSeconds, framespersecond, i);
 
         // Ripple newRipple = getNoteRippleSidescrolling(
         //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,

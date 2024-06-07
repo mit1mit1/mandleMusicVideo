@@ -5,48 +5,49 @@
 #include <iostream>
 #include <vector>
 
-Ripple getNoteRippleCircleOfScales(int width, int height, AubioNote currentNote,
-                                   int framespersecond, int instrumentNumber) {
+Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
+                                   double noteStartSeconds,
+                                   double noteEndSeconds, int framespersecond,
+                                   int instrumentNumber) {
   Ripple newRipple;
 
   double maxRadius = std::min(width / 2, height / 2) * 9 / 10;
 
-  double angle = currentNote.pitch * M_PI / 6;
-  std::cout << "angle of ripple" << angle << "\n";
+  double angle = notePitch * M_PI / 6;
+  // std::cout << "angle of ripple" << angle << "\n";
 
-  // Assume highest pitch ever is 100?
-  double radius = maxRadius * (0.3 + 0.7 * currentNote.pitch / 100);
+  // Assume highest pitch ever is 120?
+  double radius = maxRadius * (0.3 + 0.7 * notePitch / 120);
 
   newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
   newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
-  int speedBonus =
-      (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
+  int speedBonus = (int)(0.3 / (noteStartSeconds - noteEndSeconds));
   if (speedBonus > 6) {
     speedBonus = 6;
   }
   newRipple.speed = 3 + speedBonus;
   newRipple.thickness = 90;
-  newRipple.startFrame = currentNote.startSeconds * framespersecond;
+  newRipple.startFrame = noteStartSeconds * framespersecond;
 
-  newRipple.addColor = getRippleColor(currentNote, instrumentNumber);
+  newRipple.addColor = getRippleColor(notePitch, instrumentNumber);
   return newRipple;
 }
 
 // TODO: Array of nice colors
-PixelColor getRippleColor(AubioNote currentNote, int instrumentNumber) {
+PixelColor getRippleColor(double notePitch, int instrumentNumber) {
   PixelColor rippleColor;
   rippleColor.red =
-      (int)((currentNote.pitch *
+      (int)((notePitch *
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 3 +
               1)) *
             0.25);
   rippleColor.green =
-      (int)((currentNote.pitch *
+      (int)((notePitch *
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 5 +
               1)) *
             0.25);
   rippleColor.blue =
-      (int)((currentNote.pitch *
+      (int)((notePitch *
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 7 +
               1)) *
             0.25);
@@ -81,7 +82,7 @@ Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
   newRipple.speed = 3 + speedBonus;
   newRipple.thickness = 90;
   newRipple.startFrame = currentNote.startSeconds * framespersecond;
-  newRipple.addColor = getRippleColor(currentNote, instrumentNumber);
+  newRipple.addColor = getRippleColor(currentNote.pitch, instrumentNumber);
 
   return newRipple;
 }

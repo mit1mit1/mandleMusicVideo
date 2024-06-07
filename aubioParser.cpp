@@ -26,7 +26,7 @@ std::vector<AubioNote> ParseAubioNoteFile(const char *filename, float extraSecon
     std::cout << notes.front().startSeconds << " start sec  " << notes.front().endSeconds << " end sec  " << notes.front().pitch << " pitch ";
 
     std::cout << "Last Note: ";
-    std::cout << notes.back().startSeconds << " start sec  " << notes.back().endSeconds << " end sec  " << notes.back().pitch << " pitch ";
+    std::cout << notes.back().startSeconds << " start sec  " << notes.back().endSeconds << " end sec  " << notes.back().pitch << " pitch \n";
 
     return notes;
 }

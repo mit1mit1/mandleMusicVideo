@@ -6,14 +6,16 @@
 #include "videoframe.h"
 #include <vector>
 
-Ripple getNoteRippleCircleOfScales(int width, int height, AubioNote currentNote,
-                                  int framespersecond, int instrumentNumber);
+Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
+                                   double noteStartSeconds,
+                                   double noteEndSeconds, int framespersecond,
+                                   int instrumentNumber);
 
 Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
-                                   AubioNote currentNote,
-                                   std::vector<int> minPitches,
-                                   std::vector<int> pitchRanges,
-                                   int framespersecond, int intrumentNumber);
+                                  AubioNote currentNote,
+                                  std::vector<int> minPitches,
+                                  std::vector<int> pitchRanges,
+                                  int framespersecond, int intrumentNumber);
 
 PixelColor getNextBackgroundColor(double timestamp, double lastOnsetTimestamp,
                                   double onsetColorChangeLength,
@@ -25,5 +27,5 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
                   int framenumber, int scrollSpeedX, int scrollSpeedY,
                   VideoFrame currentFrame);
 
-PixelColor getRippleColor(AubioNote currentNote, int instrumentNumber);
+PixelColor getRippleColor(double notePitch, int instrumentNumber);
 #endif
