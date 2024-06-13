@@ -16,17 +16,17 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   double angle = notePitch * M_PI / 6;
   // std::cout << "angle of ripple" << angle << "\n";
 
-  // Assume highest pitch ever is 120?
-  double radius = maxRadius * (0.3 + 0.7 * notePitch / 120);
+  // Assume highest pitch ever is 120
+  double radius = maxRadius * (0.02 + 0.98 * notePitch / 120);
 
   newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
   newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
-  int speedBonus = (int)(0.3 / (noteStartSeconds - noteEndSeconds));
+  int speedBonus = (int)(0.2 / (noteStartSeconds - noteEndSeconds));
   if (speedBonus > 6) {
     speedBonus = 6;
   }
-  newRipple.speed = 3 + speedBonus;
-  newRipple.thickness = 90;
+  newRipple.speed = 1 + speedBonus;
+  newRipple.thickness = 60;
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
   newRipple.addColor = getRippleColor(notePitch, instrumentNumber);
@@ -75,12 +75,12 @@ Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
              pitchRanges[instrumentNumber]) *
             (8 * yResolution / 10));
   int speedBonus =
-      (int)(0.3 / (currentNote.startSeconds - currentNote.endSeconds));
+      (int)(0.2 / (currentNote.startSeconds - currentNote.endSeconds));
   if (speedBonus > 6) {
     speedBonus = 6;
   }
-  newRipple.speed = 3 + speedBonus;
-  newRipple.thickness = 90;
+  newRipple.speed = 1 + speedBonus;
+  newRipple.thickness = 60;
   newRipple.startFrame = currentNote.startSeconds * framespersecond;
   newRipple.addColor = getRippleColor(currentNote.pitch, instrumentNumber);
 
@@ -127,24 +127,22 @@ PixelColor getNextBackgroundColor(double timestamp, double lastOnsetTimestamp,
 void colorRipples(int width, int height, std::vector<Ripple> ripples,
                   int framenumber, int scrollSpeedX, int scrollSpeedY,
                   VideoFrame currentFrame) {
-  for (int x = 0; x < width; ++x) {
-    for (int y = 0; y < height; ++y) {
-      for (Ripple ripple : ripples) {
-
-        int framesSinceRippleStart = framenumber - ripple.startFrame;
-        int radius = framesSinceRippleStart * ripple.speed + 5;
-        int thickness =
-            (ripple.thickness + (radius / 2)) * ripple.thickness + (radius / 2);
-        int scrolledXCenter =
-            ripple.xCenter - framesSinceRippleStart * scrollSpeedX;
-        int scrolledYCenter =
-            ripple.yCenter - framesSinceRippleStart * scrollSpeedY;
+  for (Ripple ripple : ripples) {
+    int framesSinceRippleStart = framenumber - ripple.startFrame;
+    int radius = framesSinceRippleStart * ripple.speed + 12;
+    int thickness =
+        (ripple.thickness + (radius / 2)) * ripple.thickness + (radius / 2);
+    int scrolledXCenter =
+        ripple.xCenter - framesSinceRippleStart * scrollSpeedX;
+    int scrolledYCenter =
+        ripple.yCenter - framesSinceRippleStart * scrollSpeedY;
+    for (int x = 0; x < width; ++x) {
+      for (int y = 0; y < height; ++y) {
         const int distFromCentreSquared =
             (x - scrolledXCenter) * (x - scrolledXCenter) +
             (y - scrolledYCenter) * (y - scrolledYCenter);
         if (distFromCentreSquared > radius * radius - thickness &&
             distFromCentreSquared < radius * radius) {
-
           currentFrame.AddPixel(x, y, ripple.addColor);
         }
       }

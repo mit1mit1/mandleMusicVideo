@@ -85,7 +85,7 @@ int main(int argc, const char *argv[]) {
     std::vector<AubioNote> demoAudioNotes =
         ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    std::vector<std::string> arguments = {"run", "./input/PachabelEverything.mid"};
+    std::vector<std::string> arguments = {"run", "./input/PianoBallad.mid"};
     std::vector<char *> fakeargv;
     for (const auto &arg : arguments)
       fakeargv.push_back((char *)arg.data());
@@ -244,7 +244,7 @@ static int GenerateRippleZoomFrames(
       AubioNote currentNote = getCurrentNote(notes, timestamp);
       if (currentNote.startSeconds != -1) {
 
-        std::cout << " setting new ripple at " << timestamp << "\n  ";
+        // std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, currentNote.pitch,
             currentNote.startSeconds, currentNote.endSeconds, framespersecond,
@@ -259,10 +259,15 @@ static int GenerateRippleZoomFrames(
 
     for (unsigned int i = 0; i < midiNotes.size(); ++i) {
       MidiNote checkNote = midiNotes[i];
+      // Never check this note again if we're already past it's end time
+      if (checkNote.endSeconds < timestamp) {
+        midiNotes.erase(midiNotes.begin() + i);
+        continue;
+      }
       if (checkNote.startSeconds <= timestamp &&
           checkNote.endSeconds >= timestamp) {
 
-        std::cout << " setting new ripple at " << timestamp << "\n  ";
+        // std::cout << " setting new ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, checkNote.pitch, checkNote.startSeconds,
             checkNote.endSeconds, framespersecond, i);
@@ -276,23 +281,23 @@ static int GenerateRippleZoomFrames(
 
     currentFrame.BrightenAllPixels(0.75);
 
-    for (int x = 0; x < xResolution; ++x) {
-      for (int y = 0; y < yResolution; ++y) {
-        for (Ripple ripple : ripples) {
-          int framesSinceRippleStart = f - ripple.startFrame;
-          int radius = framesSinceRippleStart * ripple.speed + 5;
-          int thickness = (ripple.thickness + (radius / 2)) * ripple.thickness +
-                          (radius / 2);
-          // TODO: Extract discrete zoom and use it to move ripple centre as
-          // well
-          Coordinate zoomDiff = getDiscreteZoomDiff(
-              ripple.xCenter, ripple.yCenter, xResolution / 2, yResolution / 2);
-          int scrolledXCenter =
-              ripple.xCenter -
-              framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart);
-          int scrolledYCenter =
-              ripple.yCenter -
-              framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart);
+    for (Ripple ripple : ripples) {
+      int framesSinceRippleStart = f - ripple.startFrame;
+      int radius = framesSinceRippleStart * ripple.speed + 12;
+      int thickness =
+          (ripple.thickness + (radius / 2)) * ripple.thickness + (radius / 2);
+      // TODO: Extract discrete zoom and use it to move ripple centre as
+      // well
+      Coordinate zoomDiff = getDiscreteZoomDiff(
+          ripple.xCenter, ripple.yCenter, xResolution / 2, yResolution / 2);
+      int scrolledXCenter =
+          ripple.xCenter -
+          framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart);
+      int scrolledYCenter =
+          ripple.yCenter - framesSinceRippleStart *
+                               (scrollSpeedY + zoomDiff.imaginaryPart);
+      for (int x = 0; x < xResolution; ++x) {
+        for (int y = 0; y < yResolution; ++y) {
           const int distFromCentreSquared =
               (x - scrolledXCenter) * (x - scrolledXCenter) +
               (y - scrolledYCenter) * (y - scrolledYCenter);
