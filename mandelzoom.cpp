@@ -195,12 +195,12 @@ static int GenerateRippleZoomFrames(
   blankColor.red = 0;
   blankColor.green = 0;
   blankColor.blue = 0;
-  blankColor.alpha = 1;
+  blankColor.alpha = 255;
   PixelColor backgroundColor;
   backgroundColor.red = 0;
   backgroundColor.green = 0;
   backgroundColor.blue = 0;
-  backgroundColor.alpha = 1;
+  backgroundColor.alpha = 255;
   const int backgroundColorMaxSaturation = 20;
   const double onsetColorChangeLength = 0.4;
 
@@ -364,7 +364,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   blankColor.red = 0;
   blankColor.green = 0;
   blankColor.blue = 0;
-  blankColor.alpha = 0;
+  blankColor.alpha = 255;
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++) {
     for (unsigned int y = 0; y < yResolution; y++) {
@@ -409,7 +409,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     }
     double timestamp = GetTimestampSeconds(f, framespersecond);
 
-    std::cout << " current timestamp " << timestamp << "\n  ";
+    // std::cout << " current timestamp " << timestamp << "\n  ";
 
     long double ver_span = 4.0 / denom;
     long double hor_span = ver_span * (xResolution - 1.0) / (yResolution - 1.0);

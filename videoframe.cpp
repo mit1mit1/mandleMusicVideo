@@ -146,7 +146,7 @@ void VideoFrame::BrightenPixel(int x, int y, float multiple) {
   buffer[index] = (int)(buffer[index] * multiple);
   buffer[index + 1] = (int)(buffer[index + 1] * multiple);
   buffer[index + 2] = (int)(buffer[index + 2] * multiple);
-  buffer[index + 3] = (int)(buffer[index + 3] * multiple);
+  // buffer[index + 3] = (int)(buffer[index + 3] * multiple);
 
   for (int k = 0; k < 4; ++k) {
     if (buffer[index + k] < 0) {
@@ -196,7 +196,8 @@ void VideoFrame::AddPixel(int x, int y, PixelColor color) {
   buffer[index] = buffer[index] + color.red;
   buffer[index + 1] = buffer[index + 1] + color.green;
   buffer[index + 2] = buffer[index + 2] + color.blue;
-  buffer[index + 3] = buffer[index + 3] + color.alpha;
+  // buffer[index + 3] = buffer[index + 3] + color.alpha;
+  buffer[index + 3] = 255;
   for (int k = 0; k < 4; ++k) {
     if (buffer[index + k] < 0) {
       buffer[index + k] = 0;
@@ -220,7 +221,8 @@ void VideoFrame::SetPixel(int x, int y, PixelColor color) {
   buffer[index] = color.red;
   buffer[index + 1] = color.green;
   buffer[index + 2] = color.blue;
-  buffer[index + 3] = color.alpha;
+  // buffer[index + 3] = color.alpha;
+  buffer[index + 3] = 255;
 
   for (int k = 0; k < 4; ++k) {
     if (buffer[index + k] < 0) {

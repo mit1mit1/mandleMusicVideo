@@ -32,10 +32,11 @@ std::vector<PixelColor> getColors() {
       intermediateColor.blue = static_cast<unsigned char>(
           seedColors[i].blue +
           (seedColors[compareI].blue - seedColors[i].blue) * k / colorsBetween);
-      intermediateColor.alpha = static_cast<unsigned char>(
-          seedColors[i].alpha +
-          (seedColors[compareI].alpha - seedColors[i].alpha) * k /
-              colorsBetween);
+      // intermediateColor.alpha = static_cast<unsigned char>(
+      //     seedColors[i].alpha +
+      //     (seedColors[compareI].alpha - seedColors[i].alpha) * k /
+      //         colorsBetween);
+      intermediateColor.alpha = 255;
       colors.push_back(intermediateColor);
     }
   }

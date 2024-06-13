@@ -51,7 +51,7 @@ PixelColor getRippleColor(double notePitch, int instrumentNumber) {
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 7 +
               1)) *
             0.25);
-  rippleColor.alpha = 0;
+  rippleColor.alpha = 255;
   return rippleColor;
 }
 
@@ -112,12 +112,6 @@ PixelColor getNextBackgroundColor(double timestamp, double lastOnsetTimestamp,
       nextBackgroundColor.green = currentBackgroundColor.green + 2;
     } else {
       nextBackgroundColor.green = currentBackgroundColor.green - 2;
-    }
-    if (onsetsPassed % 2 == 0 &&
-        currentBackgroundColor.alpha < backgroundColorMaxSaturation - 3) {
-      nextBackgroundColor.alpha = currentBackgroundColor.alpha + 3;
-    } else {
-      nextBackgroundColor.alpha = currentBackgroundColor.alpha - 3;
     }
   }
 
