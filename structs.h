@@ -15,6 +15,7 @@ struct Ripple {
   int speed;
   int thickness;
   int startFrame;
+  int type;
   PixelColor addColor;
 };
 

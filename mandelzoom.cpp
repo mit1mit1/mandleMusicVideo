@@ -82,10 +82,10 @@ int main(int argc, const char *argv[]) {
       return 1;
     }
 
-    std::vector<AubioNote> demoAudioNotes =
-        ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
+    // std::vector<AubioNote> demoAudioNotes =
+    //    ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    std::vector<std::string> arguments = {"run", "./input/PianoBallad.mid"};
+    std::vector<std::string> arguments = {"run", "./input/scat2.mid"};
     std::vector<char *> fakeargv;
     for (const auto &arg : arguments)
       fakeargv.push_back((char *)arg.data());
@@ -144,8 +144,8 @@ int main(int argc, const char *argv[]) {
     // std::vector<AubioNote> pitchedNotes7 =
     //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
     std::vector<std::vector<AubioNote>> pitchedNotesVec = {};
-    std::vector<float> percussionOnsets =
-        ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
+    std::vector<float> percussionOnsets = {};
+    //    ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
 
     return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
                                     framespersecond, percussionOnsets,
@@ -294,13 +294,20 @@ static int GenerateRippleZoomFrames(
           ripple.xCenter -
           framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart);
       int scrolledYCenter =
-          ripple.yCenter - framesSinceRippleStart *
-                               (scrollSpeedY + zoomDiff.imaginaryPart);
+          ripple.yCenter -
+          framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart);
       for (int x = 0; x < xResolution; ++x) {
         for (int y = 0; y < yResolution; ++y) {
+          // const int distFromCentreSquared =
+          //     (x - scrolledXCenter) * (x - scrolledXCenter) +
+          //     (y - scrolledYCenter) * (y - scrolledYCenter);
+          // TODO make the ripples more fun - maybe remove abs, maybe multiply
+          // by another function of x and y
           const int distFromCentreSquared =
-              (x - scrolledXCenter) * (x - scrolledXCenter) +
-              (y - scrolledYCenter) * (y - scrolledYCenter);
+              std::abs(std::pow((x - scrolledXCenter), ripple.type + 1) *
+                       (std::cos(ripple.type * 3 + 3 / 4) + 0.05)) +
+              std::abs(std::pow((y - scrolledYCenter), ripple.type + 1) *
+                       (std::sin(ripple.type * 3 + 3 / 4) + 0.05));
           if (distFromCentreSquared > radius * radius - thickness &&
               distFromCentreSquared < radius * radius) {
 

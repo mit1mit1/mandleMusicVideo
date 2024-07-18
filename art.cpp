@@ -30,6 +30,7 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
   newRipple.addColor = getRippleColor(notePitch, instrumentNumber);
+  newRipple.type = instrumentNumber % 5;
   return newRipple;
 }
 
@@ -83,7 +84,7 @@ Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
   newRipple.thickness = 60;
   newRipple.startFrame = currentNote.startSeconds * framespersecond;
   newRipple.addColor = getRippleColor(currentNote.pitch, instrumentNumber);
-
+  newRipple.type = instrumentNumber % 5;
   return newRipple;
 }
 
@@ -133,8 +134,10 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
     for (int x = 0; x < width; ++x) {
       for (int y = 0; y < height; ++y) {
         const int distFromCentreSquared =
-            (x - scrolledXCenter) * (x - scrolledXCenter) +
-            (y - scrolledYCenter) * (y - scrolledYCenter);
+            std::pow((x - scrolledXCenter), ripple.type + 1) *
+                std::cos(ripple.type * 3 + 3 / 4) +
+            std::pow((y - scrolledYCenter), ripple.type + 1) *
+                std::sin(ripple.type * 3 + 3 / 4);
         if (distFromCentreSquared > radius * radius - thickness &&
             distFromCentreSquared < radius * radius) {
           currentFrame.AddPixel(x, y, ripple.addColor);

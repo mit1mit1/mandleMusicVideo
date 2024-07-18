@@ -5,6 +5,7 @@
 #include "structs.h"
 #include "videoframe.h"
 #include <vector>
+#include <numbers>
 
 Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
                                    double noteStartSeconds,
