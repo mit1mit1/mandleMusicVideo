@@ -85,7 +85,7 @@ int main(int argc, const char *argv[]) {
     // std::vector<AubioNote> demoAudioNotes =
     //    ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    std::vector<std::string> arguments = {"run", "./input/scat2.mid"};
+    std::vector<std::string> arguments = {"run", "./input/take5.mid"};
     std::vector<char *> fakeargv;
     for (const auto &arg : arguments)
       fakeargv.push_back((char *)arg.data());
@@ -303,11 +303,13 @@ static int GenerateRippleZoomFrames(
           //     (y - scrolledYCenter) * (y - scrolledYCenter);
           // TODO make the ripples more fun - maybe remove abs, maybe multiply
           // by another function of x and y
-          const int distFromCentreSquared =
-              std::abs(std::pow((x - scrolledXCenter), ripple.type + 1) *
-                       (std::cos(ripple.type * 3 + 3 / 4) + 0.05)) +
-              std::abs(std::pow((y - scrolledYCenter), ripple.type + 1) *
-                       (std::sin(ripple.type * 3 + 3 / 4) + 0.05));
+          // const int distFromCentreSquaredWonky =
+          //     std::abs(std::pow((x - scrolledXCenter), ripple.type + 1) *
+          //              (std::cos(ripple.type * 3 + 3 / 4) + 0.05)) +
+          //     std::abs(std::pow((y - scrolledYCenter), ripple.type + 1) *
+          //              (std::sin(ripple.type * 3 + 3 / 4) + 0.05));
+          const int distFromCentreSquared = std::pow(x - scrolledXCenter, 2) +
+                                            std::pow(y - scrolledYCenter, 2);
           if (distFromCentreSquared > radius * radius - thickness &&
               distFromCentreSquared < radius * radius) {
 

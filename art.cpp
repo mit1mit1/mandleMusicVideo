@@ -30,31 +30,58 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
   newRipple.addColor = getRippleColor(notePitch, instrumentNumber);
+  // newRipple.addColor = getRippleColorPitchDependent(notePitch,
+  // instrumentNumber);
   newRipple.type = instrumentNumber % 5;
   return newRipple;
 }
 
-// TODO: Array of nice colors
 PixelColor getRippleColor(double notePitch, int instrumentNumber) {
   PixelColor rippleColor;
   rippleColor.red =
-      (int)((notePitch *
+      (int)((60 *
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 3 +
               1)) *
             0.25);
   rippleColor.green =
-      (int)((notePitch *
+      (int)((60 *
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 5 +
               1)) *
             0.25);
   rippleColor.blue =
-      (int)((notePitch *
+      (int)((60 *
              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 7 +
               1)) *
             0.25);
   rippleColor.alpha = 255;
   return rippleColor;
 }
+
+// // TODO: Array of nice colors
+// PixelColor getRippleColorPitchDependent(double notePitch, int
+// instrumentNumber) {
+//   PixelColor rippleColor;
+//   rippleColor.red =
+//       (int)((notePitch *
+//              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 3
+//              +
+//               1)) *
+//             0.25);
+//   rippleColor.green =
+//       (int)((notePitch *
+//              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 5
+//              +
+//               1)) *
+//             0.25);
+//   rippleColor.blue =
+//       (int)((notePitch *
+//              (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 7
+//              +
+//               1)) *
+//             0.25);
+//   rippleColor.alpha = 255;
+//   return rippleColor;
+// }
 
 Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
                                   AubioNote currentNote,
@@ -133,11 +160,13 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
         ripple.yCenter - framesSinceRippleStart * scrollSpeedY;
     for (int x = 0; x < width; ++x) {
       for (int y = 0; y < height; ++y) {
+        // const int distFromCentreSquaredWonky =
+        //     std::pow((x - scrolledXCenter), ripple.type + 1) *
+        //         std::cos(ripple.type * 3 + 3 / 4) +
+        //     std::pow((y - scrolledYCenter), ripple.type + 1) *
+        //         std::sin(ripple.type * 3 + 3 / 4);
         const int distFromCentreSquared =
-            std::pow((x - scrolledXCenter), ripple.type + 1) *
-                std::cos(ripple.type * 3 + 3 / 4) +
-            std::pow((y - scrolledYCenter), ripple.type + 1) *
-                std::sin(ripple.type * 3 + 3 / 4);
+            std::pow(x - scrolledXCenter, 2) + std::pow(y - scrolledYCenter, 2);
         if (distFromCentreSquared > radius * radius - thickness &&
             distFromCentreSquared < radius * radius) {
           currentFrame.AddPixel(x, y, ripple.addColor);
