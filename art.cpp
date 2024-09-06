@@ -29,14 +29,41 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.thickness = 60;
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
-  newRipple.addColor = getRippleColor(notePitch, instrumentNumber);
+  newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
   // newRipple.addColor = getRippleColorPitchDependent(notePitch,
   // instrumentNumber);
   newRipple.type = instrumentNumber % 5;
   return newRipple;
 }
 
-PixelColor getRippleColor(double notePitch, int instrumentNumber) {
+
+PixelColor getRippleColorPitch(double notePitch, int instrumentNumber) {
+
+  std::vector<PixelColor> drWhoColors = {
+      PixelColor{.red = 255, .green = 237, .blue = 231, .alpha = 255},
+      PixelColor{.red = 254, .green = 228, .blue = 213, .alpha = 255},
+      PixelColor{.red = 242, .green = 146, .blue = 147, .alpha = 255},
+      PixelColor{.red = 197, .green = 86, .blue = 137, .alpha = 255},
+      PixelColor{.red = 142, .green = 107, .blue = 187, .alpha = 255},
+      PixelColor{.red = 87, .green = 46, .blue = 140, .alpha = 255},
+      PixelColor{.red = 69, .green = 26, .blue = 142, .alpha = 255},
+      PixelColor{.red = 143, .green = 25, .blue = 111, .alpha = 255},
+      PixelColor{.red = 200, .green = 117, .blue = 135, .alpha = 255},
+      PixelColor{.red = 254, .green = 238, .blue = 215, .alpha = 255},
+      PixelColor{.red = 146, .green = 115, .blue = 182, .alpha = 255},
+      PixelColor{.red = 178, .green = 96, .blue = 180, .alpha = 255},
+      PixelColor{.red = 240, .green = 220, .blue = 200, .alpha = 255},
+  };
+  
+  PixelColor rippleColor = drWhoColors[(int)(notePitch) % 12];
+  rippleColor.red = rippleColor.red * 0.05;
+  rippleColor.red = rippleColor.green * 0.05;
+  rippleColor.red = rippleColor.blue * 0.05;
+  return rippleColor;
+}
+
+
+PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber) {
   PixelColor rippleColor;
   rippleColor.red =
       (int)((60 *
@@ -110,7 +137,7 @@ Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
   newRipple.speed = 1 + speedBonus;
   newRipple.thickness = 60;
   newRipple.startFrame = currentNote.startSeconds * framespersecond;
-  newRipple.addColor = getRippleColor(currentNote.pitch, instrumentNumber);
+  newRipple.addColor = getRippleColorInstrument(currentNote.pitch, instrumentNumber);
   newRipple.type = instrumentNumber % 5;
   return newRipple;
 }

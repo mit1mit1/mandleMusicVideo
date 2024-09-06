@@ -28,5 +28,6 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
                   int framenumber, int scrollSpeedX, int scrollSpeedY,
                   VideoFrame currentFrame);
 
-PixelColor getRippleColor(double notePitch, int instrumentNumber);
+PixelColor getRippleColorPitch(double notePitch, int instrumentNumber);
+PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber);
 #endif

@@ -283,13 +283,18 @@ static int GenerateRippleZoomFrames(
 
     for (Ripple ripple : ripples) {
       int framesSinceRippleStart = f - ripple.startFrame;
-      int radius = framesSinceRippleStart * ripple.speed + 12;
-      int thickness =
-          (ripple.thickness + (radius / 2)) * ripple.thickness + (radius / 2);
+      int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30);
+      int innerRadius = outerRadius - framesSinceRippleStart * ripple.speed % 5;
+      // int thickness =
+      //     (ripple.thickness + (innerRadius / 2)) * ripple.thickness + (innerRadius / 2);
       // TODO: Extract discrete zoom and use it to move ripple centre as
       // well
-      Coordinate zoomDiff = getDiscreteZoomDiff(
-          ripple.xCenter, ripple.yCenter, xResolution / 2, yResolution / 2);
+      // For spreading effect
+      // Coordinate zoomDiff = getDiscreteZoomDiff(
+      //     ripple.xCenter, ripple.yCenter, xResolution / 2, yResolution / 2);
+      Coordinate zoomDiff;
+      zoomDiff.realPart = 0;
+      zoomDiff.imaginaryPart = 0;
       int scrolledXCenter =
           ripple.xCenter -
           framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart);
@@ -310,8 +315,12 @@ static int GenerateRippleZoomFrames(
           //              (std::sin(ripple.type * 3 + 3 / 4) + 0.05));
           const int distFromCentreSquared = std::pow(x - scrolledXCenter, 2) +
                                             std::pow(y - scrolledYCenter, 2);
-          if (distFromCentreSquared > radius * radius - thickness &&
-              distFromCentreSquared < radius * radius) {
+          if (
+            // Ring effect
+            // distFromCentreSquared > innerRadius * innerRadius - thickness &&
+             distFromCentreSquared < innerRadius * innerRadius
+              //  && framesSinceRippleStart % 5 == 0 - if you want a strobe party effect
+               ) {
 
             currentFrame.AddPixel(x, y, ripple.addColor);
           }

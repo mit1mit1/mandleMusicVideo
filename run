@@ -12,6 +12,7 @@ Fail()
 # Ofast uses fast math, which loses precision
 # TODO: Use Cmake
 rm -rf build/*
+rm mandlezoom
 cd build
 cmake ../
 cd ../
