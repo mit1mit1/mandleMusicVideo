@@ -85,7 +85,7 @@ int main(int argc, const char *argv[]) {
     // std::vector<AubioNote> demoAudioNotes =
     //    ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    std::vector<std::string> arguments = {"run", "./input/take5.mid"};
+    std::vector<std::string> arguments = {"run", "./input/zelda.mid"};
     std::vector<char *> fakeargv;
     for (const auto &arg : arguments)
       fakeargv.push_back((char *)arg.data());
@@ -244,7 +244,7 @@ static int GenerateRippleZoomFrames(
       AubioNote currentNote = getCurrentNote(notes, timestamp);
       if (currentNote.startSeconds != -1) {
 
-        // std::cout << " setting new ripple at " << timestamp << "\n  ";
+        std::cout << " setting new aubio ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, currentNote.pitch,
             currentNote.startSeconds, currentNote.endSeconds, framespersecond,
@@ -267,7 +267,7 @@ static int GenerateRippleZoomFrames(
       if (checkNote.startSeconds <= timestamp &&
           checkNote.endSeconds >= timestamp) {
 
-        // std::cout << " setting new ripple at " << timestamp << "\n  ";
+        std::cout << " setting new midi ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, checkNote.pitch, checkNote.startSeconds,
             checkNote.endSeconds, framespersecond, i);

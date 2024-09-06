@@ -1,5 +1,6 @@
 project("mandelMusicalZoom")
 
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(craigsapp-midifile/include)
