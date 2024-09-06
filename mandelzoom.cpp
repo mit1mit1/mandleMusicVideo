@@ -59,12 +59,15 @@ static int GenerateRippleZoomFrames(
 static double GetTimestampSeconds(int framenumber, int framespersecond);
 static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp);
 
-int main(int argc, const char *argv[]) {
+int main(int argc, const char *argv[])
+{
   std::cout << std::setprecision(13) << std::fixed;
-  if (argc >= 6) {
+  if (argc >= 6)
+  {
     const char *outdir = argv[1];
     int numframes = atoi(argv[2]);
-    if (numframes < 2) {
+    if (numframes < 2)
+    {
       fprintf(stderr, "ERROR: Invalid number of frames on command line. Must "
                       "be at least 2.\n");
       return 1;
@@ -74,10 +77,12 @@ int main(int argc, const char *argv[]) {
     long double zoom = atof(argv[5]);
 
     int framespersecond = 30;
-    if (argc > 6) {
+    if (argc > 6)
+    {
       framespersecond = atoi(argv[6]);
     }
-    if (zoom < 1.0) {
+    if (zoom < 1.0)
+    {
       fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
       return 1;
     }
@@ -92,13 +97,15 @@ int main(int argc, const char *argv[]) {
     fakeargv.push_back(nullptr);
     std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
     options.process(fakeargv.size() - 1, fakeargv.data(), 2);
-    if (options.getArgCount() != 1) {
+    if (options.getArgCount() != 1)
+    {
       std::cerr << "At least one MIDI filename is required.\n";
       exit(1);
     }
     MidiFile midifile;
     midifile.read(options.getArg(1));
-    if (!midifile.status()) {
+    if (!midifile.status())
+    {
       std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
       exit(1);
     }
@@ -109,8 +116,10 @@ int main(int argc, const char *argv[]) {
     std::vector<MidiNote> midiNotes = {};
 
     int track = 0;
-    for (int i = 0; i < midifile[track].size(); i++) {
-      if (!midifile[track][i].isNoteOn()) {
+    for (int i = 0; i < midifile[track].size(); i++)
+    {
+      if (!midifile[track][i].isNoteOn())
+      {
         continue;
       }
       std::cout << "Note start: " << midifile[track][i].seconds
@@ -154,7 +163,8 @@ int main(int argc, const char *argv[]) {
   return PrintUsage();
 }
 
-static int PrintUsage() {
+static int PrintUsage()
+{
   fprintf(stderr,
           "\n"
           "USAGE:\n"
@@ -170,7 +180,8 @@ static int PrintUsage() {
   return 1;
 }
 
-static double GetTimestampSeconds(int framenumber, int framespersecond) {
+static double GetTimestampSeconds(int framenumber, int framespersecond)
+{
   return ((double)framenumber) / ((double)framespersecond);
 }
 
@@ -178,12 +189,14 @@ static int GenerateRippleZoomFrames(
     const char *outdir, int numframes, long double xcenter, long double ycenter,
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
     std::vector<std::vector<AubioNote>> aubioNotesVec,
-    std::vector<MidiNote> midiNotes) {
+    std::vector<MidiNote> midiNotes)
+{
 
   std::vector<int> aubioMaxPitches{};
   std::vector<int> aubioMinPitches{};
   std::vector<int> aubioPitchRanges{};
-  for (unsigned int i = 0; i < aubioNotesVec.size(); i++) {
+  for (unsigned int i = 0; i < aubioNotesVec.size(); i++)
+  {
     aubioMaxPitches.push_back(getMaxPitch(aubioNotesVec[i]));
     aubioMinPitches.push_back(getMinPitch(aubioNotesVec[i]));
     aubioPitchRanges.push_back((aubioMaxPitches[i] - aubioMinPitches[i]));
@@ -215,15 +228,18 @@ static int GenerateRippleZoomFrames(
 
   const int startTimeSeconds = 0;
   // Generate the frames
-  for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
+  for (int f = startTimeSeconds * framespersecond; f < numframes; ++f)
+  {
     double timestamp = GetTimestampSeconds(f, framespersecond);
 
     // std::cout << " current timestamp " << timestamp << "\n  ";
 
     int onsetsPassed = 1;
     double lastOnsetTimestamp = -2 * onsetColorChangeLength;
-    for (double onsetTimestamp : onsetTimestamps) {
-      if (timestamp > onsetTimestamp) {
+    for (double onsetTimestamp : onsetTimestamps)
+    {
+      if (timestamp > onsetTimestamp)
+      {
         onsetsPassed++;
         lastOnsetTimestamp = onsetTimestamp;
       }
@@ -239,10 +255,12 @@ static int GenerateRippleZoomFrames(
     //                             zoomMultiplierPerFrame, blankColor);
 
     std::vector<Ripple> ripples = {};
-    for (unsigned int i = 0; i < aubioNotesVec.size(); ++i) {
+    for (unsigned int i = 0; i < aubioNotesVec.size(); ++i)
+    {
       std::vector<AubioNote> notes = aubioNotesVec[i];
       AubioNote currentNote = getCurrentNote(notes, timestamp);
-      if (currentNote.startSeconds != -1) {
+      if (currentNote.startSeconds != -1)
+      {
 
         // std::cout << " setting new aubio ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
@@ -257,15 +275,18 @@ static int GenerateRippleZoomFrames(
       }
     }
 
-    for (unsigned int i = 0; i < midiNotes.size(); ++i) {
+    for (unsigned int i = 0; i < midiNotes.size(); ++i)
+    {
       MidiNote checkNote = midiNotes[i];
       // Never check this note again if we're already past it's end time
-      if (checkNote.endSeconds < timestamp) {
+      if (checkNote.endSeconds < timestamp)
+      {
         midiNotes.erase(midiNotes.begin() + i);
         continue;
       }
       if (checkNote.startSeconds <= timestamp &&
-          checkNote.endSeconds >= timestamp) {
+          checkNote.endSeconds >= timestamp)
+      {
 
         std::cout << " setting new midi ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
@@ -281,7 +302,8 @@ static int GenerateRippleZoomFrames(
 
     currentFrame.BrightenAllPixels(0.75);
 
-    for (Ripple ripple : ripples) {
+    for (Ripple ripple : ripples)
+    {
       int framesSinceRippleStart = f - ripple.startFrame;
       int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30);
       int innerRadius = outerRadius - framesSinceRippleStart * ripple.speed % 5;
@@ -301,8 +323,10 @@ static int GenerateRippleZoomFrames(
           ripple.yCenter
           // - framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart)
           ;
-      for (int x = 0; x < xResolution; ++x) {
-        for (int y = 0; y < yResolution; ++y) {
+      for (int x = 0; x < xResolution; ++x)
+      {
+        for (int y = 0; y < yResolution; ++y)
+        {
           // const int distFromCentreSquared =
           //     (x - scrolledXCenter) * (x - scrolledXCenter) +
           //     (y - scrolledYCenter) * (y - scrolledYCenter);
@@ -316,12 +340,40 @@ static int GenerateRippleZoomFrames(
           const int distFromCentreSquared = std::pow(x - scrolledXCenter, 2) +
                                             std::pow(y - scrolledYCenter, 2);
           if (
-            // For a ringning effect
-            // distFromCentreSquared > innerRadius * innerRadius - thickness &&
-             distFromCentreSquared < innerRadius * innerRadius
+              // For a ringning effect
+              // distFromCentreSquared > innerRadius * innerRadius - thickness &&
+              distFromCentreSquared < innerRadius * innerRadius
               //  && framesSinceRippleStart % 5 == 0 - if you want a strobe party effect
-               ) {
+          )
+          {
 
+            currentFrame.AddPixel(x, y, ripple.addColor);
+          }
+
+          // Add a sportlight arc to the top corner
+          // if ((std::abs(std::atan2(y, x) - std::atan2(scrolledYCenter, scrolledXCenter)) < 0.1) && ((x > 0) == (scrolledXCenter > 0)) && ((y > 0) == (scrolledYCenter > 0)))
+
+          int originX = xResolution / 2;
+          int originY = yResolution / 2;
+          // Add an arc to the center
+          float angleToCheckPoint = std::atan2(y - originY, x - originX);
+          float angleToRipple = std::atan2(scrolledYCenter - originY, scrolledXCenter - originX);
+          const int rippleDistFromOriginSquared = std::pow(std::abs(scrolledXCenter - originX), 2) +
+                                                  std::pow(std::abs(scrolledYCenter - originY), 2);
+          const int pointDistFromOriginSquared = std::pow(std::abs(x - originX) + outerRadius, 2) +
+                                                 std::pow(std::abs(y - originY) + outerRadius, 2);
+          float arcAngle = 0.01;
+          if (pointDistFromOriginSquared >= (rippleDistFromOriginSquared))
+          {
+            arcAngle = 0.00;
+          }
+          else
+          {
+            arcAngle = arcAngle * std::max(std::min(0.5 * rippleDistFromOriginSquared - std::abs(pointDistFromOriginSquared - 0.5 * rippleDistFromOriginSquared), (double)rippleDistFromOriginSquared), 0.1) / rippleDistFromOriginSquared;
+          }
+
+          if (std::abs(angleToCheckPoint - angleToRipple) < arcAngle || std::abs(angleToCheckPoint - angleToRipple - 2 * M_PI) < arcAngle || std::abs(angleToCheckPoint - angleToRipple + 2 * M_PI) < arcAngle)
+          {
             currentFrame.AddPixel(x, y, ripple.addColor);
           }
         }
@@ -343,13 +395,16 @@ static int GenerateRippleZoomFrames(
   return 0;
 }
 
-static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp) {
+static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp)
+{
   bool noteIsPlaying = false;
   // Check changes from pitches
-  for (unsigned int i = 0; i < notes.size(); i++) {
+  for (unsigned int i = 0; i < notes.size(); i++)
+  {
     AubioNote checkNote = notes[i];
     if (checkNote.startSeconds < timestamp &&
-        checkNote.endSeconds > timestamp) {
+        checkNote.endSeconds > timestamp)
+    {
       return checkNote;
     }
   }
@@ -364,7 +419,8 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                                     long double xcenter, long double ycenter,
                                     long double zoom, int framespersecond,
                                     std::vector<float> onsetTimestamps,
-                                    std::vector<AubioNote> notes) {
+                                    std::vector<AubioNote> notes)
+{
   std::vector<PixelColor> availableColors = getColors();
   bool reverseDeadEnd = false;
   int framesSinceDeadEnd = 0;
@@ -384,8 +440,10 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   blankColor.blue = 0;
   blankColor.alpha = 255;
   VideoFrame currentFrame(xResolution, yResolution);
-  for (unsigned int x = 0; x < xResolution; x++) {
-    for (unsigned int y = 0; y < yResolution; y++) {
+  for (unsigned int x = 0; x < xResolution; x++)
+  {
+    for (unsigned int y = 0; y < yResolution; y++)
+    {
       currentFrame.SetPixel(x, y, blankColor);
     }
   }
@@ -419,10 +477,12 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   int mandleCounts[xResolution][yResolution];
   const int startTimeSeconds = 0;
   // Generate the frames
-  for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
+  for (int f = startTimeSeconds * framespersecond; f < numframes; ++f)
+  {
     framesSinceDeadEnd++;
     framesSinceChangeOfCentre++;
-    if (limit < maxLimit) {
+    if (limit < maxLimit)
+    {
       limit = limit * 1.012;
     }
     double timestamp = GetTimestampSeconds(f, framespersecond);
@@ -436,7 +496,8 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     long double cr_left = xcenter - hor_span / 2.0;
     long double xStepDistance = hor_span / (xResolution - 1.0);
 
-    if (framesSinceChangeOfCentre <= framesToMoveCentres) {
+    if (framesSinceChangeOfCentre <= framesToMoveCentres)
+    {
       xcenter = xcenter + ((nextCentre.realPart - xcenter) *
                            framesSinceChangeOfCentre / framesToMoveCentres);
       ycenter = ycenter + ((nextCentre.imaginaryPart - ycenter) *
@@ -444,15 +505,20 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     }
 
     int onsetsPassed = 1;
-    for (double onsetTimestamp : onsetTimestamps) {
-      if (timestamp > onsetTimestamp) {
+    for (double onsetTimestamp : onsetTimestamps)
+    {
+      if (timestamp > onsetTimestamp)
+      {
         onsetsPassed++;
       }
     }
-    if (onsetsPassed != lastOnsetsPassed) {
+    if (onsetsPassed != lastOnsetsPassed)
+    {
       lastOnsetsPassed = onsetsPassed;
       framesSinceLastOnsetPassed = 0;
-    } else {
+    }
+    else
+    {
       framesSinceLastOnsetPassed++;
     }
 
@@ -461,21 +527,28 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
         pitchMultiplier + (targetPitchMultiplier - pitchMultiplier) / 8;
 
     uniqueMandleCounts.clear();
-    if (isSilent) {
+    if (isSilent)
+    {
       alphaModifier = alphaModifier - 0.025;
-    } else {
+    }
+    else
+    {
       alphaModifier = alphaModifier - ((framesSinceChangeOfCentre - 1) * 0.025);
-      if (currentNoteLength > 0) {
+      if (currentNoteLength > 0)
+      {
         alphaModifier =
             (framesSinceChangeOfCentre / framespersecond) / currentNoteLength;
       }
     }
-    if (alphaModifier < 0) {
+    if (alphaModifier < 0)
+    {
       alphaModifier = 0;
     }
-    for (int x = 0; x < xResolution; ++x) {
+    for (int x = 0; x < xResolution; ++x)
+    {
       long double cr = getXPosition(x, cr_left, xStepDistance);
-      for (int y = 0; y < yResolution; ++y) {
+      for (int y = 0; y < yResolution; ++y)
+      {
         long double ci = getYPosition(y, ci_top, yStepDistance);
         int count = Mandelbrot(cr, ci, limit);
         mandleCounts[x][y] = count;
@@ -488,7 +561,8 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
       }
     }
     if (uniqueMandleCounts.size() <= 4 &&
-        framesSinceDeadEnd > framespersecond) {
+        framesSinceDeadEnd > framespersecond)
+    {
       framesSinceDeadEnd = 0;
       std::cout << "!!! Hit dead end - reversing!!!";
       reverseDeadEnd = !reverseDeadEnd;
@@ -510,20 +584,24 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     // Increase the zoom magnification for the next frame.
     long double multiplier =
         ((1 + pitchMultiplier + accelerationMultiplier) * smoothMultiplier);
-    if (reverseDeadEnd) {
+    if (reverseDeadEnd)
+    {
       multiplier = 1 / multiplier;
     }
     denom = denom * multiplier;
 
     bool noteIsPlaying = false;
     // Check changes from pitches
-    for (unsigned int i = 0; i < notes.size(); i++) {
+    for (unsigned int i = 0; i < notes.size(); i++)
+    {
       AubioNote checkNote = notes[i];
       if (checkNote.startSeconds < timestamp &&
-          checkNote.endSeconds > timestamp) {
+          checkNote.endSeconds > timestamp)
+      {
         noteIsPlaying = true;
 
-        if (isSilent || checkNote.pitch != currentPitch) {
+        if (isSilent || checkNote.pitch != currentPitch)
+        {
           framesSinceChangeOfCentre = 0;
           std::cout << "New note pitch: ";
           std::cout << checkNote.pitch << ", start seconds: ";
@@ -543,7 +621,8 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
           std::vector<PixelIndex> interestingPoints =
               getInterestingPixelIndexes(mandleCounts, minXIndex, maxXIndex,
                                          minYIndex, maxYIndex);
-          if (interestingPoints.size() > 0) {
+          if (interestingPoints.size() > 0)
+          {
 
             std::cout << nextCentre.realPart << " - next real part  \n  ";
             std::cout << nextCentre.imaginaryPart
@@ -555,7 +634,9 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                 ycenter, cr_left, ci_top);
             nextCentre.realPart = nextInterstingPoint.realPart;
             nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
-          } else {
+          }
+          else
+          {
             std::cout << nextCentre.realPart << "\n  ";
             std::cout << nextCentre.imaginaryPart << " \n  ";
             std::cout << xcenter << " - current real part  \n  ";
@@ -567,15 +648,18 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
         break;
       }
     }
-    if (noteIsPlaying == false) {
+    if (noteIsPlaying == false)
+    {
       isSilent = true;
-      if (currentPitch != defaultPitch) {
+      if (currentPitch != defaultPitch)
+      {
         previousPitch = currentPitch;
         currentPitch = defaultPitch;
         currentNoteLength = 0;
       }
     }
-    if (framesSinceChangeOfCentre > 1) {
+    if (framesSinceChangeOfCentre > 1)
+    {
       int minXIndex = 1;
       int maxXIndex = xResolution - 1;
       int minYIndex = 1;
@@ -584,7 +668,8 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
           mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
       // get interesting point from near target centre if pitch is unchanged
       // (so we constantly add precision as we zoom)
-      if (interestingPoints.size() > 0) {
+      if (interestingPoints.size() > 0)
+      {
         Coordinate nextInterstingPoint = chooseClosestInterestingPoint(
             interestingPoints, xStepDistance, yStepDistance, xcenter, ycenter,
             nextCentre.realPart, nextCentre.imaginaryPart, cr_left, ci_top);
@@ -596,7 +681,9 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
         std::cout << ycenter << " - current imaginary part \n  ";
         nextCentre.realPart = nextInterstingPoint.realPart;
         nextCentre.imaginaryPart = nextInterstingPoint.imaginaryPart;
-      } else {
+      }
+      else
+      {
         // TODO: Try lower and lower 'interesting' thresholds
         std::cout << nextCentre.realPart << "\n  ";
         std::cout << nextCentre.imaginaryPart << " \n  ";
