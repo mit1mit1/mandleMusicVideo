@@ -207,8 +207,8 @@ static int GenerateRippleZoomFrames(
   const int scrollSpeedX = 0;
   const int scrollSpeedY = 0;
 
-  const double spinSpeedRadiansPerFrame = 0.01;
-  const double zoomMultiplierPerFrame = 1.01;
+  // const double spinSpeedRadiansPerFrame = 0.01;
+  // const double zoomMultiplierPerFrame = 1.01;
 
   VideoFrame currentFrame(xResolution, yResolution);
   currentFrame.SetAllPixels(backgroundColor);
@@ -234,9 +234,9 @@ static int GenerateRippleZoomFrames(
     //     timestamp, lastOnsetTimestamp, onsetColorChangeLength,
     //     onsetsPassed, backgroundColor, backgroundColorMaxSaturation);
 
-    currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
-    currentFrame.SpinZoomPixels(spinSpeedRadiansPerFrame,
-                                zoomMultiplierPerFrame, blankColor);
+    // currentFrame.ScrollPixels(scrollSpeedX, scrollSpeedY, blankColor);
+    // currentFrame.SpinZoomPixels(spinSpeedRadiansPerFrame,
+    //                             zoomMultiplierPerFrame, blankColor);
 
     std::vector<Ripple> ripples = {};
     for (unsigned int i = 0; i < aubioNotesVec.size(); ++i) {
@@ -292,15 +292,15 @@ static int GenerateRippleZoomFrames(
       // For spreading effect
       // Coordinate zoomDiff = getDiscreteZoomDiff(
       //     ripple.xCenter, ripple.yCenter, xResolution / 2, yResolution / 2);
-      Coordinate zoomDiff;
-      zoomDiff.realPart = 0;
-      zoomDiff.imaginaryPart = 0;
+
       int scrolledXCenter =
-          ripple.xCenter -
-          framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart);
+          ripple.xCenter
+          // - framesSinceRippleStart * (scrollSpeedX + zoomDiff.realPart)
+          ;
       int scrolledYCenter =
-          ripple.yCenter -
-          framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart);
+          ripple.yCenter
+          // - framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart)
+          ;
       for (int x = 0; x < xResolution; ++x) {
         for (int y = 0; y < yResolution; ++y) {
           // const int distFromCentreSquared =
@@ -316,7 +316,7 @@ static int GenerateRippleZoomFrames(
           const int distFromCentreSquared = std::pow(x - scrolledXCenter, 2) +
                                             std::pow(y - scrolledYCenter, 2);
           if (
-            // Ring effect
+            // For a ringning effect
             // distFromCentreSquared > innerRadius * innerRadius - thickness &&
              distFromCentreSquared < innerRadius * innerRadius
               //  && framesSinceRippleStart % 5 == 0 - if you want a strobe party effect

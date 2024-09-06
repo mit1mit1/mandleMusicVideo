@@ -56,9 +56,11 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber) {
   };
   
   PixelColor rippleColor = drWhoColors[(int)(notePitch) % 12];
-  rippleColor.red = rippleColor.red * 0.05;
-  rippleColor.red = rippleColor.green * 0.05;
-  rippleColor.red = rippleColor.blue * 0.05;
+  rippleColor.red = (int)(rippleColor.red * 0.1);
+  rippleColor.green = (int)(rippleColor.green * 0.1);
+  rippleColor.blue = (int)(rippleColor.blue * 0.1);
+
+  // std::cout << "ripple color" << rippleColor.red << rippleColor.green << rippleColor.blue  << "\n";
   return rippleColor;
 }
 
