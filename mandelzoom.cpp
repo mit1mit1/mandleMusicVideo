@@ -125,7 +125,7 @@ int main(int argc, const char *argv[]) {
       newNote.volume = midifile[track][i].getP2();
       newNote.startSeconds = midifile[track][i].seconds;
       newNote.endSeconds = midifile[track][i].seconds +
-                           midifile[track][i].getDurationInSeconds();
+                           std::max(midifile[track][i].getDurationInSeconds(), 0.35);
       newNote.trackNumber = i;
       midiNotes.push_back(newNote);
     }
@@ -218,7 +218,7 @@ static int GenerateRippleZoomFrames(
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f) {
     double timestamp = GetTimestampSeconds(f, framespersecond);
 
-    std::cout << " current timestamp " << timestamp << "\n  ";
+    // std::cout << " current timestamp " << timestamp << "\n  ";
 
     int onsetsPassed = 1;
     double lastOnsetTimestamp = -2 * onsetColorChangeLength;
@@ -244,7 +244,7 @@ static int GenerateRippleZoomFrames(
       AubioNote currentNote = getCurrentNote(notes, timestamp);
       if (currentNote.startSeconds != -1) {
 
-        std::cout << " setting new aubio ripple at " << timestamp << "\n  ";
+        // std::cout << " setting new aubio ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, currentNote.pitch,
             currentNote.startSeconds, currentNote.endSeconds, framespersecond,
