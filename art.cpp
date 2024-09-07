@@ -8,7 +8,8 @@
 Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
                                    double noteStartSeconds,
                                    double noteEndSeconds, int framespersecond,
-                                   int instrumentNumber) {
+                                   int instrumentNumber)
+{
   Ripple newRipple;
 
   double maxRadius = std::min(width / 2, height / 2) * 9 / 10;
@@ -22,7 +23,8 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
   newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
   int speedBonus = (int)(0.2 / (noteStartSeconds - noteEndSeconds));
-  if (speedBonus > 6) {
+  if (speedBonus > 6)
+  {
     speedBonus = 6;
   }
   newRipple.speed = 1 + speedBonus;
@@ -36,36 +38,87 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   return newRipple;
 }
 
+PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
+{
 
-PixelColor getRippleColorPitch(double notePitch, int instrumentNumber) {
 
-  std::vector<PixelColor> drWhoColors = {
-      PixelColor{.red = 255, .green = 237, .blue = 231, .alpha = 255},
-      PixelColor{.red = 254, .green = 228, .blue = 213, .alpha = 255},
-      PixelColor{.red = 242, .green = 146, .blue = 147, .alpha = 255},
-      PixelColor{.red = 197, .green = 86, .blue = 137, .alpha = 255},
-      PixelColor{.red = 142, .green = 107, .blue = 187, .alpha = 255},
-      PixelColor{.red = 87, .green = 46, .blue = 140, .alpha = 255},
-      PixelColor{.red = 69, .green = 26, .blue = 142, .alpha = 255},
-      PixelColor{.red = 143, .green = 25, .blue = 111, .alpha = 255},
-      PixelColor{.red = 200, .green = 117, .blue = 135, .alpha = 255},
-      PixelColor{.red = 254, .green = 238, .blue = 215, .alpha = 255},
-      PixelColor{.red = 146, .green = 115, .blue = 182, .alpha = 255},
-      PixelColor{.red = 178, .green = 96, .blue = 180, .alpha = 255},
-      PixelColor{.red = 240, .green = 220, .blue = 200, .alpha = 255},
+  std::vector<PixelColor> mrMarsColorWheel = {
+      // F# Red
+      PixelColor{.red = 255, .green = 0, .blue = 0},
+      // G Chrysolite
+      PixelColor{.red = 0, .green = 255, .blue = 180},
+      // Ab Magenta
+      PixelColor{.red = 255, .green = 19, .blue = 255},
+      // A Chatruse
+      PixelColor{.red = 163, .green = 252, .blue = 0},
+      // Bb Corn Flower
+      PixelColor{.red = 147, .green = 153, .blue = 255},
+      // B Tumeric
+      PixelColor{.red = 255, .green = 191, .blue = 0},
+      // C Cyan
+      PixelColor{.red = 0, .green = 255, .blue = 255},
+      // Db Pink
+      PixelColor{.red = 255, .green = 147, .blue = 225},
+      // D Bright Green
+      PixelColor{.red = 0, .green = 250, .blue = 0},
+      // Eb Violet
+      PixelColor{.red = 187, .green = 58, .blue = 255},
+      // E Yellow
+      PixelColor{.red = 255, .green = 253, .blue = 0},
+      // F Azure
+      PixelColor{.red = 0, .green = 180, .blue = 255},
   };
-  
-  PixelColor rippleColor = drWhoColors[(int)(notePitch) % 12];
-  rippleColor.red = (int)(rippleColor.red * (0.1 + 0.1 * notePitch / 144) );
-  rippleColor.green = (int)(rippleColor.green * (0.1 + 0.1 * notePitch / 144));
-  rippleColor.blue = (int)(rippleColor.blue * (0.1 + 0.1 * notePitch / 144));
+  // std::vector<PixelColor> mrMarsColorWheelPastelled = {
+  //     // F# Red
+  //     PixelColor{.red = 101, .green = 15, .blue = 0},
+  //     // G Chrysolity
+  //     PixelColor{.red = 0, .green = 98, .blue = 73},
+  //     // Ab Magenta
+  //     PixelColor{.red = 101, .green = 25, .blue = 100},
+  //     // A Chatruse
+  //     PixelColor{.red = 72, .green = 98, .blue = 0},
+  //     // Bb Corn Flower
+  //     PixelColor{.red = 58, .green = 60, .blue = 100},
+  //     // B Tumeric
+  //     PixelColor{.red = 100, .green = 76, .blue = 19},
+  //     // C Cyan
+  //     PixelColor{.red = 0, .green = 99, .blue = 100},
+  //     // Db Pink
+  //     PixelColor{.red = 101, .green = 60, .blue = 87},
+  //     // D Bright Green
+  //     PixelColor{.red = 0, .green = 97, .blue = 0},
+  //     // Eb Violet
+  //     PixelColor{.red = 73, .green = 22, .blue = 100},
+  //     // E Yellow
+  //     PixelColor{.red = 100, .green = 99, .blue = 0},
+  //     // F Azure
+  //     PixelColor{.red = 0, .green = 73, .blue = 100},
+  // };
+  // std::vector<PixelColor> zeldaColors = {
+  //     PixelColor{.red = 90, .green = 151, .blue = 255},
+  //     PixelColor{.red = 0, .green = 243, .blue = 54},
+  //     PixelColor{.red = 166, .green = 87, .blue = 255},
+  //     PixelColor{.red = 0, .green = 56, .blue = 152},
+  //     PixelColor{.red = 72, .green = 0, .blue = 155},
+  //     PixelColor{.red = 72, .green = 255, .blue = 113},
+  //     PixelColor{.red = 51, .green = 20, .blue = 86},
+  //     PixelColor{.red = 0, .green = 173, .blue = 38},
+  //     PixelColor{.red = 6, .green = 92, .blue = 239},
+  //     PixelColor{.red = 115, .green = 5, .blue = 239},
+  //     PixelColor{.red = 21, .green = 44, .blue = 85},
+  //     PixelColor{.red = 16, .green = 96, .blue = 34},
+  // };
+  PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
+  rippleColor.red = (int)(rippleColor.red * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * (0.08 + 0.05 * notePitch / 72));
 
   // std::cout << "ripple color" << rippleColor.red << rippleColor.green << rippleColor.blue  << "\n";
   return rippleColor;
 }
 
-
-PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber) {
+PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber)
+{
   PixelColor rippleColor;
   rippleColor.red =
       (int)((60 *
@@ -116,7 +169,8 @@ Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
                                   AubioNote currentNote,
                                   std::vector<int> minPitches,
                                   std::vector<int> pitchRanges,
-                                  int framespersecond, int instrumentNumber) {
+                                  int framespersecond, int instrumentNumber)
+{
   Ripple newRipple;
   // TODO: Since we are scrolling on x axis now maybe don't keep
   // instruments in x quadrants - use color instead?
@@ -133,7 +187,8 @@ Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
             (8 * yResolution / 10));
   int speedBonus =
       (int)(0.2 / (currentNote.startSeconds - currentNote.endSeconds));
-  if (speedBonus > 6) {
+  if (speedBonus > 6)
+  {
     speedBonus = 6;
   }
   newRipple.speed = 1 + speedBonus;
@@ -148,26 +203,37 @@ PixelColor getNextBackgroundColor(double timestamp, double lastOnsetTimestamp,
                                   double onsetColorChangeLength,
                                   int onsetsPassed,
                                   PixelColor currentBackgroundColor,
-                                  int backgroundColorMaxSaturation) {
+                                  int backgroundColorMaxSaturation)
+{
   PixelColor nextBackgroundColor;
   // TODO: Use background color
-  if (timestamp < lastOnsetTimestamp + onsetColorChangeLength) {
+  if (timestamp < lastOnsetTimestamp + onsetColorChangeLength)
+  {
     if (onsetsPassed % 2 == 0 &&
-        currentBackgroundColor.red < backgroundColorMaxSaturation - 1) {
+        currentBackgroundColor.red < backgroundColorMaxSaturation - 1)
+    {
       nextBackgroundColor.red = currentBackgroundColor.red + 1;
-    } else {
+    }
+    else
+    {
       nextBackgroundColor.red = currentBackgroundColor.red - 1;
     }
     if (onsetsPassed % 2 == 0 &&
-        currentBackgroundColor.blue < backgroundColorMaxSaturation - 3) {
+        currentBackgroundColor.blue < backgroundColorMaxSaturation - 3)
+    {
       nextBackgroundColor.blue = currentBackgroundColor.blue + 3;
-    } else {
+    }
+    else
+    {
       nextBackgroundColor.blue = currentBackgroundColor.blue - 3;
     }
     if (onsetsPassed % 2 == 0 &&
-        currentBackgroundColor.green < backgroundColorMaxSaturation - 2) {
+        currentBackgroundColor.green < backgroundColorMaxSaturation - 2)
+    {
       nextBackgroundColor.green = currentBackgroundColor.green + 2;
-    } else {
+    }
+    else
+    {
       nextBackgroundColor.green = currentBackgroundColor.green - 2;
     }
   }
@@ -177,8 +243,10 @@ PixelColor getNextBackgroundColor(double timestamp, double lastOnsetTimestamp,
 
 void colorRipples(int width, int height, std::vector<Ripple> ripples,
                   int framenumber, int scrollSpeedX, int scrollSpeedY,
-                  VideoFrame currentFrame) {
-  for (Ripple ripple : ripples) {
+                  VideoFrame currentFrame)
+{
+  for (Ripple ripple : ripples)
+  {
     int framesSinceRippleStart = framenumber - ripple.startFrame;
     int radius = framesSinceRippleStart * ripple.speed + 12;
     int thickness =
@@ -187,8 +255,10 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
         ripple.xCenter - framesSinceRippleStart * scrollSpeedX;
     int scrolledYCenter =
         ripple.yCenter - framesSinceRippleStart * scrollSpeedY;
-    for (int x = 0; x < width; ++x) {
-      for (int y = 0; y < height; ++y) {
+    for (int x = 0; x < width; ++x)
+    {
+      for (int y = 0; y < height; ++y)
+      {
         // const int distFromCentreSquaredWonky =
         //     std::pow((x - scrolledXCenter), ripple.type + 1) *
         //         std::cos(ripple.type * 3 + 3 / 4) +
@@ -197,7 +267,8 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
         const int distFromCentreSquared =
             std::pow(x - scrolledXCenter, 2) + std::pow(y - scrolledYCenter, 2);
         if (distFromCentreSquared > radius * radius - thickness &&
-            distFromCentreSquared < radius * radius) {
+            distFromCentreSquared < radius * radius)
+        {
           currentFrame.AddPixel(x, y, ripple.addColor);
         }
       }
