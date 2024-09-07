@@ -362,14 +362,14 @@ static int GenerateRippleZoomFrames(
                                                   std::pow(std::abs(scrolledYCenter - originY), 2);
           const int pointDistFromOriginSquared = std::pow(std::abs(x - originX) + outerRadius, 2) +
                                                  std::pow(std::abs(y - originY) + outerRadius, 2);
-          float arcAngle = 0.01;
+          float arcAngle = 0.15;
           if (pointDistFromOriginSquared >= (rippleDistFromOriginSquared))
           {
             arcAngle = 0.00;
           }
           else
           {
-            arcAngle = arcAngle * std::max(std::min(0.5 * rippleDistFromOriginSquared - std::abs(pointDistFromOriginSquared - 0.5 * rippleDistFromOriginSquared), (double)rippleDistFromOriginSquared), 0.1) / rippleDistFromOriginSquared;
+            arcAngle = arcAngle * std::pow(std::max(std::min(0.5 * rippleDistFromOriginSquared - std::abs(pointDistFromOriginSquared - 0.5 * rippleDistFromOriginSquared), (double)rippleDistFromOriginSquared), 0.1) / rippleDistFromOriginSquared, 2);
           }
 
           if (std::abs(angleToCheckPoint - angleToRipple) < arcAngle || std::abs(angleToCheckPoint - angleToRipple - 2 * M_PI) < arcAngle || std::abs(angleToCheckPoint - angleToRipple + 2 * M_PI) < arcAngle)
