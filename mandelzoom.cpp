@@ -90,7 +90,7 @@ int main(int argc, const char *argv[])
     // std::vector<AubioNote> demoAudioNotes =
     //    ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    std::vector<std::string> arguments = {"run", "./input/zelda.mid"};
+    std::vector<std::string> arguments = {"run", "./input/waitTrimmed.mid"};
     std::vector<char *> fakeargv;
     for (const auto &arg : arguments)
       fakeargv.push_back((char *)arg.data());
