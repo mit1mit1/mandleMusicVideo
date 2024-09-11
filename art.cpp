@@ -31,7 +31,7 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.thickness = 60;
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
-  newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
+  newRipple.addColor = getRippleColorInstrument(notePitch, instrumentNumber);
   // newRipple.addColor = getRippleColorPitchDependent(notePitch,
   // instrumentNumber);
   newRipple.type = instrumentNumber % 5;
@@ -40,7 +40,6 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
 
 PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
 {
-
 
   std::vector<PixelColor> mrMarsColorWheel = {
       // F# Red
@@ -119,23 +118,37 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
 
 PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber)
 {
-  PixelColor rippleColor;
-  rippleColor.red =
-      (int)((60 *
-             (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 3 +
-              1)) *
-            0.25);
-  rippleColor.green =
-      (int)((60 *
-             (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 5 +
-              1)) *
-            0.25);
-  rippleColor.blue =
-      (int)((60 *
-             (((instrumentNumber + 1) + 11 + (instrumentNumber + 1) * 11) % 7 +
-              1)) *
-            0.25);
-  rippleColor.alpha = 255;
+
+  std::vector<PixelColor> mrMarsColorWheel = {
+      // // F# Red
+      // PixelColor{.red = 255, .green = 0, .blue = 0},
+      // // G Chrysolite
+      // PixelColor{.red = 0, .green = 255, .blue = 180},
+      // // Ab Magenta
+      // PixelColor{.red = 255, .green = 19, .blue = 255},
+      // // A Chatruse
+      // PixelColor{.red = 163, .green = 252, .blue = 0},
+      // // Bb Corn Flower
+      // PixelColor{.red = 147, .green = 153, .blue = 255},
+      // B Tumeric
+      PixelColor{.red = 255, .green = 191, .blue = 0},
+      // C Cyan
+      PixelColor{.red = 0, .green = 255, .blue = 255},
+      // Db Pink
+      PixelColor{.red = 255, .green = 147, .blue = 225},
+      // // D Bright Green
+      // PixelColor{.red = 0, .green = 250, .blue = 0},
+      // Eb Violet
+      PixelColor{.red = 187, .green = 58, .blue = 255},
+      // E Yellow
+      PixelColor{.red = 255, .green = 253, .blue = 0},
+      // F Azure
+      PixelColor{.red = 0, .green = 180, .blue = 255},
+  };
+  PixelColor rippleColor = mrMarsColorWheel[(int)(instrumentNumber) % 12];
+  rippleColor.red = (int)(rippleColor.red * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * (0.08 + 0.05 * notePitch / 72));
   return rippleColor;
 }
 
