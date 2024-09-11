@@ -33,6 +33,7 @@ using namespace smf;
 #include "structs.h"
 #include <algorithm>
 #include <cmath>
+#include <string>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -86,151 +87,66 @@ int main(int argc, const char *argv[])
       fprintf(stderr, "ERROR: zoom factor must be 1.0 or greater.\n");
       return 1;
     }
-    std::vector<MidiNote> midiNotes = {};
-
     // std::vector<AubioNote> demoAudioNotes =
     //    ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
-    Options options;
-    std::vector<std::string> arguments = {"run", "./input/bachFlute.mid"};
-    std::vector<char *> fakeargv;
-    for (const auto &arg : arguments)
-      fakeargv.push_back((char *)arg.data());
-    fakeargv.push_back(nullptr);
-    std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
-    options.process(fakeargv.size() - 1, fakeargv.data(), 2);
-    if (options.getArgCount() != 1)
-    {
-      std::cerr << "At least one MIDI filename is required.\n";
-      exit(1);
-    }
-    MidiFile midifile;
-    midifile.read(options.getArg(1));
-    if (!midifile.status())
-    {
-      std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
-      exit(1);
-    }
-    midifile.joinTracks();
-    midifile.doTimeAnalysis();
-    midifile.linkNotePairs();
 
-    int track = 0;
-    for (int i = 0; i < midifile[track].size(); i++)
+    std::vector<MidiNote> midiNotes = {};
+    int trackNumberCounter = 0;
+    std::string inputFiles[1] = {"./input/marimbaVibes.mid"};
+
+    for (std::string inputFile : inputFiles)
     {
-      if (!midifile[track][i].isNoteOn())
+
+      Options options;
+      std::vector<std::string> arguments = {"run", inputFile};
+      std::vector<char *> fakeargv;
+      for (const auto &arg : arguments)
+        fakeargv.push_back((char *)arg.data());
+      fakeargv.push_back(nullptr);
+      std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
+      options.process(fakeargv.size() - 1, fakeargv.data(), 2);
+      if (options.getArgCount() != 1)
       {
-        continue;
+        std::cerr << "At least one MIDI filename is required.\n";
+        exit(1);
       }
-      std::cout << "Note start: " << midifile[track][i].seconds
-                << "; duration: " << midifile[track][i].getDurationInSeconds()
-                << "; P1 (pitch?): " << midifile[track][i].getP1()
-                << "; P2 (pitch?): " << midifile[track][i].getP2()
-                << "; P3 (pitch?): " << midifile[track][i].getP3() << '\t'
-                << "Track identifier?: " << midifile[track][i][1] << std::endl;
-      MidiNote newNote;
-
-      newNote.pitch = midifile[track][i].getP1();
-      newNote.volume = midifile[track][i].getP2();
-      newNote.startSeconds = midifile[track][i].seconds;
-      newNote.endSeconds = midifile[track][i].seconds +
-                           std::max(midifile[track][i].getDurationInSeconds(), 0.35);
-      newNote.trackNumber = 0;
-      midiNotes.push_back(newNote);
-    }
-
-    std::vector<std::string> arguments2 = {"run", "./input/bachPiano1.mid"};
-    std::vector<char *> fakeargv2;
-    for (const auto &arg : arguments2)
-      fakeargv2.push_back((char *)arg.data());
-    fakeargv2.push_back(nullptr);
-    std::cout << "Pushing mid file: " << fakeargv2[0] << "\n";
-    options.process(fakeargv2.size() - 1, fakeargv2.data(), 2);
-    if (options.getArgCount() != 1)
-    {
-      std::cerr << "At least one MIDI filename is required.\n";
-      exit(1);
-    }
-    MidiFile midifile2;
-    midifile2.read(options.getArg(1));
-    if (!midifile2.status())
-    {
-      std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
-      exit(1);
-    }
-    midifile2.joinTracks();
-    midifile2.doTimeAnalysis();
-    midifile2.linkNotePairs();
-
-    int track2 = 0;
-    for (int i = 0; i < midifile2[track2].size(); i++)
-    {
-      if (!midifile2[track2][i].isNoteOn())
+      MidiFile midifile;
+      midifile.read(options.getArg(1));
+      if (!midifile.status())
       {
-        continue;
+        std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
+        exit(1);
       }
-      std::cout << "Note start: " << midifile2[track2][i].seconds
-                << "; duration: " << midifile2[track2][i].getDurationInSeconds()
-                << "; P1 (pitch?): " << midifile2[track2][i].getP1()
-                << "; P2 (pitch?): " << midifile2[track2][i].getP2()
-                << "; P3 (pitch?): " << midifile2[track2][i].getP3() << '\t'
-                << "Track identifier?: " << midifile2[track2][i][1] << std::endl;
-      MidiNote newNote;
+      midifile.joinTracks();
+      midifile.doTimeAnalysis();
+      midifile.linkNotePairs();
 
-      newNote.pitch = midifile2[track2][i].getP1();
-      newNote.volume = midifile2[track2][i].getP2();
-      newNote.startSeconds = midifile2[track2][i].seconds;
-      newNote.endSeconds = midifile2[track2][i].seconds +
-                           std::max(midifile2[track2][i].getDurationInSeconds(), 0.35);
-      newNote.trackNumber = 3;
-      midiNotes.push_back(newNote);
-    }
-
-    std::vector<std::string> arguments3 = {"run", "./input/bachPiano2.mid"};
-    std::vector<char *> fakeargv3;
-    for (const auto &arg : arguments3)
-      fakeargv3.push_back((char *)arg.data());
-    fakeargv3.push_back(nullptr);
-    std::cout << "Pushing mid file: " << fakeargv3[0] << "\n";
-    options.process(fakeargv3.size() - 1, fakeargv3.data(), 2);
-    if (options.getArgCount() != 1)
-    {
-      std::cerr << "At least one MIDI filename is required.\n";
-      exit(1);
-    }
-    MidiFile midifile3;
-    midifile3.read(options.getArg(1));
-    if (!midifile3.status())
-    {
-      std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
-      exit(1);
-    }
-    midifile3.joinTracks();
-    midifile3.doTimeAnalysis();
-    midifile3.linkNotePairs();
-
-    int track3 = 0;
-    for (int i = 0; i < midifile3[track3].size(); i++)
-    {
-      if (!midifile3[track3][i].isNoteOn())
+      int track = 0;
+      for (int i = 0; i < midifile[track].size(); i++)
       {
-        continue;
-      }
-      std::cout << "Note start: " << midifile3[track3][i].seconds
-                << "; duration: " << midifile3[track3][i].getDurationInSeconds()
-                << "; P1 (pitch?): " << midifile3[track3][i].getP1()
-                << "; P2 (pitch?): " << midifile3[track3][i].getP2()
-                << "; P3 (pitch?): " << midifile3[track3][i].getP3() << '\t'
-                << "Track identifier?: " << midifile3[track3][i][1] << std::endl;
-      MidiNote newNote;
+        if (!midifile[track][i].isNoteOn())
+        {
+          continue;
+        }
+        std::cout << "Note start: " << midifile[track][i].seconds
+                  << "; duration: " << midifile[track][i].getDurationInSeconds()
+                  << "; P1 (pitch?): " << midifile[track][i].getP1()
+                  << "; P2 (pitch?): " << midifile[track][i].getP2()
+                  << "; P3 (pitch?): " << midifile[track][i].getP3() << '\t'
+                  << "Track identifier?: " << midifile[track][i][1] << std::endl;
+        MidiNote newNote;
 
-      newNote.pitch = midifile3[track3][i].getP1();
-      newNote.volume = midifile3[track3][i].getP2();
-      newNote.startSeconds = midifile3[track3][i].seconds;
-      newNote.endSeconds = midifile3[track3][i].seconds +
-                           std::max(midifile3[track3][i].getDurationInSeconds(), 0.35);
-      newNote.trackNumber = 5;
-      midiNotes.push_back(newNote);
+        newNote.pitch = midifile[track][i].getP1();
+        newNote.volume = midifile[track][i].getP2();
+        newNote.startSeconds = midifile[track][i].seconds;
+        newNote.endSeconds = midifile[track][i].seconds +
+                             std::max(midifile[track][i].getDurationInSeconds(), 0.35);
+        newNote.trackNumber = trackNumberCounter;
+        midiNotes.push_back(newNote);
+      }
+      trackNumberCounter++;
     }
+
     // std::vector<AubioNote> pitchedNotes1 =
     //     ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
     // std::vector<AubioNote> pitchedNotes2 =

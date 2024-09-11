@@ -31,7 +31,8 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.thickness = 60;
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
-  newRipple.addColor = getRippleColorInstrument(notePitch, instrumentNumber);
+  // TODO switch this based on number of input files
+  newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
   // newRipple.addColor = getRippleColorPitchDependent(notePitch,
   // instrumentNumber);
   newRipple.type = instrumentNumber % 5;
@@ -120,24 +121,24 @@ PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber)
 {
 
   std::vector<PixelColor> mrMarsColorWheel = {
-      // // F# Red
-      // PixelColor{.red = 255, .green = 0, .blue = 0},
-      // // G Chrysolite
-      // PixelColor{.red = 0, .green = 255, .blue = 180},
-      // // Ab Magenta
-      // PixelColor{.red = 255, .green = 19, .blue = 255},
-      // // A Chatruse
-      // PixelColor{.red = 163, .green = 252, .blue = 0},
-      // // Bb Corn Flower
-      // PixelColor{.red = 147, .green = 153, .blue = 255},
+      // F# Red
+      PixelColor{.red = 255, .green = 0, .blue = 0},
+      // G Chrysolite
+      PixelColor{.red = 0, .green = 255, .blue = 180},
+      // Ab Magenta
+      PixelColor{.red = 255, .green = 19, .blue = 255},
+      // A Chatruse
+      PixelColor{.red = 163, .green = 252, .blue = 0},
+      // Bb Corn Flower
+      PixelColor{.red = 147, .green = 153, .blue = 255},
       // B Tumeric
       PixelColor{.red = 255, .green = 191, .blue = 0},
       // C Cyan
       PixelColor{.red = 0, .green = 255, .blue = 255},
       // Db Pink
       PixelColor{.red = 255, .green = 147, .blue = 225},
-      // // D Bright Green
-      // PixelColor{.red = 0, .green = 250, .blue = 0},
+      // D Bright Green
+      PixelColor{.red = 0, .green = 250, .blue = 0},
       // Eb Violet
       PixelColor{.red = 187, .green = 58, .blue = 255},
       // E Yellow
