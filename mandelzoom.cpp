@@ -92,7 +92,7 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    std::string inputFiles[1] = {"./input/marimbaVibes.mid"};
+    std::string inputFiles[1] = {"./input/PoorManSummersDay.mid"};
 
     for (std::string inputFile : inputFiles)
     {
