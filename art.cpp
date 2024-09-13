@@ -8,26 +8,40 @@
 Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
                                    double noteStartSeconds,
                                    double noteEndSeconds, int framespersecond,
-                                   int instrumentNumber)
+                                   int instrumentNumber, bool isPercussion)
 {
   Ripple newRipple;
 
-  double maxRadius = std::min(width / 2, height / 2) * 9 / 10;
-
-  double angle = notePitch * M_PI / 6;
-  // std::cout << "angle of ripple" << angle << "\n";
-
-  // Assume highest pitch ever is 120
-  double radius = maxRadius * (0.02 + 0.98 * notePitch / 120);
-
-  newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
-  newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
-  int speedBonus = (int)(0.2 / (noteStartSeconds - noteEndSeconds));
-  if (speedBonus > 6)
+  if (isPercussion)
   {
-    speedBonus = 6;
+    // Offset with tuned notes
+    double angle = (notePitch * 7) * M_PI / 12 + M_PI / 24;
+    // std::cout << "angle of ripple" << angle << "\n";
+
+    // Keep near the center
+    double radius = std::min(width / 2, height / 2) * 1 / 10;
+    newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
+    newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
+    newRipple.speed = 10;
   }
-  newRipple.speed = 1 + speedBonus;
+  else
+  {
+    double angle = notePitch * M_PI / 6;
+    // std::cout << "angle of ripple" << angle << "\n";
+
+    // Assume highest pitch ever is 120
+    double maxRadius = std::min(width / 2, height / 2) * 9 / 10;
+    double radius = maxRadius * (0.02 + 0.98 * notePitch / 120);
+    newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
+    newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
+    int speedBonus = (int)(0.2 / (noteStartSeconds - noteEndSeconds));
+    if (speedBonus > 6)
+    {
+      speedBonus = 6;
+    }
+    newRipple.speed = 1 + speedBonus;
+  }
+
   newRipple.thickness = 60;
   newRipple.startFrame = noteStartSeconds * framespersecond;
 

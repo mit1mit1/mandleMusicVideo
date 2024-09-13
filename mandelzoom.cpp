@@ -92,13 +92,15 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    std::string inputFiles[1] = {"./input/PoorManSummersDay.mid"};
+    MidiTrack inputFiles[2] = {
+        MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/percTest1PercTrack.mid", .isPercussion = true}};
 
-    for (std::string inputFile : inputFiles)
+    for (MidiTrack inputFile : inputFiles)
     {
 
       Options options;
-      std::vector<std::string> arguments = {"run", inputFile};
+      std::vector<std::string> arguments = {"run", inputFile.filename};
       std::vector<char *> fakeargv;
       for (const auto &arg : arguments)
         fakeargv.push_back((char *)arg.data());
@@ -139,9 +141,18 @@ int main(int argc, const char *argv[])
         newNote.pitch = midifile[track][i].getP1();
         newNote.volume = midifile[track][i].getP2();
         newNote.startSeconds = midifile[track][i].seconds;
-        newNote.endSeconds = midifile[track][i].seconds +
-                             std::max(midifile[track][i].getDurationInSeconds(), 0.35);
+        if (inputFile.isPercussion)
+        {
+          newNote.endSeconds = midifile[track][i].seconds +
+                               std::max(midifile[track][i].getDurationInSeconds(), 0.21);
+        }
+        else
+        {
+          newNote.endSeconds = midifile[track][i].seconds +
+                               std::max(midifile[track][i].getDurationInSeconds(), 0.35);
+        }
         newNote.trackNumber = trackNumberCounter;
+        newNote.isPercussion = inputFile.isPercussion;
         midiNotes.push_back(newNote);
       }
       trackNumberCounter++;
@@ -275,7 +286,7 @@ static int GenerateRippleZoomFrames(
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, currentNote.pitch,
             currentNote.startSeconds, currentNote.endSeconds, framespersecond,
-            i);
+            i, false);
 
         // Ripple newRipple = getNoteRippleSidescrolling(
         //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
@@ -300,7 +311,7 @@ static int GenerateRippleZoomFrames(
         std::cout << " setting new midi ripple at " << timestamp << "\n  ";
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, checkNote.pitch, checkNote.startSeconds,
-            checkNote.endSeconds, framespersecond, checkNote.trackNumber);
+            checkNote.endSeconds, framespersecond, checkNote.trackNumber, checkNote.isPercussion);
 
         // Ripple newRipple = getNoteRippleSidescrolling(
         //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,

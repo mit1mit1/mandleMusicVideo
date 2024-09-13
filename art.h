@@ -10,7 +10,7 @@
 Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
                                    double noteStartSeconds,
                                    double noteEndSeconds, int framespersecond,
-                                   int instrumentNumber);
+                                   int instrumentNumber, bool isPercussion);
 
 Ripple getNoteRippleSidescrolling(int minX, int maxX, int minY, int maxY,
                                   AubioNote currentNote,
