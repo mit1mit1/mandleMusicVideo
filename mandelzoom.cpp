@@ -54,7 +54,7 @@ static int GenerateRippleZoomFrames(
     const char *outdir, int numframes, long double xcenter, long double ycenter,
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
     std::vector<std::vector<AubioNote>> aubioNotesVec,
-    std::vector<MidiNote> midiNotes);
+    std::vector<MidiNote> midiNotes, std::vector<MidiNote> midiNotesPercussion);
 
 static double GetTimestampSeconds(int framenumber, int framespersecond);
 static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp);
@@ -82,10 +82,8 @@ int main(int argc, const char *argv[]) {
       return 1;
     }
 
-    // std::vector<AubioNote> demoAudioNotes =
-    //    ParseAubioNoteFile("./output/demoAudio.txt", 0.0);
     Options options;
-    std::vector<std::string> arguments = {"run", "./input/take5.mid"};
+    std::vector<std::string> arguments = {"run", "./input/take5nodrums.mid"};
     std::vector<char *> fakeargv;
     for (const auto &arg : arguments)
       fakeargv.push_back((char *)arg.data());
@@ -102,54 +100,94 @@ int main(int argc, const char *argv[]) {
       std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
       exit(1);
     }
-    midifile.joinTracks();
     midifile.doTimeAnalysis();
     midifile.linkNotePairs();
 
     std::vector<MidiNote> midiNotes = {};
 
-    int track = 0;
-    for (int i = 0; i < midifile[track].size(); i++) {
-      if (!midifile[track][i].isNoteOn()) {
-        continue;
-      }
-      std::cout << "Note start: " << midifile[track][i].seconds
-                << "; duration: " << midifile[track][i].getDurationInSeconds()
-                << "; P1 (pitch?): " << midifile[track][i].getP1()
-                << "; P2 (pitch?): " << midifile[track][i].getP2()
-                << "; P3 (pitch?): " << midifile[track][i].getP3() << '\t'
-                << "Track identifier?: " << midifile[track][i][1] << std::endl;
-      MidiNote newNote;
+    int trackCount = midifile.getTrackCount();
+    for (int track = 0; track < trackCount; track++) {
+      std::cout << "START TRACK: " << track << std::endl;
+      for (int i = 0; i < midifile[track].size(); i++) {
+        if (!midifile[track][i].isNoteOn()) {
+          continue;
+        }
+        std::cout << "Note start: " << midifile[track][i].seconds
+                  << "; duration: " << midifile[track][i].getDurationInSeconds()
+                  << "; P1 (pitch?): " << midifile[track][i].getP1()
+                  << "; P2 (pitch?): " << midifile[track][i].getP2()
+                  << "; P3 (pitcFh?): " << midifile[track][i].getP3() << '\t'
+                  << "Track identifier?: " << track << std::endl;
+        MidiNote newNote;
 
-      newNote.pitch = midifile[track][i].getP1();
-      newNote.volume = midifile[track][i].getP2();
-      newNote.startSeconds = midifile[track][i].seconds;
-      newNote.endSeconds = midifile[track][i].seconds +
-                           midifile[track][i].getDurationInSeconds();
-      newNote.trackNumber = i;
-      midiNotes.push_back(newNote);
+        newNote.pitch = midifile[track][i].getP1();
+        newNote.volume = midifile[track][i].getP2();
+        newNote.startSeconds = midifile[track][i].seconds;
+        newNote.endSeconds = midifile[track][i].seconds +
+                             midifile[track][i].getDurationInSeconds();
+        newNote.trackNumber = track;
+        midiNotes.push_back(newNote);
+      }
     }
-    // std::vector<AubioNote> pitchedNotes1 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
-    // std::vector<AubioNote> pitchedNotes2 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
-    // std::vector<AubioNote> pitchedNotes3 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
-    // std::vector<AubioNote> pitchedNotes4 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument1Notes.txt", 0.0);
-    // std::vector<AubioNote> pitchedNotes5 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument2Notes.txt", 0.0);
-    // std::vector<AubioNote> pitchedNotes6 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
-    // std::vector<AubioNote> pitchedNotes7 =
-    //     ParseAubioNoteFile("./output/pitchedInstrument3Notes.txt", 0.0);
+
+    Options optionsPercussion;
+    std::vector<std::string> argumentsPercussion = {
+        "run", "./input/take5justdrums.mid"};
+    std::vector<char *> fakeargvPercussion;
+    for (const auto &arg : arguments)
+      fakeargv.push_back((char *)arg.data());
+    fakeargv.push_back(nullptr);
+    std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
+    options.process(fakeargv.size() - 1, fakeargv.data(), 2);
+    if (options.getArgCount() != 1) {
+      std::cerr << "At least one MIDI filename is required.\n";
+      exit(1);
+    }
+    MidiFile midifilePercussion;
+    midifilePercussion.read(options.getArg(1));
+    if (!midifilePercussion.status()) {
+      std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
+      exit(1);
+    }
+    midifilePercussion.doTimeAnalysis();
+    midifilePercussion.linkNotePairs();
+
+    std::vector<MidiNote> midiNotesPercussion = {};
+
+    int trackCountPercussion = midifilePercussion.getTrackCount();
+    for (int track = 0; track < trackCountPercussion; track++) {
+      std::cout << "START TRACK: " << track << std::endl;
+      for (int i = 0; i < midifilePercussion[track].size(); i++) {
+        if (!midifilePercussion[track][i].isNoteOn()) {
+          continue;
+        }
+        std::cout << "Note start: " << midifilePercussion[track][i].seconds
+                  << "; duration: "
+                  << midifilePercussion[track][i].getDurationInSeconds()
+                  << "; P1 (pitch?): " << midifilePercussion[track][i].getP1()
+                  << "; P2 (pitch?): " << midifilePercussion[track][i].getP2()
+                  << "; P3 (pitcFh?): " << midifilePercussion[track][i].getP3()
+                  << '\t' << "Track identifier?: " << track << std::endl;
+        MidiNote newNote;
+
+        newNote.pitch = midifilePercussion[track][i].getP1();
+        newNote.volume = midifilePercussion[track][i].getP2();
+        newNote.startSeconds = midifilePercussion[track][i].seconds;
+        newNote.endSeconds =
+            midifilePercussion[track][i].seconds +
+            midifilePercussion[track][i].getDurationInSeconds();
+        newNote.trackNumber = track;
+        midiNotesPercussion.push_back(newNote);
+      }
+    }
+
     std::vector<std::vector<AubioNote>> pitchedNotesVec = {};
     std::vector<float> percussionOnsets = {};
     //    ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
 
-    return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
-                                    framespersecond, percussionOnsets,
-                                    pitchedNotesVec, midiNotes);
+    return GenerateRippleZoomFrames(
+        outdir, numframes, xcenter, ycenter, zoom, framespersecond,
+        percussionOnsets, pitchedNotesVec, midiNotes, midiNotesPercussion);
   }
   return PrintUsage();
 }
@@ -178,7 +216,8 @@ static int GenerateRippleZoomFrames(
     const char *outdir, int numframes, long double xcenter, long double ycenter,
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
     std::vector<std::vector<AubioNote>> aubioNotesVec,
-    std::vector<MidiNote> midiNotes) {
+    std::vector<MidiNote> midiNotes,
+    std::vector<MidiNote> midiNotesPercussion) {
 
   std::vector<int> aubioMaxPitches{};
   std::vector<int> aubioMinPitches{};
