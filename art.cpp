@@ -46,7 +46,8 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
   // TODO switch this based on number of input files
-  newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
+  newRipple.addColor = getRippleColorInstrument(notePitch, instrumentNumber);
+  // newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
   // newRipple.addColor = getRippleColorPitchDependent(notePitch,
   // instrumentNumber);
   newRipple.type = instrumentNumber % 5;
@@ -81,6 +82,34 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
       PixelColor{.red = 255, .green = 253, .blue = 0},
       // F Azure
       PixelColor{.red = 0, .green = 180, .blue = 255},
+  };
+
+  std::vector<PixelColor> autumnPallette = {
+     // Macadamia
+      PixelColor{.red = 238, .green = 224, .blue = 200},
+      // Dark Ginger
+      PixelColor{.red = 172, .green = 92, .blue = 56},
+      // Amber
+      PixelColor{.red = 214, .green = 120, .blue = 52},
+      // Laguna 2
+      PixelColor{.red = 0, .green = 100, .blue = 118},
+      // Brick red
+      PixelColor{.red = 211, .green = 58, .blue = 52},
+      // Olive
+      PixelColor{.red = 147, .green = 152, .blue = 94},
+      // Camel
+      PixelColor{.red = 180, .green = 124, .blue = 65},
+      // Laguna 1
+      PixelColor{.red = 29, .green = 90, .blue = 107},
+      // Soft Olive
+      PixelColor{.red = 125, .green = 123, .blue = 79},
+      // Mustard
+      PixelColor{.red = 230, .green = 176, .blue = 81},
+      // Chocolate
+      PixelColor{.red = 50, .green = 39, .blue = 19},
+      // Spiced Coral
+      PixelColor{.red = 229, .green = 110, .blue = 104},
+
   };
   // std::vector<PixelColor> mrMarsColorWheelPastelled = {
   //     // F# Red
@@ -122,7 +151,7 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   //     PixelColor{.red = 21, .green = 44, .blue = 85},
   //     PixelColor{.red = 16, .green = 96, .blue = 34},
   // };
-  PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
+  PixelColor rippleColor = autumnPallette[(int)(notePitch) % 12];
   rippleColor.red = (int)(rippleColor.red * (0.08 + 0.05 * notePitch / 72));
   rippleColor.green = (int)(rippleColor.green * (0.08 + 0.05 * notePitch / 72));
   rippleColor.blue = (int)(rippleColor.blue * (0.08 + 0.05 * notePitch / 72));

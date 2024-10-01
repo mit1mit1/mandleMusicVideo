@@ -92,9 +92,12 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    MidiTrack inputFiles[2] = {
-        MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/percTest1PercTrack.mid", .isPercussion = true}};
+    MidiTrack inputFiles[4] = {
+        // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Bebop Organ Render 2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Classic Electric Piano Render 2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Marimba Render 2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Upright Studio Bass Render 2.mid", .isPercussion = false}};
 
     for (MidiTrack inputFile : inputFiles)
     {

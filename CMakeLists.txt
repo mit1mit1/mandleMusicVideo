@@ -1,4 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
 project("mandelMusicalZoom")
+
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
