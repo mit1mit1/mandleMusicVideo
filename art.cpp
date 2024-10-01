@@ -11,7 +11,7 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
                                    int instrumentNumber, bool isPercussion)
 {
   Ripple newRipple;
-
+  const double frameSpeedMultiplier = 0.5;
   if (isPercussion)
   {
     // Offset with tuned notes
@@ -22,7 +22,7 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
     double radius = std::min(width / 2, height / 2) * 1 / 10;
     newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
     newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
-    newRipple.speed = 10;
+    newRipple.speed = 10 * frameSpeedMultiplier;
   }
   else
   {
@@ -35,11 +35,11 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
     newRipple.xCenter = (int)(width / 2 + radius * std::cos(angle));
     newRipple.yCenter = (int)(height / 2 + radius * std::sin(angle));
     int speedBonus = (int)(0.2 / (noteStartSeconds - noteEndSeconds));
-    if (speedBonus > 6)
+    if (speedBonus > 3)
     {
-      speedBonus = 6;
+      speedBonus = 3;
     }
-    newRipple.speed = 1 + speedBonus;
+    newRipple.speed = (1 + speedBonus) * frameSpeedMultiplier;
   }
 
   newRipple.thickness = 60;
@@ -151,10 +151,11 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   //     PixelColor{.red = 21, .green = 44, .blue = 85},
   //     PixelColor{.red = 16, .green = 96, .blue = 34},
   // };
+  const double darkener = 0.625;
   PixelColor rippleColor = autumnPallette[(int)(notePitch) % 12];
-  rippleColor.red = (int)(rippleColor.red * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (int)(rippleColor.green * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (int)(rippleColor.blue * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.red = (int)(rippleColor.red * darkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * darkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * darkener * (0.08 + 0.05 * notePitch / 72));
 
   // std::cout << "ripple color" << rippleColor.red << rippleColor.green << rippleColor.blue  << "\n";
   return rippleColor;
@@ -189,10 +190,11 @@ PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber)
       // F Azure
       PixelColor{.red = 0, .green = 180, .blue = 255},
   };
+  const double darkener = 0.625;
   PixelColor rippleColor = mrMarsColorWheel[(int)(instrumentNumber) % 12];
-  rippleColor.red = (int)(rippleColor.red * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (int)(rippleColor.green * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (int)(rippleColor.blue * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.red = (int)(rippleColor.red *  darkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * darkener *  (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * darkener *  (0.08 + 0.05 * notePitch / 72));
   return rippleColor;
 }
 

@@ -16,7 +16,7 @@ struct Ripple
 {
   int xCenter;
   int yCenter;
-  int speed;
+  double speed;
   int thickness;
   int startFrame;
   int type;

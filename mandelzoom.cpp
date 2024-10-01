@@ -94,10 +94,10 @@ int main(int argc, const char *argv[])
     int trackNumberCounter = 0;
     MidiTrack inputFiles[4] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Bebop Organ Render 2.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Classic Electric Piano Render 2.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Marimba Render 2.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Upright Studio Bass Render 2.mid", .isPercussion = false}};
+        MidiTrack{.filename = "./input/comingHomeBaby Bebop Organ Render 0.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Classic Electric Piano Render 0.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Marimba Render 0.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/comingHomeBaby Upright Studio Bass Render 0.mid", .isPercussion = false}};
 
     for (MidiTrack inputFile : inputFiles)
     {
@@ -147,12 +147,12 @@ int main(int argc, const char *argv[])
         if (inputFile.isPercussion)
         {
           newNote.endSeconds = midifile[track][i].seconds +
-                               std::max(midifile[track][i].getDurationInSeconds(), 0.21);
+                               std::max(midifile[track][i].getDurationInSeconds(), (double)(5 / framespersecond));
         }
         else
         {
           newNote.endSeconds = midifile[track][i].seconds +
-                               std::max(midifile[track][i].getDurationInSeconds(), 0.35);
+                               std::max(midifile[track][i].getDurationInSeconds(), (double)(7 / framespersecond));
         }
         newNote.trackNumber = trackNumberCounter;
         newNote.isPercussion = inputFile.isPercussion;
@@ -323,13 +323,13 @@ static int GenerateRippleZoomFrames(
       }
     }
 
-    currentFrame.BrightenAllPixels(0.75);
+    currentFrame.BrightenAllPixels(0.87);
 
     for (Ripple ripple : ripples)
     {
       int framesSinceRippleStart = f - ripple.startFrame;
-      int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30);
-      int innerRadius = outerRadius - framesSinceRippleStart * ripple.speed % 5;
+      int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30.0);
+      int innerRadius = outerRadius - (int)(framesSinceRippleStart * ripple.speed / 16) % 8;
       // int thickness =
       //     (ripple.thickness + (innerRadius / 2)) * ripple.thickness + (innerRadius / 2);
       // TODO: Extract discrete zoom and use it to move ripple centre as
