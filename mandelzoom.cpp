@@ -323,13 +323,14 @@ static int GenerateRippleZoomFrames(
       }
     }
 
-    currentFrame.BrightenAllPixels(0.87);
+    currentFrame.BrightenAllPixels(0.86);
 
     for (Ripple ripple : ripples)
     {
       int framesSinceRippleStart = f - ripple.startFrame;
       int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30.0);
-      int innerRadius = outerRadius - (int)(framesSinceRippleStart * ripple.speed / 16) % 8;
+      // Make notes throb irregularly
+      int innerRadius = outerRadius - (int)(framesSinceRippleStart * ripple.speed / 2) % (4 + ((ripple.startFrame + ripple.xCenter + ripple.yCenter) % 3));
       // int thickness =
       //     (ripple.thickness + (innerRadius / 2)) * ripple.thickness + (innerRadius / 2);
       // TODO: Extract discrete zoom and use it to move ripple centre as

@@ -151,11 +151,11 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   //     PixelColor{.red = 21, .green = 44, .blue = 85},
   //     PixelColor{.red = 16, .green = 96, .blue = 34},
   // };
-  const double darkener = 0.625;
+  const double frameSpeedDarkener = 0.6;
   PixelColor rippleColor = autumnPallette[(int)(notePitch) % 12];
-  rippleColor.red = (int)(rippleColor.red * darkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (int)(rippleColor.green * darkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (int)(rippleColor.blue * darkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.red = (int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
 
   // std::cout << "ripple color" << rippleColor.red << rippleColor.green << rippleColor.blue  << "\n";
   return rippleColor;
@@ -190,11 +190,11 @@ PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber)
       // F Azure
       PixelColor{.red = 0, .green = 180, .blue = 255},
   };
-  const double darkener = 0.625;
+  const double frameSpeedDarkener = 0.6;
   PixelColor rippleColor = mrMarsColorWheel[(int)(instrumentNumber) % 12];
-  rippleColor.red = (int)(rippleColor.red *  darkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (int)(rippleColor.green * darkener *  (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (int)(rippleColor.blue * darkener *  (0.08 + 0.05 * notePitch / 72));
+  rippleColor.red = (int)(rippleColor.red *  frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * frameSpeedDarkener *  (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * frameSpeedDarkener *  (0.08 + 0.05 * notePitch / 72));
   return rippleColor;
 }
 
