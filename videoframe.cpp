@@ -10,17 +10,22 @@ VideoFrame::VideoFrame(int _width, int _height)
     : width(_width), height(_height), buffer(4 * _width * _height, 255) {}
 
 void VideoFrame::ScrollPixels(int xScrollSpeed, int yScrollSpeed,
-                              PixelColor blankColor) {
+                              PixelColor blankColor)
+{
   int xScrollMultiplier = 1;
   int yScrollMultiplier = 1;
-  if (xScrollSpeed < 0) {
+  if (xScrollSpeed < 0)
+  {
     xScrollMultiplier = xScrollMultiplier * -1;
   }
-  if (yScrollSpeed < 0) {
+  if (yScrollSpeed < 0)
+  {
     yScrollMultiplier = yScrollMultiplier * -1;
   }
-  for (int x = 0; x < width; ++x) {
-    for (int y = 0; y < height; ++y) {
+  for (int x = 0; x < width; ++x)
+  {
+    for (int y = 0; y < height; ++y)
+    {
       int destinationX =
           -(width - 1) * (-1 + xScrollMultiplier) / 2 + x * xScrollMultiplier;
       int destinationY =
@@ -39,8 +44,10 @@ void VideoFrame::ScrollPixels(int xScrollSpeed, int yScrollSpeed,
 void VideoFrame::CopySpunPixel(int destinationX, int destinationY, int originX,
                                int originY, double spinSpeedRadiansPerFrame,
                                double zoomMultiplierPerFrame,
-                               PixelColor blankColor) {
-  if (destinationX == originX) {
+                               PixelColor blankColor)
+{
+  if (destinationX == originX)
+  {
     return;
   }
   // std::cout << "Starting CopySpunPixel with " << destinationX << ", "
@@ -75,7 +82,8 @@ void VideoFrame::CopyDiscreteSpunPixel(int destinationX, int destinationY,
                                        int originX, int originY,
                                        double spinSpeedRadiansPerFrame,
                                        double zoomMultiplierPerFrame,
-                                       PixelColor blankColor) {
+                                       PixelColor blankColor)
+{
   Coordinate zoomDiff =
       getDiscreteZoomDiff(destinationX, destinationY, originX, originY);
   CopyPixel(destinationX + zoomDiff.realPart,
@@ -85,11 +93,14 @@ void VideoFrame::CopyDiscreteSpunPixel(int destinationX, int destinationY,
 
 void VideoFrame::SpinZoomPixels(double spinSpeedRadiansPerFrame,
                                 double zoomMultiplierPerFrame,
-                                PixelColor blankColor) {
+                                PixelColor blankColor)
+{
   int originX = width / 2;
   int originY = height / 2;
-  for (int x = 0; x < width / 2; ++x) {
-    for (int y = 0; y < height / 2; ++y) {
+  for (int x = 0; x < width / 2; ++x)
+  {
+    for (int y = 0; y < height / 2; ++y)
+    {
       CopyDiscreteSpunPixel(x, y, originX, originY, spinSpeedRadiansPerFrame,
                             zoomMultiplierPerFrame, blankColor);
       CopyDiscreteSpunPixel(width - 1 - x, height - 1 - y, originX, originY,
@@ -97,8 +108,10 @@ void VideoFrame::SpinZoomPixels(double spinSpeedRadiansPerFrame,
                             blankColor);
     }
   }
-  for (int x = 0; x < width / 2; ++x) {
-    for (int y = 0; y < height / 2; ++y) {
+  for (int x = 0; x < width / 2; ++x)
+  {
+    for (int y = 0; y < height / 2; ++y)
+    {
       CopyDiscreteSpunPixel(x, height - 1 - y, originX, originY,
                             spinSpeedRadiansPerFrame, zoomMultiplierPerFrame,
                             blankColor);
@@ -110,16 +123,19 @@ void VideoFrame::SpinZoomPixels(double spinSpeedRadiansPerFrame,
 };
 
 void VideoFrame::CopyPixel(int sourceX, int sourceY, int destinationX,
-                           int destinationY, PixelColor blankColor) {
+                           int destinationY, PixelColor blankColor)
+{
 
   //   std::cout << "copying pixel (" << sourceX << ", " << sourceY << ") -> ("
   //             << destinationX << ", " << destinationY << ") \n";
   if (destinationX < 0 || destinationX >= width || destinationY < 0 ||
-      destinationY >= height) {
+      destinationY >= height)
+  {
     return;
   }
   int destinationIndex = 4 * (destinationY * width + destinationX);
-  if (sourceX >= width || sourceX < 0 || sourceY >= height || sourceY < 0) {
+  if (sourceX >= width || sourceX < 0 || sourceY >= height || sourceY < 0)
+  {
     buffer[destinationIndex] = blankColor.red;
     buffer[destinationIndex + 1] = blankColor.green;
     buffer[destinationIndex + 2] = blankColor.blue;
@@ -133,90 +149,95 @@ void VideoFrame::CopyPixel(int sourceX, int sourceY, int destinationX,
   buffer[destinationIndex + 3] = buffer[sourceIndex + 3];
 };
 
-void VideoFrame::BrightenAllPixels(float multiple) {
-  for (int x = 0; x < width; ++x) {
-    for (int y = 0; y < height; ++y) {
+void VideoFrame::BrightenAllPixels(float multiple)
+{
+  for (int x = 0; x < width; ++x)
+  {
+    for (int y = 0; y < height; ++y)
+    {
       BrightenPixel(x, y, multiple);
     }
   }
 };
 
-void VideoFrame::BrightenPixel(int x, int y, float multiple) {
+void VideoFrame::BrightenPixel(int x, int y, float multiple)
+{
   int index = 4 * (y * width + x);
-  buffer[index] = (int)(buffer[index] * multiple);
-  buffer[index + 1] = (int)(buffer[index + 1] * multiple);
-  buffer[index + 2] = (int)(buffer[index + 2] * multiple);
+  buffer[index] = std::min(std::max((int)(buffer[index] * multiple), 0), 255);
+  buffer[index + 1] = std::min(std::max((int)(buffer[index + 1] * multiple), 0), 255);
+  buffer[index + 2] = std::min(std::max((int)(buffer[index + 2] * multiple), 0), 255);
   // buffer[index + 3] = (int)(buffer[index + 3] * multiple);
 
-  for (int k = 0; k < 4; ++k) {
-    if (buffer[index + k] < 0) {
-      buffer[index + k] = 0;
-    }
-    if (buffer[index + k] > 255) {
-      buffer[index + k] = 255;
+  // for (int k = 0; k < 4; ++k) {
+  //   if (buffer[index + k] < 0) {
+  //     buffer[index + k] = 0;
+  //   }
+  //   if (buffer[index + k] > 255) {
+  //     buffer[index + k] = 255;
+  //   }
+  // }
+};
+
+void VideoFrame::LinearStepAllPixelsTo(PixelColor targetColor, float multiple)
+{
+  for (int x = 0; x < width; ++x)
+  {
+    for (int y = 0; y < height; ++y)
+    {
+      CombinePixel(x, y, multiple, targetColor, 255);
     }
   }
 };
 
 void VideoFrame::CombinePixel(int x, int y, float multiple,
-                              PixelColor targetColor, int maxSaturation) {
+                              PixelColor targetColor, int maxSaturation)
+{
   int index = 4 * (y * width + x);
-  buffer[index] = (int)(buffer[index] * multiple);
-  if (buffer[index] < maxSaturation) {
-    buffer[index] += (int)((1 - multiple) * targetColor.red);
-  };
+  const int distanceToTarget = std::abs(targetColor.red - buffer[index]) + std::abs(targetColor.green - buffer[index + 1]) + std::abs(targetColor.blue - buffer[index + 2]);
+  multiple = multiple * (std::min(distanceToTarget, 50) / 100 + 0.5);
+  buffer[index] = std::min(std::max((int)((1 - multiple) * targetColor.red + multiple * buffer[index]), 0), maxSaturation);
 
-  buffer[index + 1] = (int)(buffer[index + 1] * multiple);
-  if (buffer[index + 1] < maxSaturation) {
-    buffer[index + 1] += (int)((1 - multiple) * targetColor.green);
-  };
+  buffer[index + 1] = std::min(std::max((int)((1 - multiple) * targetColor.green + multiple * buffer[index + 1]), 0), maxSaturation);
 
-  buffer[index + 2] = (int)(buffer[index + 2] * multiple);
-  if (buffer[index + 2] < maxSaturation) {
-    buffer[index + 2] += (int)((1 - multiple) * targetColor.blue);
-  }
+  buffer[index + 2] = std::min(std::max((int)((1 - multiple) * targetColor.blue + multiple * buffer[index + 2]), 0), maxSaturation);
 
-  buffer[index + 3] = (int)(buffer[index + 3] * multiple);
-  if (buffer[index + 3] < maxSaturation) {
-    buffer[index + 3] += (int)((1 - multiple) * targetColor.alpha);
-  }
-
-  for (int k = 0; k < 4; ++k) {
-    if (buffer[index + k] < 0) {
-      buffer[index + k] = 0;
-    }
-    if (buffer[index + k] > 255) {
-      buffer[index + k] = 255;
-    }
-  }
+  buffer[index + 3] = std::min(std::max((int)((1 - multiple) * targetColor.alpha + multiple * buffer[index + 3]), 0), 255);
 };
 
-void VideoFrame::AddPixel(int x, int y, PixelColor color) {
+void VideoFrame::AddPixel(int x, int y, PixelColor color)
+{
   int index = 4 * (y * width + x);
   buffer[index] = buffer[index] + color.red;
   buffer[index + 1] = buffer[index + 1] + color.green;
   buffer[index + 2] = buffer[index + 2] + color.blue;
   // buffer[index + 3] = buffer[index + 3] + color.alpha;
   buffer[index + 3] = 255;
-  for (int k = 0; k < 4; ++k) {
-    if (buffer[index + k] < 0) {
+  for (int k = 0; k < 4; ++k)
+  {
+    if (buffer[index + k] < 0)
+    {
       buffer[index + k] = 0;
     }
-    if (buffer[index + k] > 255) {
+    if (buffer[index + k] > 255)
+    {
       buffer[index + k] = 255;
     }
   }
 };
 
-void VideoFrame::SetAllPixels(PixelColor color) {
-  for (int x = 0; x < width; ++x) {
-    for (int y = 0; y < height; ++y) {
+void VideoFrame::SetAllPixels(PixelColor color)
+{
+  for (int x = 0; x < width; ++x)
+  {
+    for (int y = 0; y < height; ++y)
+    {
       SetPixel(x, y, color);
     }
   }
 };
 
-void VideoFrame::SetPixel(int x, int y, PixelColor color) {
+void VideoFrame::SetPixel(int x, int y, PixelColor color)
+{
   int index = 4 * (y * width + x);
   buffer[index] = color.red;
   buffer[index + 1] = color.green;
@@ -224,17 +245,21 @@ void VideoFrame::SetPixel(int x, int y, PixelColor color) {
   // buffer[index + 3] = color.alpha;
   buffer[index + 3] = 255;
 
-  for (int k = 0; k < 4; ++k) {
-    if (buffer[index + k] < 0) {
+  for (int k = 0; k < 4; ++k)
+  {
+    if (buffer[index + k] < 0)
+    {
       buffer[index + k] = 0;
     }
-    if (buffer[index + k] > 255) {
+    if (buffer[index + k] > 255)
+    {
       buffer[index + k] = 255;
     }
   }
 };
 
-PixelColor VideoFrame::GetPixel(int x, int y) {
+PixelColor VideoFrame::GetPixel(int x, int y)
+{
   int index = 4 * (y * width + x);
   PixelColor color;
   color.red = buffer[index];
@@ -244,9 +269,11 @@ PixelColor VideoFrame::GetPixel(int x, int y) {
   return color;
 };
 
-int VideoFrame::SavePng(const char *outFileName) {
+int VideoFrame::SavePng(const char *outFileName)
+{
   unsigned error = lodepng::encode(outFileName, buffer, width, height);
-  if (error) {
+  if (error)
+  {
     fprintf(stderr, "ERROR: lodepng::encode returned %u\n", error);
     return 1;
   }

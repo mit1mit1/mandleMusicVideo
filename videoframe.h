@@ -7,7 +7,8 @@
 #include "structs.h"
 #include <vector>
 
-class VideoFrame {
+class VideoFrame
+{
 private:
   int width;
   int height;
@@ -26,11 +27,13 @@ public:
                      PixelColor blankColor);
 
   void CopyDiscreteSpunPixel(int sourceX, int sourceY, int originX, int originY,
-                     double spinSpeedRadiansPerFrame, double zoomMultiplierPerFrame,
-                     PixelColor blankColor);
+                             double spinSpeedRadiansPerFrame, double zoomMultiplierPerFrame,
+                             PixelColor blankColor);
 
   void CopyPixel(int sourceX, int sourceY, int destinationX, int destinationY,
                  PixelColor blankColor);
+
+  void LinearStepAllPixelsTo(PixelColor targetColor, float multiple);
 
   void BrightenAllPixels(float multiple);
 

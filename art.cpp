@@ -46,7 +46,7 @@ Ripple getNoteRippleCircleOfScales(int width, int height, double notePitch,
   newRipple.startFrame = noteStartSeconds * framespersecond;
 
   // TODO switch this based on number of input files
-  newRipple.addColor = getRippleColorInstrument(notePitch, instrumentNumber);
+  newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
   // newRipple.addColor = getRippleColorPitch(notePitch, instrumentNumber);
   // newRipple.addColor = getRippleColorPitchDependent(notePitch,
   // instrumentNumber);
@@ -59,57 +59,83 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
 
   std::vector<PixelColor> mrMarsColorWheel = {
       // F# Red
-      PixelColor{.red = 255, .green = 0, .blue = 0},
+      PixelColor{.red = 255, .green = 0, .blue = 0, .alpha = 255},
       // G Chrysolite
-      PixelColor{.red = 0, .green = 255, .blue = 180},
+      PixelColor{.red = 0, .green = 255, .blue = 180, .alpha = 255},
       // Ab Magenta
-      PixelColor{.red = 255, .green = 19, .blue = 255},
+      PixelColor{.red = 255, .green = 19, .blue = 255, .alpha = 255},
       // A Chatruse
-      PixelColor{.red = 163, .green = 252, .blue = 0},
+      PixelColor{.red = 163, .green = 252, .blue = 0, .alpha = 255},
       // Bb Corn Flower
-      PixelColor{.red = 147, .green = 153, .blue = 255},
+      PixelColor{.red = 147, .green = 153, .blue = 255, .alpha = 255},
       // B Tumeric
-      PixelColor{.red = 255, .green = 191, .blue = 0},
+      PixelColor{.red = 255, .green = 191, .blue = 0, .alpha = 255},
       // C Cyan
-      PixelColor{.red = 0, .green = 255, .blue = 255},
+      PixelColor{.red = 0, .green = 255, .blue = 255, .alpha = 255},
       // Db Pink
-      PixelColor{.red = 255, .green = 147, .blue = 225},
+      PixelColor{.red = 255, .green = 147, .blue = 225, .alpha = 255},
       // D Bright Green
-      PixelColor{.red = 0, .green = 250, .blue = 0},
+      PixelColor{.red = 0, .green = 250, .blue = 0, .alpha = 255},
       // Eb Violet
-      PixelColor{.red = 187, .green = 58, .blue = 255},
+      PixelColor{.red = 187, .green = 58, .blue = 255, .alpha = 255},
       // E Yellow
-      PixelColor{.red = 255, .green = 253, .blue = 0},
+      PixelColor{.red = 255, .green = 253, .blue = 0, .alpha = 255},
       // F Azure
-      PixelColor{.red = 0, .green = 180, .blue = 255},
+      PixelColor{.red = 0, .green = 180, .blue = 255, .alpha = 255},
   };
 
   std::vector<PixelColor> autumnPallette = {
-     // Macadamia
-      PixelColor{.red = 238, .green = 224, .blue = 200},
+      // Macadamia
+      PixelColor{.red = 238, .green = 224, .blue = 200, .alpha = 255},
       // Dark Ginger
-      PixelColor{.red = 172, .green = 92, .blue = 56},
+      PixelColor{.red = 172, .green = 92, .blue = 56, .alpha = 255},
       // Amber
-      PixelColor{.red = 214, .green = 120, .blue = 52},
+      PixelColor{.red = 214, .green = 120, .blue = 52, .alpha = 255},
       // Laguna 2
-      PixelColor{.red = 0, .green = 100, .blue = 118},
+      PixelColor{.red = 0, .green = 100, .blue = 118, .alpha = 255},
       // Brick red
-      PixelColor{.red = 211, .green = 58, .blue = 52},
+      PixelColor{.red = 211, .green = 58, .blue = 52, .alpha = 255},
       // Olive
-      PixelColor{.red = 147, .green = 152, .blue = 94},
+      PixelColor{.red = 147, .green = 152, .blue = 94, .alpha = 255},
       // Camel
-      PixelColor{.red = 180, .green = 124, .blue = 65},
+      PixelColor{.red = 180, .green = 124, .blue = 65, .alpha = 255},
       // Laguna 1
-      PixelColor{.red = 29, .green = 90, .blue = 107},
+      PixelColor{.red = 29, .green = 90, .blue = 107, .alpha = 255},
       // Soft Olive
-      PixelColor{.red = 125, .green = 123, .blue = 79},
+      PixelColor{.red = 125, .green = 123, .blue = 79, .alpha = 255},
       // Mustard
-      PixelColor{.red = 230, .green = 176, .blue = 81},
+      PixelColor{.red = 230, .green = 176, .blue = 81, .alpha = 255},
       // Chocolate
-      PixelColor{.red = 50, .green = 39, .blue = 19},
+      PixelColor{.red = 50, .green = 39, .blue = 19, .alpha = 255},
       // Spiced Coral
-      PixelColor{.red = 229, .green = 110, .blue = 104},
+      PixelColor{.red = 229, .green = 110, .blue = 104, .alpha = 255},
+  };
 
+  std::vector<PixelColor> bladeRunnerPallette = {
+      // Orange
+      PixelColor{.red = 135, .green = 12, .blue = 2, .alpha = 255},
+      // Blue
+      PixelColor{.red = 1, .green = 39, .blue = 54, .alpha = 255},
+      // Orange
+      PixelColor{.red = 157, .green = 28, .blue = 2, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 66, .blue = 78, .alpha = 255},
+      // Orange
+      PixelColor{.red = 186, .green = 60, .blue = 2, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 95, .blue = 109, .alpha = 255},
+      // Orange
+      PixelColor{.red = 214, .green = 100, .blue = 2, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 1, .blue = 115, .alpha = 255},
+      // Orange
+      PixelColor{.red = 188, .green = 64, .blue = 5, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 44, .blue = 59, .alpha = 255},
+      // Orange
+      PixelColor{.red = 50, .green = 39, .blue = 19, .alpha = 255},
+      // Blue
+      PixelColor{.red = 2, .green = 60, .blue = 90, .alpha = 255},
   };
   // std::vector<PixelColor> mrMarsColorWheelPastelled = {
   //     // F# Red
@@ -151,13 +177,27 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   //     PixelColor{.red = 21, .green = 44, .blue = 85},
   //     PixelColor{.red = 16, .green = 96, .blue = 34},
   // };
-  const double frameSpeedDarkener = 0.6;
-  PixelColor rippleColor = autumnPallette[(int)(notePitch) % 12];
-  rippleColor.red = (int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  // Dark mode
+  // const double frameSpeedDarkener = 0.6;
+  // Light mode
 
-  // std::cout << "ripple color" << rippleColor.red << rippleColor.green << rippleColor.blue  << "\n";
+  // Defined blade runner pallete in alternating colors hues - will make each instrument one hue
+  const int palleteIndex = (2 * ((int)(notePitch) % 6) + instrumentNumber % 2) % 12;
+  PixelColor rippleColor = bladeRunnerPallette[(2 * ((int)(notePitch) % 6) + instrumentNumber % 2) % 12];
+  std::cout << "ripple color from pallete index " << +palleteIndex << ": (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ") " << "\n";
+
+  // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
+  // Dark add mode
+  // rippleColor.red = (unsigned char)(int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  // rippleColor.green = (unsigned char)(int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  // rippleColor.blue = (unsigned char)(int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+
+  // Light combine mode
+  rippleColor.red = (unsigned char)(int)(rippleColor.red);
+  rippleColor.green = (unsigned char)(int)(rippleColor.green);
+  rippleColor.blue = (unsigned char)(int)(rippleColor.blue);
+
+  std::cout << "ripple color after calc: (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ")" << "\n";
   return rippleColor;
 }
 
@@ -192,9 +232,9 @@ PixelColor getRippleColorInstrument(double notePitch, int instrumentNumber)
   };
   const double frameSpeedDarkener = 0.6;
   PixelColor rippleColor = mrMarsColorWheel[(int)(instrumentNumber) % 12];
-  rippleColor.red = (int)(rippleColor.red *  frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (int)(rippleColor.green * frameSpeedDarkener *  (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (int)(rippleColor.blue * frameSpeedDarkener *  (0.08 + 0.05 * notePitch / 72));
+  rippleColor.red = (int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
   return rippleColor;
 }
 

@@ -92,12 +92,10 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    MidiTrack inputFiles[4] = {
+    MidiTrack inputFiles[2] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Bebop Organ Render 0.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Classic Electric Piano Render 0.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Marimba Render 0.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/comingHomeBaby Upright Studio Bass Render 0.mid", .isPercussion = false}};
+        MidiTrack{.filename = "./input/cubistSynthSynth.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}};
 
     for (MidiTrack inputFile : inputFiles)
     {
@@ -227,17 +225,23 @@ static int GenerateRippleZoomFrames(
 
   std::vector<PixelColor> availableColors = getColors();
   // Create a video frame buffer with 720p resolution (1280x720).
-  PixelColor blankColor;
-  blankColor.red = 0;
-  blankColor.green = 0;
-  blankColor.blue = 0;
-  blankColor.alpha = 255;
+  // PixelColor blankColorBlack;
+  // blankColorBlack.red = 0;
+  // blankColorBlack.green = 0;
+  // blankColorBlack.blue = 0;
+  // blankColorBlack.alpha = 255;
+  PixelColor blankColorWhite;
+  blankColorWhite.red = 255;
+  blankColorWhite.green = 255;
+  blankColorWhite.blue = 255;
+  blankColorWhite.alpha = 255;
   PixelColor backgroundColor;
-  backgroundColor.red = 0;
-  backgroundColor.green = 0;
-  backgroundColor.blue = 0;
+  backgroundColor.red = 255;
+  backgroundColor.green = 255;
+  backgroundColor.blue = 255;
   backgroundColor.alpha = 255;
-  const int backgroundColorMaxSaturation = 20;
+  // Dark mode
+  // const int backgroundColorMaxSaturation = 20;
   const double onsetColorChangeLength = 0.4;
 
   const int scrollSpeedX = 0;
@@ -323,7 +327,11 @@ static int GenerateRippleZoomFrames(
       }
     }
 
-    currentFrame.BrightenAllPixels(0.86);
+    // Dark mode
+    // currentFrame.BrightenAllPixels(0.86);
+    // Light mode
+    // currentFrame.BrightenAllPixels(1.14);
+    currentFrame.LinearStepAllPixelsTo(backgroundColor, 0.95);
 
     for (Ripple ripple : ripples)
     {
@@ -370,8 +378,11 @@ static int GenerateRippleZoomFrames(
               //  && framesSinceRippleStart % 5 == 0 - if you want a strobe party effect
           )
           {
-
-            currentFrame.AddPixel(x, y, ripple.addColor);
+            // Dark mode
+            // currentFrame.AddPixel(x, y, ripple.addColor);
+            // Light mode
+            // std::cout << "adding pixel"  << ripple.addColor.red << ripple.addColor.green << ripple.addColor.blue << "\n";
+            currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
           }
 
           // Add a sportlight arc to the top corner
@@ -398,7 +409,10 @@ static int GenerateRippleZoomFrames(
 
           if (std::abs(angleToCheckPoint - angleToRipple) < arcAngle || std::abs(angleToCheckPoint - angleToRipple - 2 * M_PI) < arcAngle || std::abs(angleToCheckPoint - angleToRipple + 2 * M_PI) < arcAngle)
           {
-            currentFrame.AddPixel(x, y, ripple.addColor);
+            // Dark mode
+            // currentFrame.AddPixel(x, y, ripple.addColor);
+            // Light mode
+            currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
           }
         }
       }
