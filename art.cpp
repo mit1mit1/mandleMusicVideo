@@ -111,31 +111,64 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
       PixelColor{.red = 229, .green = 110, .blue = 104, .alpha = 255},
   };
 
-  std::vector<PixelColor> bladeRunnerPallette = {
-      // Orange
-      PixelColor{.red = 135, .green = 12, .blue = 2, .alpha = 255},
+  // TODO add whole proper pallete per track
+  std::vector<PixelColor> bladeRunnerPalletteBlue = {
       // Blue
-      PixelColor{.red = 1, .green = 39, .blue = 54, .alpha = 255},
-      // Orange
-      PixelColor{.red = 157, .green = 28, .blue = 2, .alpha = 255},
-      // Blue
-      PixelColor{.red = 0, .green = 66, .blue = 78, .alpha = 255},
-      // Orange
-      PixelColor{.red = 186, .green = 60, .blue = 2, .alpha = 255},
+      PixelColor{.red = 0, .green = 66, .blue = 90, .alpha = 255},
       // Blue
       PixelColor{.red = 0, .green = 95, .blue = 109, .alpha = 255},
-      // Orange
-      PixelColor{.red = 214, .green = 100, .blue = 2, .alpha = 255},
-      // Blue
-      PixelColor{.red = 0, .green = 1, .blue = 115, .alpha = 255},
-      // Orange
-      PixelColor{.red = 188, .green = 64, .blue = 5, .alpha = 255},
-      // Blue
-      PixelColor{.red = 0, .green = 44, .blue = 59, .alpha = 255},
-      // Orange
-      PixelColor{.red = 50, .green = 39, .blue = 19, .alpha = 255},
       // Blue
       PixelColor{.red = 2, .green = 60, .blue = 90, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 44, .blue = 59, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 1, .blue = 115, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 55, .blue = 150, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 80, .blue = 120, .alpha = 255},
+      // Blue
+      PixelColor{.red = 2, .green = 150, .blue = 170, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 20, .blue = 160, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 15, .blue = 125, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 80, .blue = 120, .alpha = 255},
+      // Blue
+      PixelColor{.red = 0, .green = 35, .blue = 105, .alpha = 255},
+  };
+
+  std::vector<PixelColor> bladeRunnerPalletteOrange = {
+      // Orange
+      PixelColor{.red = 135, .green = 12, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 157, .green = 28, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 186, .green = 60, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 214, .green = 100, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 188, .green = 64, .blue = 5, .alpha = 255},
+      // Orange
+      PixelColor{.red = 170, .green = 20, .blue = 9, .alpha = 255},
+      // Orange
+      PixelColor{.red = 160, .green = 10, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 190, .green = 95, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 170, .green = 50, .blue = 5, .alpha = 255},
+      // Orange
+      PixelColor{.red = 100, .green = 20, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 110, .green = 5, .blue = 2, .alpha = 255},
+      // Orange
+      PixelColor{.red = 50, .green = 39, .blue = 19, .alpha = 255},
+  };
+
+  std::vector<std::vector<PixelColor>> bladeRunnerPallettes = {
+    bladeRunnerPalletteBlue,
+    bladeRunnerPalletteOrange
   };
   // std::vector<PixelColor> mrMarsColorWheelPastelled = {
   //     // F# Red
@@ -182,9 +215,8 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   // Light mode
 
   // Defined blade runner pallete in alternating colors hues - will make each instrument one hue
-  const int palleteIndex = (2 * ((int)(notePitch) % 6) + instrumentNumber % 2) % 12;
-  PixelColor rippleColor = bladeRunnerPallette[(2 * ((int)(notePitch) % 6) + instrumentNumber % 2) % 12];
-  std::cout << "ripple color from pallete index " << +palleteIndex << ": (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ") " << "\n";
+  PixelColor rippleColor = bladeRunnerPallettes[instrumentNumber % 2][(int)(notePitch) % 12];
+  // std::cout << "ripple color from pallete index " << ": (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ") " << "\n";
 
   // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
   // Dark add mode
@@ -197,7 +229,7 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   rippleColor.green = (unsigned char)(int)(rippleColor.green);
   rippleColor.blue = (unsigned char)(int)(rippleColor.blue);
 
-  std::cout << "ripple color after calc: (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ")" << "\n";
+  // std::cout << "ripple color after calc: (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ")" << "\n";
   return rippleColor;
 }
 

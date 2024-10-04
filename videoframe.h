@@ -40,7 +40,7 @@ public:
   void BrightenPixel(int x, int y, float multiple);
 
   void CombinePixel(int x, int y, float multiple, PixelColor targetColor,
-                    int maxSaturation);
+                    int maxSaturation, bool accelerateEnding = false);
 
   void AddPixel(int x, int y, PixelColor color);
 

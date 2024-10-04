@@ -184,24 +184,28 @@ void VideoFrame::LinearStepAllPixelsTo(PixelColor targetColor, float multiple)
   {
     for (int y = 0; y < height; ++y)
     {
-      CombinePixel(x, y, multiple, targetColor, 255);
+      CombinePixel(x, y, multiple, targetColor, 255, true);
     }
   }
 };
 
 void VideoFrame::CombinePixel(int x, int y, float multiple,
-                              PixelColor targetColor, int maxSaturation)
+                              PixelColor targetColor, int maxSaturation, bool accelerateEnding)
 {
   int index = 4 * (y * width + x);
-  const int distanceToTarget = std::abs(targetColor.red - buffer[index]) + std::abs(targetColor.green - buffer[index + 1]) + std::abs(targetColor.blue - buffer[index + 2]);
-  multiple = multiple * (std::min(distanceToTarget, 50) / 100 + 0.5);
-  buffer[index] = std::min(std::max((int)((1 - multiple) * targetColor.red + multiple * buffer[index]), 0), maxSaturation);
+  const int distanceToTarget = std::abs(+targetColor.red - +buffer[index]) + std::abs(+targetColor.green - +buffer[index + 1]) + std::abs(+targetColor.blue - +buffer[index + 2]);
+  double newMultiple = accelerateEnding ? multiple * ((double)std::min(distanceToTarget, 80) / (80 * 2) + 0.5) : multiple;
+  // if (distanceToTarget != 0 && multiple != 0.5)
+  // {
+  //   std::cout << "distance to taget: " << distanceToTarget << ", std::min(distanceToTarget, 40): " << std::min(distanceToTarget, 40) << "(std::min(distanceToTarget, 40) / 160 + 0.75): " << ((double)std::min(distanceToTarget, 40) / 160 + 0.75) << ", multiple: " << multiple << ", newMultiple: " << newMultiple << std::endl;
+  // }
+  buffer[index] = std::min(std::max((int)((1 - newMultiple) * targetColor.red + newMultiple * buffer[index]), 0), maxSaturation);
 
-  buffer[index + 1] = std::min(std::max((int)((1 - multiple) * targetColor.green + multiple * buffer[index + 1]), 0), maxSaturation);
+  buffer[index + 1] = std::min(std::max((int)((1 - newMultiple) * targetColor.green + newMultiple * buffer[index + 1]), 0), maxSaturation);
 
-  buffer[index + 2] = std::min(std::max((int)((1 - multiple) * targetColor.blue + multiple * buffer[index + 2]), 0), maxSaturation);
+  buffer[index + 2] = std::min(std::max((int)((1 - newMultiple) * targetColor.blue + newMultiple * buffer[index + 2]), 0), maxSaturation);
 
-  buffer[index + 3] = std::min(std::max((int)((1 - multiple) * targetColor.alpha + multiple * buffer[index + 3]), 0), 255);
+  buffer[index + 3] = std::min(std::max((int)((1 - newMultiple) * targetColor.alpha + newMultiple * buffer[index + 3]), 0), 255);
 };
 
 void VideoFrame::AddPixel(int x, int y, PixelColor color)

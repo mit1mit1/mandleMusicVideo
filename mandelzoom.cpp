@@ -231,14 +231,14 @@ static int GenerateRippleZoomFrames(
   // blankColorBlack.blue = 0;
   // blankColorBlack.alpha = 255;
   PixelColor blankColorWhite;
-  blankColorWhite.red = 255;
-  blankColorWhite.green = 255;
-  blankColorWhite.blue = 255;
+  blankColorWhite.red = 205;
+  blankColorWhite.green = 203;
+  blankColorWhite.blue = 206;
   blankColorWhite.alpha = 255;
   PixelColor backgroundColor;
-  backgroundColor.red = 255;
-  backgroundColor.green = 255;
-  backgroundColor.blue = 255;
+  backgroundColor.red = 205;
+  backgroundColor.green = 203;
+  backgroundColor.blue = 206;
   backgroundColor.alpha = 255;
   // Dark mode
   // const int backgroundColorMaxSaturation = 20;
@@ -331,14 +331,15 @@ static int GenerateRippleZoomFrames(
     // currentFrame.BrightenAllPixels(0.86);
     // Light mode
     // currentFrame.BrightenAllPixels(1.14);
-    currentFrame.LinearStepAllPixelsTo(backgroundColor, 0.95);
+    // TODO slow this down nicer
+    currentFrame.LinearStepAllPixelsTo(backgroundColor, 0.85);
 
     for (Ripple ripple : ripples)
     {
       int framesSinceRippleStart = f - ripple.startFrame;
       int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30.0);
       // Make notes throb irregularly
-      int innerRadius = outerRadius - (int)(framesSinceRippleStart * ripple.speed / 2) % (4 + ((ripple.startFrame + ripple.xCenter + ripple.yCenter) % 3));
+      int innerRadius = outerRadius - (int)((5 + (ripple.startFrame + ripple.xCenter + ripple.yCenter) % 3) * std::sin((((ripple.startFrame + ripple.xCenter + ripple.yCenter) % 5 + 1) * framesSinceRippleStart * 0.01)));
       // int thickness =
       //     (ripple.thickness + (innerRadius / 2)) * ripple.thickness + (innerRadius / 2);
       // TODO: Extract discrete zoom and use it to move ripple centre as
