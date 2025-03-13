@@ -92,10 +92,11 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    MidiTrack inputFiles[2] = {
+    MidiTrack inputFiles[1] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/cubistSynthSynth.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}};
+        MidiTrack{.filename = "./input/dcp1.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
+      };
 
     for (MidiTrack inputFile : inputFiles)
     {
@@ -241,7 +242,7 @@ static int GenerateRippleZoomFrames(
   backgroundColor.blue = 206;
   backgroundColor.alpha = 255;
   // Dark mode
-  // const int backgroundColorMaxSaturation = 20;
+  const int backgroundColorMaxSaturation = 20;
   const double onsetColorChangeLength = 0.4;
 
   const int scrollSpeedX = 0;
@@ -328,11 +329,11 @@ static int GenerateRippleZoomFrames(
     }
 
     // Dark mode
-    // currentFrame.BrightenAllPixels(0.86);
+    currentFrame.BrightenAllPixels(0.86);
     // Light mode
     // currentFrame.BrightenAllPixels(1.14);
     // TODO slow this down nicer
-    currentFrame.LinearStepAllPixelsTo(backgroundColor, 0.85);
+    // currentFrame.LinearStepAllPixelsTo(backgroundColor, 0.85);
 
     for (Ripple ripple : ripples)
     {
@@ -380,10 +381,10 @@ static int GenerateRippleZoomFrames(
           )
           {
             // Dark mode
-            // currentFrame.AddPixel(x, y, ripple.addColor);
+            currentFrame.AddPixel(x, y, ripple.addColor);
             // Light mode
             // std::cout << "adding pixel"  << ripple.addColor.red << ripple.addColor.green << ripple.addColor.blue << "\n";
-            currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
+            // currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
           }
 
           // Add a sportlight arc to the top corner
@@ -411,9 +412,9 @@ static int GenerateRippleZoomFrames(
           if (std::abs(angleToCheckPoint - angleToRipple) < arcAngle || std::abs(angleToCheckPoint - angleToRipple - 2 * M_PI) < arcAngle || std::abs(angleToCheckPoint - angleToRipple + 2 * M_PI) < arcAngle)
           {
             // Dark mode
-            // currentFrame.AddPixel(x, y, ripple.addColor);
+            currentFrame.AddPixel(x, y, ripple.addColor);
             // Light mode
-            currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
+            // currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
           }
         }
       }

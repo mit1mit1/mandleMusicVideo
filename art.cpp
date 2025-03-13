@@ -211,23 +211,25 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   //     PixelColor{.red = 16, .green = 96, .blue = 34},
   // };
   // Dark mode
-  // const double frameSpeedDarkener = 0.6;
+  const double frameSpeedDarkener = 0.6;
   // Light mode
 
   // Defined blade runner pallete in alternating colors hues - will make each instrument one hue
-  PixelColor rippleColor = bladeRunnerPallettes[instrumentNumber % 2][(int)(notePitch) % 12];
+  // PixelColor rippleColor = bladeRunnerPallettes[instrumentNumber % 2][(int)(notePitch) % 12];
+  
+  PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
   // std::cout << "ripple color from pallete index " << ": (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ") " << "\n";
 
   // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
   // Dark add mode
-  // rippleColor.red = (unsigned char)(int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  // rippleColor.green = (unsigned char)(int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  // rippleColor.blue = (unsigned char)(int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.red = (unsigned char)(int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.green = (unsigned char)(int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+  rippleColor.blue = (unsigned char)(int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
 
   // Light combine mode
-  rippleColor.red = (unsigned char)(int)(rippleColor.red);
-  rippleColor.green = (unsigned char)(int)(rippleColor.green);
-  rippleColor.blue = (unsigned char)(int)(rippleColor.blue);
+  // rippleColor.red = (unsigned char)(int)(rippleColor.red);
+  // rippleColor.green = (unsigned char)(int)(rippleColor.green);
+  // rippleColor.blue = (unsigned char)(int)(rippleColor.blue);
 
   // std::cout << "ripple color after calc: (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ")" << "\n";
   return rippleColor;
