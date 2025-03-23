@@ -92,9 +92,10 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    MidiTrack inputFiles[1] = {
+    MidiTrack inputFiles[2] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/dcp1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinvention1part1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinvention1part2.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
       };
 
@@ -226,21 +227,28 @@ static int GenerateRippleZoomFrames(
 
   std::vector<PixelColor> availableColors = getColors();
   // Create a video frame buffer with 720p resolution (1280x720).
-  // PixelColor blankColorBlack;
-  // blankColorBlack.red = 0;
-  // blankColorBlack.green = 0;
-  // blankColorBlack.blue = 0;
-  // blankColorBlack.alpha = 255;
-  PixelColor blankColorWhite;
-  blankColorWhite.red = 205;
-  blankColorWhite.green = 203;
-  blankColorWhite.blue = 206;
-  blankColorWhite.alpha = 255;
+  // Dark mode
+  PixelColor blankColorBlack;
+  blankColorBlack.red = 0;
+  blankColorBlack.green = 0;
+  blankColorBlack.blue = 0;
+  blankColorBlack.alpha = 255;
   PixelColor backgroundColor;
-  backgroundColor.red = 205;
-  backgroundColor.green = 203;
-  backgroundColor.blue = 206;
+  backgroundColor.red = 0;
+  backgroundColor.green = 0;
+  backgroundColor.blue = 0;
   backgroundColor.alpha = 255;
+  // Light mode
+  // PixelColor blankColorWhite;
+  // blankColorWhite.red = 205;
+  // blankColorWhite.green = 203;
+  // blankColorWhite.blue = 206;
+  // blankColorWhite.alpha = 255;
+  // PixelColor backgroundColor;
+  // backgroundColor.red = 205;
+  // backgroundColor.green = 203;
+  // backgroundColor.blue = 206;
+  // backgroundColor.alpha = 255;
   // Dark mode
   const int backgroundColorMaxSaturation = 20;
   const double onsetColorChangeLength = 0.4;
@@ -328,8 +336,17 @@ static int GenerateRippleZoomFrames(
       }
     }
 
+    // Another thing to help with attack speed
+    // const float rippleAttackSpeed = 1;
+    const float rippleAttackSpeed = 1.8;
+
     // Dark mode
-    currentFrame.BrightenAllPixels(0.86);
+    // Medium darkening
+    // currentFrame.BrightenAllPixels(0.86);
+    // Rapid darkening, suitable for quick attack and decay instruments
+    currentFrame.BrightenAllPixels(0.78);
+
+
     // Light mode
     // currentFrame.BrightenAllPixels(1.14);
     // TODO slow this down nicer
@@ -338,9 +355,9 @@ static int GenerateRippleZoomFrames(
     for (Ripple ripple : ripples)
     {
       int framesSinceRippleStart = f - ripple.startFrame;
-      int outerRadius = std::min(framesSinceRippleStart * ripple.speed + 12, 30.0);
+      int outerRadius = std::min((framesSinceRippleStart * ripple.speed + 12) * rippleAttackSpeed, 30.0);
       // Make notes throb irregularly
-      int innerRadius = outerRadius - (int)((5 + (ripple.startFrame + ripple.xCenter + ripple.yCenter) % 3) * std::sin((((ripple.startFrame + ripple.xCenter + ripple.yCenter) % 5 + 1) * framesSinceRippleStart * 0.01)));
+      int innerRadius = outerRadius - (int)((5 + (ripple.startFrame + ripple.xCenter + ripple.yCenter) % 3) * std::sin((((ripple.startFrame + ripple.xCenter + ripple.yCenter) % 5 + 1) * framesSinceRippleStart * 0.01 * rippleAttackSpeed)));
       // int thickness =
       //     (ripple.thickness + (innerRadius / 2)) * ripple.thickness + (innerRadius / 2);
       // TODO: Extract discrete zoom and use it to move ripple centre as

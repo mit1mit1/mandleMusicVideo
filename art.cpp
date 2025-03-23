@@ -111,6 +111,24 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
       PixelColor{.red = 229, .green = 110, .blue = 104, .alpha = 255},
   };
 
+  std::vector<PixelColor> technoPallette = {
+      // (114,255,71)
+      PixelColor{.red = 114, .green = 255, .blue = 71, .alpha = 255},
+      PixelColor{.red = 99, .green = 48, .blue = 122, .alpha = 255},
+      PixelColor{.red = 255, .green = 109, .blue = 249, .alpha = 255},
+      PixelColor{.red = 182, .green = 221, .blue = 170, .alpha = 255},
+      PixelColor{.red = 4, .green = 107, .blue = 122, .alpha = 255},
+
+      PixelColor{.red = 104, .green = 245, .blue = 81, .alpha = 255},
+      PixelColor{.red = 109, .green = 38, .blue = 112, .alpha = 255},
+      PixelColor{.red = 235, .green = 100, .blue = 239, .alpha = 255},
+      PixelColor{.red = 172, .green = 231, .blue = 120, .alpha = 255},
+      PixelColor{.red = 14, .green = 117, .blue = 112, .alpha = 255},
+
+      PixelColor{.red = 105, .green = 68, .blue = 102, .alpha = 255},
+      PixelColor{.red = 172, .green = 211, .blue = 160, .alpha = 255},
+  };
+
   // TODO add whole proper pallete per track
   std::vector<PixelColor> bladeRunnerPalletteBlue = {
       // Blue
@@ -167,64 +185,70 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   };
 
   std::vector<std::vector<PixelColor>> bladeRunnerPallettes = {
-    bladeRunnerPalletteBlue,
-    bladeRunnerPalletteOrange
+      bladeRunnerPalletteBlue,
+      bladeRunnerPalletteOrange};
+  std::vector<PixelColor> mrMarsColorWheelPastelled = {
+      // F# Red
+      PixelColor{.red = 101, .green = 15, .blue = 0},
+      // G Chrysolity
+      PixelColor{.red = 0, .green = 98, .blue = 73},
+      // Ab Magenta
+      PixelColor{.red = 101, .green = 25, .blue = 100},
+      // A Chatruse
+      PixelColor{.red = 72, .green = 98, .blue = 0},
+      // Bb Corn Flower
+      PixelColor{.red = 58, .green = 60, .blue = 100},
+      // B Tumeric
+      PixelColor{.red = 100, .green = 76, .blue = 19},
+      // C Cyan
+      PixelColor{.red = 0, .green = 99, .blue = 100},
+      // Db Pink
+      PixelColor{.red = 101, .green = 60, .blue = 87},
+      // D Bright Green
+      PixelColor{.red = 0, .green = 97, .blue = 0},
+      // Eb Violet
+      PixelColor{.red = 73, .green = 22, .blue = 100},
+      // E Yellow
+      PixelColor{.red = 100, .green = 99, .blue = 0},
+      // F Azure
+      PixelColor{.red = 0, .green = 73, .blue = 100},
   };
-  // std::vector<PixelColor> mrMarsColorWheelPastelled = {
-  //     // F# Red
-  //     PixelColor{.red = 101, .green = 15, .blue = 0},
-  //     // G Chrysolity
-  //     PixelColor{.red = 0, .green = 98, .blue = 73},
-  //     // Ab Magenta
-  //     PixelColor{.red = 101, .green = 25, .blue = 100},
-  //     // A Chatruse
-  //     PixelColor{.red = 72, .green = 98, .blue = 0},
-  //     // Bb Corn Flower
-  //     PixelColor{.red = 58, .green = 60, .blue = 100},
-  //     // B Tumeric
-  //     PixelColor{.red = 100, .green = 76, .blue = 19},
-  //     // C Cyan
-  //     PixelColor{.red = 0, .green = 99, .blue = 100},
-  //     // Db Pink
-  //     PixelColor{.red = 101, .green = 60, .blue = 87},
-  //     // D Bright Green
-  //     PixelColor{.red = 0, .green = 97, .blue = 0},
-  //     // Eb Violet
-  //     PixelColor{.red = 73, .green = 22, .blue = 100},
-  //     // E Yellow
-  //     PixelColor{.red = 100, .green = 99, .blue = 0},
-  //     // F Azure
-  //     PixelColor{.red = 0, .green = 73, .blue = 100},
-  // };
-  // std::vector<PixelColor> zeldaColors = {
-  //     PixelColor{.red = 90, .green = 151, .blue = 255},
-  //     PixelColor{.red = 0, .green = 243, .blue = 54},
-  //     PixelColor{.red = 166, .green = 87, .blue = 255},
-  //     PixelColor{.red = 0, .green = 56, .blue = 152},
-  //     PixelColor{.red = 72, .green = 0, .blue = 155},
-  //     PixelColor{.red = 72, .green = 255, .blue = 113},
-  //     PixelColor{.red = 51, .green = 20, .blue = 86},
-  //     PixelColor{.red = 0, .green = 173, .blue = 38},
-  //     PixelColor{.red = 6, .green = 92, .blue = 239},
-  //     PixelColor{.red = 115, .green = 5, .blue = 239},
-  //     PixelColor{.red = 21, .green = 44, .blue = 85},
-  //     PixelColor{.red = 16, .green = 96, .blue = 34},
-  // };
+  std::vector<PixelColor> zeldaColors = {
+      PixelColor{.red = 90, .green = 151, .blue = 255},
+      PixelColor{.red = 0, .green = 243, .blue = 54},
+      PixelColor{.red = 166, .green = 87, .blue = 255},
+      PixelColor{.red = 0, .green = 56, .blue = 152},
+      PixelColor{.red = 72, .green = 0, .blue = 155},
+      PixelColor{.red = 72, .green = 255, .blue = 113},
+      PixelColor{.red = 51, .green = 20, .blue = 86},
+      PixelColor{.red = 0, .green = 173, .blue = 38},
+      PixelColor{.red = 6, .green = 92, .blue = 239},
+      PixelColor{.red = 115, .green = 5, .blue = 239},
+      PixelColor{.red = 21, .green = 44, .blue = 85},
+      PixelColor{.red = 16, .green = 96, .blue = 34},
+  };
   // Dark mode
   const double frameSpeedDarkener = 0.6;
   // Light mode
 
   // Defined blade runner pallete in alternating colors hues - will make each instrument one hue
-  // PixelColor rippleColor = bladeRunnerPallettes[instrumentNumber % 2][(int)(notePitch) % 12];
-  
-  PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
+  PixelColor rippleColor = instrumentNumber % 2 ? autumnPallette[(int)(notePitch) % 12] : technoPallette[(int)(notePitch) % 12];
+
+  // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
   // std::cout << "ripple color from pallete index " << ": (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ") " << "\n";
 
   // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
   // Dark add mode
-  rippleColor.red = (unsigned char)(int)(rippleColor.red * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.green = (unsigned char)(int)(rippleColor.green * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
-  rippleColor.blue = (unsigned char)(int)(rippleColor.blue * frameSpeedDarkener * (0.08 + 0.05 * notePitch / 72));
+
+  // Suitable for drums, quick attack synth
+  const float noteBaseAttackSpeed = 0.12;
+  const float notePitchMultiplierAttackSpeed = 0.12;
+  // Suitable for strings, piano
+  // const float noteBaseAttackSpeed = 0.08;
+  // const float notePitchMultiplierAttackSpeed = 0.08;
+  rippleColor.red = (unsigned char)(int)(rippleColor.red * frameSpeedDarkener * (noteBaseAttackSpeed + notePitchMultiplierAttackSpeed * notePitch / 72));
+  rippleColor.green = (unsigned char)(int)(rippleColor.green * frameSpeedDarkener * (noteBaseAttackSpeed + notePitchMultiplierAttackSpeed * notePitch / 72));
+  rippleColor.blue = (unsigned char)(int)(rippleColor.blue * frameSpeedDarkener * (noteBaseAttackSpeed + notePitchMultiplierAttackSpeed * notePitch / 72));
 
   // Light combine mode
   // rippleColor.red = (unsigned char)(int)(rippleColor.red);
