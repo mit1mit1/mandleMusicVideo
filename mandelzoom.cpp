@@ -94,8 +94,8 @@ int main(int argc, const char *argv[])
     int trackNumberCounter = 0;
     MidiTrack inputFiles[2] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinvention1part1.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinvention1part2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinvention3track1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinvention3track2.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
       };
 
