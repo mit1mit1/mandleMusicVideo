@@ -94,10 +94,10 @@ int main(int argc, const char *argv[])
     int trackNumberCounter = 0;
     MidiTrack inputFiles[2] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinvention3track1.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinvention3track2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinvention5track1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinvention5track2.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
-      };
+    };
 
     for (MidiTrack inputFile : inputFiles)
     {
@@ -345,7 +345,6 @@ static int GenerateRippleZoomFrames(
     // currentFrame.BrightenAllPixels(0.86);
     // Rapid darkening, suitable for quick attack and decay instruments
     currentFrame.BrightenAllPixels(0.78);
-
 
     // Light mode
     // currentFrame.BrightenAllPixels(1.14);

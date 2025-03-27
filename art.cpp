@@ -226,32 +226,32 @@ std::vector<PixelColor> zeldaColors = {
 };
 
 std::vector<PixelColor> bluePinkGradient = {
-    PixelColor{.red = 45, .green = 0, .blue = 247},  // done
-    PixelColor{.red = 188, .green = 0, .blue = 221}, // done
-    PixelColor{.red = 200, .green = 0, .blue = 190}, // done-alt
-    PixelColor{.red = 161, .green = 0, .blue = 242}, // done
-    PixelColor{.red = 229, .green = 0, .blue = 164}, // done
-    PixelColor{.red = 106, .green = 0, .blue = 244}, // done
-    PixelColor{.red = 209, .green = 0, .blue = 209}, // done
-    PixelColor{.red = 115, .green = 0, .blue = 240}, // done-alt
-    PixelColor{.red = 177, .green = 0, .blue = 232}, // done
-    PixelColor{.red = 137, .green = 0, .blue = 242}, // done
-    PixelColor{.red = 137, .green = 0, .blue = 242}, // done
-    PixelColor{.red = 219, .green = 0, .blue = 182}, // done
+    PixelColor{.red = 45, .green = 3, .blue = 247},  // done
+    PixelColor{.red = 188, .green = 6, .blue = 221}, // done
+    PixelColor{.red = 200, .green = 9, .blue = 190}, // done-alt
+    PixelColor{.red = 161, .green = 12, .blue = 242}, // done
+    PixelColor{.red = 229, .green = 3, .blue = 164}, // done
+    PixelColor{.red = 106, .green = 6, .blue = 244}, // done
+    PixelColor{.red = 209, .green = 3, .blue = 209}, // done
+    PixelColor{.red = 115, .green = 6, .blue = 240}, // done-alt
+    PixelColor{.red = 177, .green = 9, .blue = 232}, // done
+    PixelColor{.red = 137, .green = 6, .blue = 242}, // done
+    PixelColor{.red = 137, .green = 9, .blue = 242}, // done
+    PixelColor{.red = 219, .green = 3, .blue = 182}, // done
 };
 
 std::vector<PixelColor> greenYellowGradient = {
     PixelColor{.red = 0, .green = 75, .blue = 35},    // done
     PixelColor{.red = 112, .green = 224, .blue = 0},  // done
     PixelColor{.red = 0, .green = 105, .blue = 0},    // d alt
-    PixelColor{.red = 0, .green = 128, .blue = 0},    // done
-    PixelColor{.red = 90, .green = 200, .blue = 0},   // aktdone
-    PixelColor{.red = 0, .green = 100, .blue = 0},    // done
+    PixelColor{.red = 25, .green = 128, .blue = 2},    // done
+    PixelColor{.red = 120, .green = 200, .blue = 28},   // aktdone
+    PixelColor{.red = 0, .green = 100, .blue = 15},    // done
     PixelColor{.red = 158, .green = 240, .blue = 26}, // done
     PixelColor{.red = 0, .green = 85, .blue = 20},    // dalt
     PixelColor{.red = 56, .green = 176, .blue = 0},   // done
-    PixelColor{.red = 25, .green = 140, .blue = 0},   // dalt
-    PixelColor{.red = 0, .green = 114, .blue = 0},    // done
+    PixelColor{.red = 25, .green = 140, .blue = 14},   // dalt
+    PixelColor{.red = 20, .green = 114, .blue = 4},    // done
     PixelColor{.red = 204, .green = 255, .blue = 51}, // done
 };
 
@@ -276,7 +276,9 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   // Suitable for strings, piano
   // const float noteBaseAttackSpeed = 0.08;
   // const float notePitchMultiplierAttackSpeed = 0.08;
-  const float brightnessNormaliser = 450 / (rippleColor.red + rippleColor.green + rippleColor.blue);
+  const float brightnessNormaliser = std::max(std::min({220.0 / (rippleColor.red + 0.1), 220.0 / (rippleColor.green + 0.1), 220.0 / (rippleColor.blue + 0.1)}), 1.0);
+
+  // const float brightnessNormaliser = 450 / (rippleColor.red + rippleColor.green + rippleColor.blue);
 
   rippleColor.red = (unsigned char)(int)std::min(rippleColor.red * frameSpeedDarkener * (noteBaseAttackSpeed + notePitchMultiplierAttackSpeed * notePitch / 72) * (0.3 + 0.7 * brightnessNormaliser), 255.0);
   rippleColor.green = (unsigned char)(int)std::min(rippleColor.green * frameSpeedDarkener * (noteBaseAttackSpeed + notePitchMultiplierAttackSpeed * notePitch / 72) * (0.3 + 0.7 * brightnessNormaliser), 255.0);
