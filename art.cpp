@@ -226,32 +226,32 @@ std::vector<PixelColor> zeldaColors = {
 };
 
 std::vector<PixelColor> bluePinkGradient = {
-    PixelColor{.red = 45, .green = 3, .blue = 247},  // done
-    PixelColor{.red = 188, .green = 6, .blue = 221}, // done
-    PixelColor{.red = 200, .green = 9, .blue = 190}, // done-alt
+    PixelColor{.red = 45, .green = 3, .blue = 247},   // done
+    PixelColor{.red = 188, .green = 6, .blue = 221},  // done
+    PixelColor{.red = 200, .green = 9, .blue = 190},  // done-alt
     PixelColor{.red = 161, .green = 12, .blue = 242}, // done
-    PixelColor{.red = 229, .green = 3, .blue = 164}, // done
-    PixelColor{.red = 106, .green = 6, .blue = 244}, // done
-    PixelColor{.red = 209, .green = 3, .blue = 209}, // done
-    PixelColor{.red = 115, .green = 6, .blue = 240}, // done-alt
-    PixelColor{.red = 177, .green = 9, .blue = 232}, // done
-    PixelColor{.red = 137, .green = 6, .blue = 242}, // done
-    PixelColor{.red = 137, .green = 9, .blue = 242}, // done
-    PixelColor{.red = 219, .green = 3, .blue = 182}, // done
+    PixelColor{.red = 229, .green = 3, .blue = 164},  // done
+    PixelColor{.red = 106, .green = 6, .blue = 244},  // done
+    PixelColor{.red = 209, .green = 3, .blue = 209},  // done
+    PixelColor{.red = 115, .green = 6, .blue = 240},  // done-alt
+    PixelColor{.red = 177, .green = 9, .blue = 232},  // done
+    PixelColor{.red = 137, .green = 6, .blue = 242},  // done
+    PixelColor{.red = 137, .green = 9, .blue = 242},  // done
+    PixelColor{.red = 219, .green = 3, .blue = 182},  // done
 };
 
 std::vector<PixelColor> greenYellowGradient = {
-    PixelColor{.red = 0, .green = 75, .blue = 35},    // done
-    PixelColor{.red = 112, .green = 224, .blue = 0},  // done
-    PixelColor{.red = 0, .green = 105, .blue = 0},    // d alt
-    PixelColor{.red = 25, .green = 128, .blue = 2},    // done
-    PixelColor{.red = 120, .green = 200, .blue = 28},   // aktdone
-    PixelColor{.red = 0, .green = 100, .blue = 15},    // done
-    PixelColor{.red = 158, .green = 240, .blue = 26}, // done
-    PixelColor{.red = 0, .green = 85, .blue = 20},    // dalt
-    PixelColor{.red = 56, .green = 176, .blue = 0},   // done
-    PixelColor{.red = 25, .green = 140, .blue = 14},   // dalt
-    PixelColor{.red = 20, .green = 114, .blue = 4},    // done
+    PixelColor{.red = 0, .green = 75, .blue = 55},    // done
+    PixelColor{.red = 142, .green = 224, .blue = 0},  // done
+    PixelColor{.red = 20, .green = 105, .blue = 0},   // d alt
+    PixelColor{.red = 35, .green = 128, .blue = 10},  // done
+    PixelColor{.red = 120, .green = 200, .blue = 38}, // aktdone
+    PixelColor{.red = 10, .green = 100, .blue = 25},  // done
+    PixelColor{.red = 158, .green = 240, .blue = 36}, // done
+    PixelColor{.red = 0, .green = 85, .blue = 30},    // dalt
+    PixelColor{.red = 86, .green = 176, .blue = 10},  // done
+    PixelColor{.red = 35, .green = 140, .blue = 24},  // dalt
+    PixelColor{.red = 20, .green = 114, .blue = 4},   // done
     PixelColor{.red = 204, .green = 255, .blue = 51}, // done
 };
 
@@ -460,7 +460,7 @@ void colorRipples(int width, int height, std::vector<Ripple> ripples,
         if (distFromCentreSquared > radius * radius - thickness &&
             distFromCentreSquared < radius * radius)
         {
-          currentFrame.AddPixel(x, y, ripple.addColor);
+          currentFrame.AddPixel(x, y, ripple.addColor, 1.0);
         }
       }
     }

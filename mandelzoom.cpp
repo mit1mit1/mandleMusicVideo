@@ -94,8 +94,8 @@ int main(int argc, const char *argv[])
     int trackNumberCounter = 0;
     MidiTrack inputFiles[2] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinvention5track1.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinvention5track2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinv10track1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinv10track2.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
     };
 
@@ -373,6 +373,10 @@ static int GenerateRippleZoomFrames(
           ripple.yCenter
           // - framesSinceRippleStart * (scrollSpeedY + zoomDiff.imaginaryPart)
           ;
+
+      // Decay multiplier - choose a lower number for plucky instruments, higher number / 1 for sustained instruments
+      const float decayBrightnessMultiplier = std::max(std::pow(0.96, std::max(framesSinceRippleStart - 15, 0)), 0.1);
+
       for (int x = 0; x < xResolution; ++x)
       {
         for (int y = 0; y < yResolution; ++y)
@@ -396,8 +400,9 @@ static int GenerateRippleZoomFrames(
               //  && framesSinceRippleStart % 5 == 0 - if you want a strobe party effect
           )
           {
+            const float decayMultiplier = 0.9;
             // Dark mode
-            currentFrame.AddPixel(x, y, ripple.addColor);
+            currentFrame.AddPixel(x, y, ripple.addColor, decayBrightnessMultiplier);
             // Light mode
             // std::cout << "adding pixel"  << ripple.addColor.red << ripple.addColor.green << ripple.addColor.blue << "\n";
             // currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
@@ -428,7 +433,7 @@ static int GenerateRippleZoomFrames(
           if (std::abs(angleToCheckPoint - angleToRipple) < arcAngle || std::abs(angleToCheckPoint - angleToRipple - 2 * M_PI) < arcAngle || std::abs(angleToCheckPoint - angleToRipple + 2 * M_PI) < arcAngle)
           {
             // Dark mode
-            currentFrame.AddPixel(x, y, ripple.addColor);
+            currentFrame.AddPixel(x, y, ripple.addColor, decayBrightnessMultiplier);
             // Light mode
             // currentFrame.CombinePixel(x, y, 0.5, ripple.addColor, 255);
           }

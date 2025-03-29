@@ -42,7 +42,7 @@ public:
   void CombinePixel(int x, int y, float multiple, PixelColor targetColor,
                     int maxSaturation, bool accelerateEnding = false);
 
-  void AddPixel(int x, int y, PixelColor color);
+  void AddPixel(int x, int y, PixelColor color, float brightnessMultiplier);
 
   void SetAllPixels(PixelColor color);
 
