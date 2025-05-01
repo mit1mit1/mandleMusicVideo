@@ -94,8 +94,8 @@ int main(int argc, const char *argv[])
     int trackNumberCounter = 0;
     MidiTrack inputFiles[2] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinv10track1.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinv10track2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinv15track2.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/bachinv15track1.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
     };
 
@@ -342,9 +342,73 @@ static int GenerateRippleZoomFrames(
 
     // Dark mode
     // Medium darkening
-    // currentFrame.BrightenAllPixels(0.86);
+    currentFrame.BrightenAllPixels(0.9999);
     // Rapid darkening, suitable for quick attack and decay instruments
-    currentFrame.BrightenAllPixels(0.78);
+    // currentFrame.BrightenAllPixels(0.78);
+
+    // Dissolve the colors
+    const int squareSize = 3;
+    for (int x = 0; x < xResolution / squareSize; ++x)
+    {
+      for (int y = 0; y < yResolution / squareSize; ++y)
+      {
+        const PixelColor middlePixel = currentFrame.GetPixel(x * squareSize + 1, y * squareSize + 1);
+        int smallestSum = 257 * 3;
+        bool hasTie = false;
+        int xDirection = -1;
+        int yDirection = -1;
+        int xTieDirection = -1;
+        int yTieDirection = -1;
+
+        for (int i = 0; i < squareSize; ++i)
+        {
+          for (int j = 0; j < squareSize; ++j)
+          {
+            if (i == 1 && j == 1)
+            {
+              continue;
+            }
+
+            const PixelColor pixel = currentFrame.GetPixel(x * squareSize + i, y * squareSize + j);
+            int squareSum = pixel.red + pixel.green + pixel.blue;
+            if (squareSum < smallestSum)
+            {
+              smallestSum = squareSum;
+              hasTie = false;
+              xDirection = i;
+              yDirection = j;
+            }
+            else if (squareSum == smallestSum)
+            {
+              hasTie = true;
+              xTieDirection = i;
+              yTieDirection = j;
+            }
+          }
+        }
+
+        if (hasTie && rand() > 0.5)
+        {
+          xDirection = xTieDirection;
+          yDirection = yTieDirection;
+        }
+
+        for (int i = 0; i < squareSize; ++i)
+        {
+          for (int j = 0; j < squareSize; ++j)
+          {
+            const PixelColor targetPixel = currentFrame.GetPixel((x + xDirection) * squareSize + i, (y + yDirection) * squareSize + j);
+            currentFrame.CombinePixel(
+                (x + xDirection) * squareSize + i, (y + yDirection) * squareSize + j, 0.98,
+                currentFrame.GetPixel(x * squareSize + i, y * squareSize + j),
+                255, true);
+            currentFrame.CombinePixel(
+                x * squareSize + i, y * squareSize + j, 0.98,
+                targetPixel, 255, true);
+          }
+        }
+      }
+    }
 
     // Light mode
     // currentFrame.BrightenAllPixels(1.14);

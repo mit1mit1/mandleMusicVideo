@@ -242,17 +242,17 @@ std::vector<PixelColor> bluePinkGradient = {
 
 std::vector<PixelColor> greenYellowGradient = {
     PixelColor{.red = 0, .green = 75, .blue = 55},    // done
-    PixelColor{.red = 142, .green = 224, .blue = 0},  // done
+    PixelColor{.red = 112, .green = 224, .blue = 0},  // done
     PixelColor{.red = 20, .green = 105, .blue = 0},   // d alt
-    PixelColor{.red = 35, .green = 128, .blue = 10},  // done
-    PixelColor{.red = 120, .green = 200, .blue = 38}, // aktdone
-    PixelColor{.red = 10, .green = 100, .blue = 25},  // done
-    PixelColor{.red = 158, .green = 240, .blue = 36}, // done
-    PixelColor{.red = 0, .green = 85, .blue = 30},    // dalt
-    PixelColor{.red = 86, .green = 176, .blue = 10},  // done
-    PixelColor{.red = 35, .green = 140, .blue = 24},  // dalt
-    PixelColor{.red = 20, .green = 114, .blue = 4},   // done
-    PixelColor{.red = 204, .green = 255, .blue = 51}, // done
+    PixelColor{.red = 30, .green = 128, .blue = 10},  // done
+    PixelColor{.red = 100, .green = 200, .blue = 38}, // aktdone
+    PixelColor{.red = 15, .green = 100, .blue = 25},  // done
+    PixelColor{.red = 198, .green = 240, .blue = 36}, // done
+    PixelColor{.red = 10, .green = 85, .blue = 30},    // dalt
+    PixelColor{.red = 96, .green = 176, .blue = 10},  // done
+    PixelColor{.red = 45, .green = 140, .blue = 24},  // dalt
+    PixelColor{.red = 10, .green = 114, .blue = 4},   // done
+    PixelColor{.red = 244, .green = 255, .blue = 51}, // done
 };
 
 PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
