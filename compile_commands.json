@@ -1,79 +1,79 @@
 [
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/mandelzoom.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/mandelzoom.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/mandelzoom.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/mandelzoom.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/mandelzoom.cpp",
   "output": "CMakeFiles/mandelzoom.dir/mandelzoom.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/aubioParser.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/aubioParser.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/aubioParser.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/aubioParser.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/aubioParser.cpp",
   "output": "CMakeFiles/mandelzoom.dir/aubioParser.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/colors.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/colors.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/colors.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/colors.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/colors.cpp",
   "output": "CMakeFiles/mandelzoom.dir/colors.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/lodepng.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/lodepng.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/lodepng.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/lodepng.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/lodepng.cpp",
   "output": "CMakeFiles/mandelzoom.dir/lodepng.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/math.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/math.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/math.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/math.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/math.cpp",
   "output": "CMakeFiles/mandelzoom.dir/math.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/art.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/art.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/art.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/art.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/art.cpp",
   "output": "CMakeFiles/mandelzoom.dir/art.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/videoframe.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/videoframe.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/videoframe.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/videoframe.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/videoframe.cpp",
   "output": "CMakeFiles/mandelzoom.dir/videoframe.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/Binasc.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/Binasc.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/Binasc.cpp",
   "output": "CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Binasc.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiEvent.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiEvent.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiEvent.cpp",
   "output": "CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEvent.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiEventList.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiEventList.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiEventList.cpp",
   "output": "CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiEventList.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiFile.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiFile.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiFile.cpp",
   "output": "CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiFile.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiMessage.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiMessage.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/MidiMessage.cpp",
   "output": "CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/MidiMessage.cpp.o"
 },
 {
   "directory": "/Users/mitchellroberts/repos/mandleMusicVideo",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/Options.cpp",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/include -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk -Werror -o CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.cpp.o -c /Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/Options.cpp",
   "file": "/Users/mitchellroberts/repos/mandleMusicVideo/craigsapp-midifile/src/Options.cpp",
   "output": "CMakeFiles/mandelzoom.dir/craigsapp-midifile/src/Options.cpp.o"
 }

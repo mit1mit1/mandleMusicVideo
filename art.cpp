@@ -271,8 +271,8 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   // Dark add mode
 
   // Suitable for drums, quick attack synth
-  const float noteBaseAttackSpeed = 0.20;
-  const float notePitchMultiplierAttackSpeed = 0.04;
+  const float noteBaseAttackSpeed = 0.05;
+  const float notePitchMultiplierAttackSpeed = 0.01;
   // Suitable for strings, piano
   // const float noteBaseAttackSpeed = 0.08;
   // const float notePitchMultiplierAttackSpeed = 0.08;

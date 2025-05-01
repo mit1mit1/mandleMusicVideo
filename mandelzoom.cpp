@@ -266,6 +266,7 @@ static int GenerateRippleZoomFrames(
   // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f)
   {
+    bool hasNewRipple = false;
     double timestamp = GetTimestampSeconds(f, framespersecond);
 
     // std::cout << " current timestamp " << timestamp << "\n  ";
@@ -303,6 +304,7 @@ static int GenerateRippleZoomFrames(
             xResolution, yResolution, currentNote.pitch,
             currentNote.startSeconds, currentNote.endSeconds, framespersecond,
             i, false);
+        hasNewRipple = true;
 
         // Ripple newRipple = getNoteRippleSidescrolling(
         //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
@@ -328,6 +330,7 @@ static int GenerateRippleZoomFrames(
         Ripple newRipple = getNoteRippleCircleOfScales(
             xResolution, yResolution, checkNote.pitch, checkNote.startSeconds,
             checkNote.endSeconds, framespersecond, checkNote.trackNumber, checkNote.isPercussion);
+        hasNewRipple = true;
 
         // Ripple newRipple = getNoteRippleSidescrolling(
         //     0, xResolution - 1, 0, yResolution - 1, currentNote, minPitches,
@@ -342,69 +345,106 @@ static int GenerateRippleZoomFrames(
 
     // Dark mode
     // Medium darkening
-    currentFrame.BrightenAllPixels(0.9999);
+    // currentFrame.BrightenAllPixels(0.9);
     // Rapid darkening, suitable for quick attack and decay instruments
     // currentFrame.BrightenAllPixels(0.78);
 
     // Dissolve the colors
-    const int squareSize = 3;
-    for (int x = 0; x < xResolution / squareSize; ++x)
+    // if (f % 9 == 0)
+    if (hasNewRipple)
     {
-      for (int y = 0; y < yResolution / squareSize; ++y)
+      const int squareSize = 9;
+      for (int x = 0; x < xResolution / squareSize; ++x)
       {
-        const PixelColor middlePixel = currentFrame.GetPixel(x * squareSize + 1, y * squareSize + 1);
-        int smallestSum = 257 * 3;
-        bool hasTie = false;
-        int xDirection = -1;
-        int yDirection = -1;
-        int xTieDirection = -1;
-        int yTieDirection = -1;
-
-        for (int i = 0; i < squareSize; ++i)
+        for (int y = 0; y < yResolution / squareSize; ++y)
         {
-          for (int j = 0; j < squareSize; ++j)
-          {
-            if (i == 1 && j == 1)
-            {
-              continue;
-            }
+          const PixelColor middlePixel = currentFrame.GetPixel(x * squareSize + 4, y * squareSize + 4);
+          int smallestSum = 257 * 3;
+          bool hasTie = false;
+          bool hasMultipleTies = false;
+          int xDirection = -1;
+          int yDirection = -1;
+          int xTieDirection = -1;
+          int yTieDirection = -1;
 
-            const PixelColor pixel = currentFrame.GetPixel(x * squareSize + i, y * squareSize + j);
-            int squareSum = pixel.red + pixel.green + pixel.blue;
-            if (squareSum < smallestSum)
+          for (int i = 0; i < 3; ++i)
+          {
+            for (int j = 0; j < 3; ++j)
             {
-              smallestSum = squareSum;
-              hasTie = false;
-              xDirection = i;
-              yDirection = j;
-            }
-            else if (squareSum == smallestSum)
-            {
-              hasTie = true;
-              xTieDirection = i;
-              yTieDirection = j;
+              if (i == 1 && j == 1)
+              {
+                continue;
+              }
+
+              const PixelColor pixel = currentFrame.GetPixel(x * squareSize + 3 + 1, y * squareSize + 3 + j);
+              int squareSum = pixel.red + pixel.green + pixel.blue;
+              if (squareSum < smallestSum)
+              {
+                smallestSum = squareSum;
+                hasTie = false;
+                hasMultipleTies = false;
+                xDirection = i;
+                yDirection = j;
+              }
+              else if (squareSum == smallestSum)
+              {
+                if (hasTie)
+                {
+                  hasMultipleTies = true;
+                }
+                else
+                {
+                  hasTie = true;
+                  xTieDirection = i;
+                  yTieDirection = j;
+                }
+              }
             }
           }
-        }
 
-        if (hasTie && rand() > 0.5)
-        {
-          xDirection = xTieDirection;
-          yDirection = yTieDirection;
-        }
-
-        for (int i = 0; i < squareSize; ++i)
-        {
-          for (int j = 0; j < squareSize; ++j)
+          if (hasMultipleTies)
           {
-            const PixelColor targetPixel = currentFrame.GetPixel((x + xDirection) * squareSize + i, (y + yDirection) * squareSize + j);
-            currentFrame.CombinePixel(
-                (x + xDirection) * squareSize + i, (y + yDirection) * squareSize + j, 0.98,
-                currentFrame.GetPixel(x * squareSize + i, y * squareSize + j),
-                255, true);
-            currentFrame.CombinePixel(
-                x * squareSize + i, y * squareSize + j, 0.98,
-                targetPixel, 255, true);
+            xDirection = (int)((rand() % 4) - 2);
+            yDirection = (int)((rand() % 4) - 2);
+            // std::cout << "multitie x direction" << xDirection << "multitie y direction" << yDirection << "\n";
+          }
+          else
+          {
+            if (hasTie && (rand() % 2 == 0))
+            {
+              xDirection = xTieDirection;
+              yDirection = yTieDirection;
+              // std::cout << "tie x direction" << xDirection << "tie y direction" << yDirection << "\n";
+            }
+            else
+            {
+              // std::cout << "normal x direction" << xDirection << "normal y direction" << yDirection << "\n";
+            }
+          }
+
+          for (int i = 0; i < squareSize; ++i)
+          {
+            for (int j = 0; j < squareSize; ++j)
+            {
+              int targetX = ((x + xDirection) * squareSize + i) % xResolution;
+              int targetY = ((y + yDirection) * squareSize + j) % yResolution;
+              if (targetX < 0)
+              {
+                targetX = xResolution + targetX;
+              }
+              if (targetY < 0)
+              {
+                targetY = yResolution + targetY;
+              }
+              const PixelColor targetPixel = currentFrame.GetPixel(targetX, targetY);
+              currentFrame.CombinePixel(
+                  x * squareSize + i, y * squareSize + j, 0.5,
+                  targetPixel, 255, false);
+              currentFrame.CombinePixel(
+                  targetX, targetY, 0.5,
+                  currentFrame.GetPixel(x * squareSize + i, y * squareSize + j),
+                  255, false);
+            }
           }
         }
       }
