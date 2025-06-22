@@ -262,9 +262,9 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   // Light mode
 
   // Defined blade runner pallete in alternating colors hues - will make each instrument one hue
-  PixelColor rippleColor = instrumentNumber % 2 ? greenYellowGradient[(int)(notePitch) % 12] : bluePinkGradient[(int)(notePitch) % 12];
+  // PixelColor rippleColor = instrumentNumber % 2 ? greenYellowGradient[(int)(notePitch) % 12] : bluePinkGradient[(int)(notePitch) % 12];
 
-  // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
+  PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];
   // std::cout << "ripple color from pallete index " << ": (" << +rippleColor.red << ", " << +rippleColor.green << ", " << +rippleColor.blue << ") " << "\n";
 
   // PixelColor rippleColor = mrMarsColorWheel[(int)(notePitch) % 12];

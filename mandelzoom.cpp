@@ -92,10 +92,9 @@ int main(int argc, const char *argv[])
 
     std::vector<MidiNote> midiNotes = {};
     int trackNumberCounter = 0;
-    MidiTrack inputFiles[2] = {
+    MidiTrack inputFiles[1] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinv15track2.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/bachinv15track1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/chromaticsAndOctaves.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
     };
 
@@ -350,8 +349,8 @@ static int GenerateRippleZoomFrames(
     // currentFrame.BrightenAllPixels(0.78);
 
     // Dissolve the colors
-    // if (f % 9 == 0)
-    if (hasNewRipple)
+    if (f % 9 == 0)
+    // if (hasNewRipple)
     {
       const int squareSize = 9;
       for (int x = 0; x < xResolution / squareSize; ++x)
