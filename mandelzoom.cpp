@@ -94,8 +94,8 @@ int main(int argc, const char *argv[])
     int trackNumberCounter = 0;
     MidiTrack inputFiles[1] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/chromaticsAndOctaves.mid", .isPercussion = false},
-        // MidiTrack{.filename = "./input/cubistSynthErhu.mid", .isPercussion = false}
+        MidiTrack{.filename = "./input/FallingInLovegoodtake.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/chordprogwurli.mid", .isPercussion = false},
     };
 
     for (MidiTrack inputFile : inputFiles)
@@ -151,7 +151,8 @@ int main(int argc, const char *argv[])
         else
         {
           newNote.endSeconds = midifile[track][i].seconds +
-                               std::max(midifile[track][i].getDurationInSeconds(), (double)(7 / framespersecond));
+                               // Tweak this if you want really snappy attack
+                               std::max(midifile[track][i].getDurationInSeconds(), (double)(0.15)); // or 17 / framespersecond for snappy attacks
         }
         newNote.trackNumber = trackNumberCounter;
         newNote.isPercussion = inputFile.isPercussion;
@@ -478,7 +479,7 @@ static int GenerateRippleZoomFrames(
           ;
 
       // Decay multiplier - choose a lower number for plucky instruments, higher number / 1 for sustained instruments
-      const float decayBrightnessMultiplier = std::max(std::pow(0.96, std::max(framesSinceRippleStart - 15, 0)), 0.1);
+      const float decayBrightnessMultiplier = std::max(std::pow(0.96, (double)std::max(framesSinceRippleStart - 15, 0)), 0.1);
 
       for (int x = 0; x < xResolution; ++x)
       {
