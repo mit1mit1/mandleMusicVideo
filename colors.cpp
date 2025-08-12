@@ -2,25 +2,55 @@
 #include <cmath>
 #include <vector>
 
-std::vector<PixelColor> getColors() {
+std::vector<PixelColor> getColors()
+{
+  // Golden
+  // std::vector<PixelColor> seedColors = {
+  //     PixelColor{.red = 0, .green = 0, .blue = 0, .alpha = 255},
+  //     PixelColor{.red = 255, .green = 224, .blue = 146, .alpha = 255},
+  //     PixelColor{.red = 255, .green = 243, .blue = 248, .alpha = 255},
+  //     PixelColor{.red = 255, .green = 224, .blue = 146, .alpha = 255},
+  //     PixelColor{.red = 0, .green = 0, .blue = 0, .alpha = 255},
+  // };
+
+  // Disco
   std::vector<PixelColor> seedColors = {
-      PixelColor{.red = 0, .green = 0, .blue = 0, .alpha = 255},
-      PixelColor{.red = 255, .green = 224, .blue = 146, .alpha = 255},
-      PixelColor{.red = 255, .green = 243, .blue = 248, .alpha = 255},
-      PixelColor{.red = 255, .green = 224, .blue = 146, .alpha = 255},
-      PixelColor{.red = 0, .green = 0, .blue = 0, .alpha = 255},
+      PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
+      PixelColor{.red = 164, .green = 168, .blue = 241, .alpha = 255},
+      PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
+      PixelColor{.red = 177, .green = 181, .blue = 228, .alpha = 255},
+      PixelColor{.red = 81, .green = 51, .blue = 173, .alpha = 255},
+      PixelColor{.red = 177, .green = 181, .blue = 228, .alpha = 255},
+      PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
+      PixelColor{.red = 177, .green = 181, .blue = 228, .alpha = 255},
+      PixelColor{.red = 252, .green = 96, .blue = 161, .alpha = 255},
+      PixelColor{.red = 81, .green = 51, .blue = 173, .alpha = 255},
+      PixelColor{.red = 38, .green = 246, .blue = 171, .alpha = 255},
+      PixelColor{.red = 81, .green = 51, .blue = 173, .alpha = 255},
+      PixelColor{.red = 177, .green = 181, .blue = 228, .alpha = 255},
+      PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
+      PixelColor{.red = 177, .green = 181, .blue = 228, .alpha = 255},
+      PixelColor{.red = 81, .green = 51, .blue = 173, .alpha = 255},
+      PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
+      PixelColor{.red = 81, .green = 51, .blue = 173, .alpha = 255},
+      PixelColor{.red = 255, .green = 111, .blue = 251, .alpha = 255},
+      PixelColor{.red = 151, .green = 152, .blue = 235, .alpha = 255},
+      PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
   };
 
   std::vector<PixelColor> colors = {};
-  const int colorsBetween = 32;
+  const int colorsBetween = 48;
 
-  for (unsigned int i = 0; i < seedColors.size(); i++) {
+  for (unsigned int i = 0; i < seedColors.size(); i++)
+  {
     unsigned int compareI = i + 1;
     colors.push_back(seedColors[i]);
-    if (compareI >= seedColors.size()) {
+    if (compareI >= seedColors.size())
+    {
       compareI = 0;
     }
-    for (int k = 1; k < colorsBetween; k++) {
+    for (int k = 1; k < colorsBetween; k++)
+    {
       PixelColor intermediateColor;
       intermediateColor.red = static_cast<unsigned char>(
           seedColors[i].red +
@@ -44,30 +74,38 @@ std::vector<PixelColor> getColors() {
   return colors;
 }
 
-static double ZigZag(double x) {
+static double ZigZag(double x)
+{
   double y = fmod(fabs(x), 2.0);
   if (y > 1.0)
     y = 1.0 - y;
   return y;
 }
 
-static int getWavyOnsets(int onsetsPassed) {
-  if (onsetsPassed % 8 == 0) {
+static int getWavyOnsets(int onsetsPassed)
+{
+  if (onsetsPassed % 8 == 0)
+  {
     return onsetsPassed - 1;
   }
-  if (onsetsPassed % 8 == 1) {
+  if (onsetsPassed % 8 == 1)
+  {
     return onsetsPassed - 3;
   }
-  if (onsetsPassed % 8 == 2) {
+  if (onsetsPassed % 8 == 2)
+  {
     return onsetsPassed - 5;
   }
-  if (onsetsPassed % 8 == 4) {
+  if (onsetsPassed % 8 == 4)
+  {
     return onsetsPassed - 4;
   }
-  if (onsetsPassed % 8 == 5) {
+  if (onsetsPassed % 8 == 5)
+  {
     return onsetsPassed - 3;
   }
-  if (onsetsPassed % 8 == 6) {
+  if (onsetsPassed % 8 == 6)
+  {
     return onsetsPassed - 1;
   }
   return onsetsPassed;
@@ -83,7 +121,8 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    float previousPitch, int framesSincePitchChange,
                    int framesSinceLastOnsetPassed, float alphaModifier,
                    std::vector<PixelColor> availableColors,
-                   PixelColor currentColor) {
+                   PixelColor currentColor)
+{
   const int onsetColorJump = 3;
   const float alphaSeed = 0.0;
   alphaModifier = 1.0;
@@ -93,17 +132,22 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
   // TODO: Set alpha based on volume (of particular notes?
   PixelColor color;
   color.alpha = 255;
-  if (count >= limit) {
+  if (count >= limit)
+  {
     color.green = color.blue = 5;
     double red = 50.0 * ZigZag(0.0342 * onsetsPassed);
-    if (red > 50.0) {
+    if (red > 50.0)
+    {
       red = fmod(red, 50.0);
     }
-    if (red > 0.0) {
+    if (red > 0.0)
+    {
       red = 0.0;
     }
     color.red = static_cast<unsigned char>(red);
-  } else {
+  }
+  else
+  {
     // TODO: Fade different colors based on what note
     // TODO: Keep track of previous fade, and slowly transition fade (so can
     // increase to 90% fade without triggering epilepsy)
@@ -129,10 +173,12 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                         availableColors.size()];
 
     float smoothColorChangeRatio = framesSinceLastOnsetPassed * 0.2;
-    if (smoothColorChangeRatio > 1.0) {
+    if (smoothColorChangeRatio > 1.0)
+    {
       smoothColorChangeRatio = 1.0;
     }
-    if (smoothColorChangeRatio < 0.0) {
+    if (smoothColorChangeRatio < 0.0)
+    {
       smoothColorChangeRatio = 0.0;
     }
     selectedColor.red = static_cast<unsigned char>(
@@ -145,7 +191,8 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
         selectedColor.blue * smoothColorChangeRatio +
         previousOffsetColor.blue * (1.0 - smoothColorChangeRatio));
 
-    if (alphaModifier >= 1 || alphaModifier <= 0) {
+    if (alphaModifier >= 1 || alphaModifier <= 0)
+    {
       alphaModifier = 1.0;
     }
     // alphaModifier = alphaModifier;

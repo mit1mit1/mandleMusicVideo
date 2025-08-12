@@ -6,22 +6,26 @@
 
 // #include <iostream>
 long double getXPosition(int xSquare, long double cr_left,
-                         long double xStepDistance) {
+                         long double xStepDistance)
+{
   return cr_left + xSquare * xStepDistance;
 };
 
 long double getYPosition(int ySquare, long double ci_top,
-                         long double yStepDistance) {
+                         long double yStepDistance)
+{
   return ci_top - ySquare * yStepDistance;
 };
 
-int Mandelbrot(long double cr, long double ci, int limit) {
+int Mandelbrot(long double cr, long double ci, int limit)
+{
   int count = 0;
   long double zr = 0.0;
   long double zi = 0.0;
   long double zr2 = 0.0;
   long double zi2 = 0.0;
-  while ((count < limit) && (zr2 + zi2 < 4.001)) {
+  while ((count < limit) && (zr2 + zi2 < 4.001))
+  {
     long double tzi = 2.0 * zr * zi + ci;
     zr = zr2 - zi2 + cr;
     zi = tzi;
@@ -33,32 +37,42 @@ int Mandelbrot(long double cr, long double ci, int limit) {
 }
 
 std::vector<PixelIndex>
-getInterestingPixelIndexes(int mandleCounts[xResolution][yResolution],
+getInterestingPixelIndexes(int mandleCounts[xResolution / squareSize][yResolution / squareSize],
                            int minXIndex, int maxXIndex, int minYIndex,
-                           int maxYIndex) {
-  if (minXIndex < 1) {
+                           int maxYIndex)
+{
+  if (minXIndex < 1)
+  {
     minXIndex = 1;
   }
-  if (minYIndex < 1) {
+  if (minYIndex < 1)
+  {
     minYIndex = 1;
   }
-  if (maxXIndex > xResolution - 1) {
-    maxXIndex = xResolution - 1;
+  if (maxXIndex > (xResolution / squareSize) - 1)
+  {
+    maxXIndex = (xResolution / squareSize) - 1;
   }
-  if (maxYIndex > yResolution - 1) {
-    maxYIndex = yResolution - 1;
+  if (maxYIndex > (yResolution / squareSize) - 1)
+  {
+    maxYIndex = (yResolution / squareSize) - 1;
   }
   std::vector<PixelIndex> sufficientlyInterestingElements{};
   long unsigned int interestingPointThreshold = 3;
-  for (int x = minXIndex; x < maxXIndex; x++) {
-    for (int y = minYIndex; y < maxYIndex; y++) {
+  for (int x = minXIndex; x < maxXIndex; x++)
+  {
+    for (int y = minYIndex; y < maxYIndex; y++)
+    {
       std::set<int> uniqueNeighbours;
-      for (int xDelta = -1; xDelta < 2; xDelta++) {
-        for (int yDelta = -1; yDelta < 2; yDelta++) {
+      for (int xDelta = -1; xDelta < 2; xDelta++)
+      {
+        for (int yDelta = -1; yDelta < 2; yDelta++)
+        {
           uniqueNeighbours.insert(mandleCounts[x + xDelta][y + yDelta]);
         }
       }
-      if (uniqueNeighbours.size() > interestingPointThreshold) {
+      if (uniqueNeighbours.size() > interestingPointThreshold)
+      {
         PixelIndex interestingPoint;
         interestingPoint.xIndex = x;
         interestingPoint.yIndex = y;
@@ -76,12 +90,15 @@ getInterestingPixelIndexes(int mandleCounts[xResolution][yResolution],
   return sufficientlyInterestingElements;
 }
 
-int sumAll(int start, int end) {
+int sumAll(int start, int end)
+{
   int sum = 0;
-  if (end < start) {
+  if (end < start)
+  {
     return sum;
   }
-  for (int i = start; i < end; i++) {
+  for (int i = start; i < end; i++)
+  {
     sum += i;
   }
   return sum;
@@ -91,11 +108,13 @@ Coordinate chooseClosestInterestingPoint(
     std::vector<PixelIndex> interestingPoints, long double xStepDistance,
     long double yStepDistance, long double centreX, long double centreY,
     long double targetX, long double targetY, long double cr_left,
-    long double ci_top) {
+    long double ci_top)
+{
   long double closestDistanceSquared = 100000;
   Coordinate chosenInterestingPoint;
   Coordinate testInterestingPoint;
-  for (unsigned int i = 0; i < interestingPoints.size(); i++) {
+  for (unsigned int i = 0; i < interestingPoints.size(); i++)
+  {
     testInterestingPoint.realPart =
         getXPosition(interestingPoints[i].xIndex, cr_left, xStepDistance);
     testInterestingPoint.imaginaryPart =
@@ -103,7 +122,8 @@ Coordinate chooseClosestInterestingPoint(
     long double testDistanceSquared =
         pow((testInterestingPoint.realPart - targetX), 2) +
         pow((testInterestingPoint.imaginaryPart - targetY), 2);
-    if (testDistanceSquared < closestDistanceSquared) {
+    if (testDistanceSquared < closestDistanceSquared)
+    {
       closestDistanceSquared = testDistanceSquared;
       chosenInterestingPoint.realPart = testInterestingPoint.realPart;
       chosenInterestingPoint.imaginaryPart = testInterestingPoint.imaginaryPart;
@@ -116,11 +136,13 @@ Coordinate chooseClosestInterestingPoint(
 Coordinate chooseRandomInterestingPoint(
     std::vector<PixelIndex> interestingPoints, long double xStepDistance,
     long double yStepDistance, long double centreX, long double centreY,
-    long double cr_left, long double ci_top) {
+    long double cr_left, long double ci_top)
+{
   PixelIndex chosenPixIndex;
   chosenPixIndex.xIndex = 0;
   chosenPixIndex.yIndex = 0;
-  if (interestingPoints.size() > 0) {
+  if (interestingPoints.size() > 0)
+  {
     int index = rand() % interestingPoints.size();
     chosenPixIndex.xIndex = interestingPoints[index].xIndex;
     chosenPixIndex.yIndex = interestingPoints[index].yIndex;
@@ -134,12 +156,13 @@ Coordinate chooseRandomInterestingPoint(
   return nextInterestingPoint;
 }
 
-Coordinate getInterestingPoint(int mandleCounts[][yResolution],
+Coordinate getInterestingPoint(int mandleCounts[][yResolution / squareSize],
                                long double xStepDistance,
                                long double yStepDistance, long double centreX,
                                long double centreY, int minXIndex,
                                int maxXIndex, int minYIndex, int maxYIndex,
-                               long double cr_left, long double ci_top) {
+                               long double cr_left, long double ci_top)
+{
   std::vector<PixelIndex> maxBoundaryElements = getInterestingPixelIndexes(
       mandleCounts, minXIndex, maxXIndex, minYIndex, maxYIndex);
   return chooseRandomInterestingPoint(maxBoundaryElements, xStepDistance,
@@ -147,60 +170,102 @@ Coordinate getInterestingPoint(int mandleCounts[][yResolution],
                                       ci_top);
 }
 
-int getMaxPitch(std::vector<AubioNote> notes) {
+int getMaxPitch(std::vector<AubioNote> notes)
+{
   int maxPitch = notes[0].pitch;
-  for (unsigned int i = 1; i < notes.size(); i++) {
-    if (notes[i].pitch > maxPitch) {
+  for (unsigned int i = 1; i < notes.size(); i++)
+  {
+    if (notes[i].pitch > maxPitch)
+    {
       maxPitch = notes[i].pitch;
     }
   }
   return maxPitch;
 }
 
-int getMinPitch(std::vector<AubioNote> notes) {
+int getMaxPitch(std::vector<MidiNote> notes)
+{
+  int maxPitch = notes[0].pitch;
+  for (unsigned int i = 1; i < notes.size(); i++)
+  {
+    if (notes[i].pitch > maxPitch)
+    {
+      maxPitch = notes[i].pitch;
+    }
+  }
+  return maxPitch;
+}
+
+int getMinPitch(std::vector<AubioNote> notes)
+{
   int minPitch = notes[0].pitch;
-  for (unsigned int i = 1; i < notes.size(); i++) {
-    if (notes[i].pitch < minPitch) {
+  for (unsigned int i = 1; i < notes.size(); i++)
+  {
+    if (notes[i].pitch < minPitch)
+    {
       minPitch = notes[i].pitch;
     }
   }
   return minPitch;
 }
 
-int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec) {
+int getMinPitch(std::vector<MidiNote> notes)
+{
+  int minPitch = notes[0].pitch;
+  for (unsigned int i = 1; i < notes.size(); i++)
+  {
+    if (notes[i].pitch < minPitch)
+    {
+      minPitch = notes[i].pitch;
+    }
+  }
+  return minPitch;
+}
+
+int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec)
+{
   int maxMaxPitch = getMaxPitch(notesVec[0]);
-  for (unsigned int i = 1; i < notesVec.size(); i++) {
+  for (unsigned int i = 1; i < notesVec.size(); i++)
+  {
     int newMaxPitch = getMaxPitch(notesVec[i]);
-    if (newMaxPitch > maxMaxPitch) {
+    if (newMaxPitch > maxMaxPitch)
+    {
       maxMaxPitch = newMaxPitch;
     }
   }
   return maxMaxPitch;
 }
 
-int getMinMinPitch(std::vector<std::vector<AubioNote>> notesVec) {
+int getMinMinPitch(std::vector<std::vector<AubioNote>> notesVec)
+{
   int minMinPitch = getMinPitch(notesVec[0]);
-  for (unsigned int i = 1; i < notesVec.size(); i++) {
+  for (unsigned int i = 1; i < notesVec.size(); i++)
+  {
     int newMinPitch = getMinPitch(notesVec[i]);
-    if (newMinPitch < minMinPitch) {
+    if (newMinPitch < minMinPitch)
+    {
       minMinPitch = newMinPitch;
     }
   }
   return minMinPitch;
 }
 
-int getPitchSum(std::vector<AubioNote> notes) {
+int getPitchSum(std::vector<AubioNote> notes)
+{
   int pitchSum = 0;
-  for (unsigned int i = 0; i < notes.size(); i++) {
+  for (unsigned int i = 0; i < notes.size(); i++)
+  {
     pitchSum += notes[i].pitch;
   }
   return pitchSum;
 }
 
 Coordinate getDiscreteZoomDiff(int destinationX, int destinationY, int originX,
-                               int originY) {
+                               int originY)
+{
   Coordinate zoomDiff;
-  if (destinationX == originX) {
+  if (destinationX == originX)
+  {
     zoomDiff.imaginaryPart = 0.5;
     zoomDiff.realPart = 0.5;
     return zoomDiff;
@@ -212,15 +277,21 @@ Coordinate getDiscreteZoomDiff(int destinationX, int destinationY, int originX,
   bool yPositiveDirection = (destinationY - originY) > 0;
   int sourceX, sourceY;
 
-  if (xPositiveDirection) {
+  if (xPositiveDirection)
+  {
     zoomDiff.realPart = -0.5;
-  } else {
+  }
+  else
+  {
     zoomDiff.realPart = +0.5;
   }
 
-  if (yPositiveDirection) {
+  if (yPositiveDirection)
+  {
     zoomDiff.imaginaryPart = -0.5;
-  } else {
+  }
+  else
+  {
     zoomDiff.imaginaryPart = +0.5;
   }
   return zoomDiff;

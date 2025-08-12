@@ -25,7 +25,7 @@ Coordinate getInterestingPoint(int mandleCounts[][yResolution],
 Coordinate getDiscreteZoomDiff(int destinationX, int destinationY, int originX,
                                int originY);
 std::vector<PixelIndex>
-getInterestingPixelIndexes(int mandleCounts[xResolution][yResolution],
+getInterestingPixelIndexes(int mandleCounts[xResolution / squareSize][yResolution / squareSize],
                            int minXIndex, int maxXIndex, int minYIndex,
                            int maxYIndex);
 long double getXPosition(int xSquare, long double cr_left,
@@ -35,6 +35,8 @@ long double getYPosition(int ySquare, long double ci_top,
 int getPitchSum(std::vector<AubioNote> notes);
 int getMinPitch(std::vector<AubioNote> notes);
 int getMaxPitch(std::vector<AubioNote> notes);
+int getMinPitch(std::vector<MidiNote> notes);
+int getMaxPitch(std::vector<MidiNote> notes);
 int getMinMinPitch(std::vector<std::vector<AubioNote>> notesVec);
 int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec);
 int sumAll(int start, int end);

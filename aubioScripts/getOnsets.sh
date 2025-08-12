@@ -1,8 +1,8 @@
 # https://aubio.org/manual/latest/
 
-aubio onset "./input/demoAudio.wav" -t 0.6 -s -45 > ./output/rhythmInstrument1Onsets.txt
+aubio onset "./input/discosnail.mp3" -t 0.6 -s -45 > ./output/rhythmInstrument1Onsets.txt
 
-aubio notes "./input/demoAudio.wav" -s -40 > ./output/demoAudioDirty.txt
+aubio notes "./input/discosnail.mp3" -s -40 > ./output/demoAudioDirty.txt
 # Notes file includes some notes without timestamps oddly
 sed -e 's/[^[:space:][:cntrl:]]/&/15' -e t -e d < ./output/demoAudioDirty.txt > ./output/demoAudio.txt
 
