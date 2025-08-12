@@ -31,12 +31,12 @@ mkdir movie || Fail "Error creating movie directory."
 # TODO pass in aubio outputs instead of hard coding them
 # Run the mandelbrot generator. This creates all the output PNG files.
 # 60 fps is nice for the ripples per note, mandlezoom is heavy and doesn't need to line up as tight so 30 should be fine
-./mandelzoom movie $((30 * 210)) 0.432574143 -0.207743265 1.0e3 30 ||
+./mandelzoom movie $((15 * 210)) 0.432574143 -0.207743265 1.0e5 15 ||
     Fail "Error running Mandelbrot Zoom program."
 
 # Convert the PNG files to a video file zoom.mp4.
 # Explanation of the ffmpeg command-line arguments:
-# "-r 30" means 30 frames per second
+# "-r 15" means 15 frames per second
 # "-f image2" : convert a series of images to a video.
 # "-s 1280x720" indicates the dimensions of the output video, in pixels.
 # "-i movie/frame_%05d.png" specifies filenames of the series of png files to be used as input.
@@ -46,7 +46,7 @@ mkdir movie || Fail "Error creating movie directory."
 # "zoom.mp4" is the output filename.
 
 filename="${1:-${RANDOM}zoom}.mp4"
-ffmpeg -r 30 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p output/${filename} ||
+ffmpeg -r 15 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p output/${filename} ||
     Fail "Error in ffmpeg."
 
 echo "Created movie ${filename}"

@@ -123,7 +123,7 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    std::vector<PixelColor> availableColors,
                    PixelColor currentColor)
 {
-  const int onsetColorJump = 7;
+  const int onsetColorJump = 13;
   const float alphaSeed = 0.0;
   alphaModifier = 1.0;
 
