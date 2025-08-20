@@ -258,7 +258,7 @@ std::vector<PixelColor> greenYellowGradient = {
 PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
 {
   // Dark mode
-  const double frameSpeedDarkener = 0.6;
+  const double frameSpeedDarkener = 0.92;
   // Light mode
 
   // Defined blade runner pallete in alternating colors hues - will make each instrument one hue
@@ -271,8 +271,10 @@ PixelColor getRippleColorPitch(double notePitch, int instrumentNumber)
   // Dark add mode
 
   // Suitable for drums, quick attack synth
-  const float noteBaseAttackSpeed = 0.05;
-  const float notePitchMultiplierAttackSpeed = 0.01;
+  // const float noteBaseAttackSpeed = 0.05; //60fps
+  const float noteBaseAttackSpeed = 0.15; // 30fps
+  // const float notePitchMultiplierAttackSpeed = 0.01;// 60fps
+  const float notePitchMultiplierAttackSpeed = 0.03; // 30fps
   // Suitable for strings, piano
   // const float noteBaseAttackSpeed = 0.08;
   // const float notePitchMultiplierAttackSpeed = 0.08;

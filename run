@@ -49,5 +49,7 @@ filename="${1:-${RANDOM}zoom}.mp4"
 ffmpeg -r 15 -f image2 -s 1280x720 -i movie/frame_%05d.png -vcodec libx264 -crf 15 -pix_fmt yuv420p output/${filename} ||
     Fail "Error in ffmpeg."
 
+
+# ffmpeg -r 15 -f image2 -s 1280x720 -i movie/frame_%05d.png -c:v prores -pix_fmt yuva444p10le output/transparencytest.mov // Transparency works with .movs
 echo "Created movie ${filename}"
 exit 0

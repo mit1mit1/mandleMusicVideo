@@ -78,7 +78,7 @@ int main(int argc, const char *argv[])
     long double ycenter = atof(argv[4]);
     long double zoom = atof(argv[5]);
 
-    int framespersecond = 30;
+    int framespersecond = 15;
     if (argc > 6)
     {
       framespersecond = atoi(argv[6]);
@@ -93,9 +93,13 @@ int main(int argc, const char *argv[])
     std::vector<MidiNote> midiPercussionNotes = {};
     int trackNumberCounter = 0;
     int percussionTrackNumberCounter = 0;
-    MidiTrack inputFiles[1] = {
+    MidiTrack inputFiles[4] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/discosnailschords.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/discosnailschords.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/discooffbeat.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/discochordstabs.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/discostring1.mid", .isPercussion = false},
+        MidiTrack{.filename = "./input/discolyrics.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/chordprogwurli.mid", .isPercussion = false},
     };
 
@@ -159,68 +163,67 @@ int main(int argc, const char *argv[])
       newPercussionNote.trackNumber = percussionTrackNumberCounter;
       newPercussionNote.isPercussion = percussionMidi.isPercussion;
       midiPercussionNotes.push_back(newPercussionNote);
-
-      for (MidiTrack inputFile : inputFiles)
+    }
+    for (MidiTrack inputFile : inputFiles)
+    {
+      Options options;
+      std::vector<std::string> arguments = {"run", inputFile.filename};
+      std::vector<char *> fakeargv;
+      for (const auto &arg : arguments)
+        fakeargv.push_back((char *)arg.data());
+      fakeargv.push_back(nullptr);
+      std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
+      options.process(fakeargv.size() - 1, fakeargv.data(), 2);
+      if (options.getArgCount() != 1)
       {
-        Options options;
-        std::vector<std::string> arguments = {"run", inputFile.filename};
-        std::vector<char *> fakeargv;
-        for (const auto &arg : arguments)
-          fakeargv.push_back((char *)arg.data());
-        fakeargv.push_back(nullptr);
-        std::cout << "Pushing mid file: " << fakeargv[0] << "\n";
-        options.process(fakeargv.size() - 1, fakeargv.data(), 2);
-        if (options.getArgCount() != 1)
-        {
-          std::cerr << "At least one MIDI filename is required.\n";
-          exit(1);
-        }
-        MidiFile midifile;
-        midifile.read(options.getArg(1));
-        if (!midifile.status())
-        {
-          std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
-          exit(1);
-        }
-        midifile.joinTracks();
-        midifile.doTimeAnalysis();
-        midifile.linkNotePairs();
-
-        int track = 0;
-        for (int i = 0; i < midifile[track].size(); i++)
-        {
-          if (!midifile[track][i].isNoteOn())
-          {
-            continue;
-          }
-          std::cout << "Note start: " << midifile[track][i].seconds
-                    << "; duration: " << midifile[track][i].getDurationInSeconds()
-                    << "; P1 (pitch?): " << midifile[track][i].getP1()
-                    << "; P2 (pitch?): " << midifile[track][i].getP2()
-                    << "; P3 (pitch?): " << midifile[track][i].getP3() << '\t'
-                    << "Track identifier?: " << midifile[track][i][1] << std::endl;
-          MidiNote newNote;
-
-          newNote.pitch = midifile[track][i].getP1();
-          newNote.volume = midifile[track][i].getP2();
-          newNote.startSeconds = midifile[track][i].seconds;
-          if (inputFile.isPercussion)
-          {
-            newNote.endSeconds = midifile[track][i].seconds +
-                                 std::max(midifile[track][i].getDurationInSeconds(), (double)(5 / framespersecond));
-          }
-          else
-          {
-            newNote.endSeconds = midifile[track][i].seconds +
-                                 // Tweak this if you want really snappy attack
-                                 std::max(midifile[track][i].getDurationInSeconds(), (double)(0.15)); // or 17 / framespersecond for snappy attacks
-          }
-          newNote.trackNumber = trackNumberCounter;
-          newNote.isPercussion = inputFile.isPercussion;
-          midiNotes.push_back(newNote);
-        }
-        trackNumberCounter++;
+        std::cerr << "At least one MIDI filename is required.\n";
+        exit(1);
       }
+      MidiFile midifile;
+      midifile.read(options.getArg(1));
+      if (!midifile.status())
+      {
+        std::cerr << "Error reading MIDI file " << options.getArg(1) << std::endl;
+        exit(1);
+      }
+      midifile.joinTracks();
+      midifile.doTimeAnalysis();
+      midifile.linkNotePairs();
+
+      int track = 0;
+      for (int i = 0; i < midifile[track].size(); i++)
+      {
+        if (!midifile[track][i].isNoteOn())
+        {
+          continue;
+        }
+        std::cout << "Note start: " << midifile[track][i].seconds
+                  << "; duration: " << midifile[track][i].getDurationInSeconds()
+                  << "; P1 (pitch?): " << midifile[track][i].getP1()
+                  << "; P2 (pitch?): " << midifile[track][i].getP2()
+                  << "; P3 (pitch?): " << midifile[track][i].getP3() << '\t'
+                  << "Track identifier?: " << midifile[track][i][1] << std::endl;
+        MidiNote newNote;
+
+        newNote.pitch = midifile[track][i].getP1();
+        newNote.volume = midifile[track][i].getP2();
+        newNote.startSeconds = midifile[track][i].seconds;
+        if (inputFile.isPercussion)
+        {
+          newNote.endSeconds = midifile[track][i].seconds +
+                               std::max(midifile[track][i].getDurationInSeconds(), (double)(5 / framespersecond));
+        }
+        else
+        {
+          newNote.endSeconds = midifile[track][i].seconds +
+                               // Tweak this if you want really snappy attack
+                               std::max(midifile[track][i].getDurationInSeconds(), (double)(0.2665));
+        }
+        newNote.trackNumber = trackNumberCounter;
+        newNote.isPercussion = inputFile.isPercussion;
+        midiNotes.push_back(newNote);
+      }
+      trackNumberCounter++;
     }
 
     // std::vector<AubioNote> demoAudioNotes =
@@ -246,9 +249,9 @@ int main(int argc, const char *argv[])
     // return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
     //                                 framespersecond, percussionOnsets,
     //                                 pitchedNotesVec, midiNotes);
-    return GenerateMandleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
+    return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
                                     framespersecond, percussionOnsets,
-                                    pitchedNotesVec, midiNotes, midiPercussionNotes);
+                                    pitchedNotesVec, midiNotes);
   }
   return PrintUsage();
 }
@@ -299,12 +302,12 @@ static int GenerateRippleZoomFrames(
   blankColorBlack.red = 0;
   blankColorBlack.green = 0;
   blankColorBlack.blue = 0;
-  blankColorBlack.alpha = 255;
+  blankColorBlack.alpha = 0;
   PixelColor backgroundColor;
   backgroundColor.red = 0;
   backgroundColor.green = 0;
   backgroundColor.blue = 0;
-  backgroundColor.alpha = 255;
+  backgroundColor.alpha = 0;
   // Light mode
   // PixelColor blankColorWhite;
   // blankColorWhite.red = 205;
@@ -408,7 +411,7 @@ static int GenerateRippleZoomFrames(
 
     // Another thing to help with attack speed
     // const float rippleAttackSpeed = 1;
-    const float rippleAttackSpeed = 1.8;
+    const float rippleAttackSpeed = 0.9 * (4 * 15 / framespersecond);
 
     // Dark mode
     // Medium darkening
@@ -417,7 +420,8 @@ static int GenerateRippleZoomFrames(
     // currentFrame.BrightenAllPixels(0.78);
 
     // Dissolve the colors
-    if (f % 9 == 0)
+    // if (f % int(framespersecond * 3 / 20) == 0) 60 fps
+    if (f % 1 == 0) // super dissolved, suitable for 15fps
     // if (hasNewRipple)
     {
       for (int x = 0; x < xResolution / squareSize; ++x)
@@ -545,7 +549,7 @@ static int GenerateRippleZoomFrames(
           ;
 
       // Decay multiplier - choose a lower number for plucky instruments, higher number / 1 for sustained instruments
-      const float decayBrightnessMultiplier = std::max(std::pow(0.96, (double)std::max(framesSinceRippleStart - 15, 0)), 0.1);
+      const float decayBrightnessMultiplier = std::max(std::pow(0.98 - (1 / framespersecond), (double)std::max(framesSinceRippleStart - 15, 0)), 0.1);
 
       for (int x = 0; x < xResolution; ++x)
       {
@@ -570,7 +574,7 @@ static int GenerateRippleZoomFrames(
               //  && framesSinceRippleStart % 5 == 0 - if you want a strobe party effect
           )
           {
-            const float decayMultiplier = 0.9;
+            // const float decayMultiplier = 0.9;
             // Dark mode
             currentFrame.AddPixel(x, y, ripple.addColor, decayBrightnessMultiplier);
             // Light mode
@@ -677,7 +681,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   blankColor.red = 0;
   blankColor.green = 0;
   blankColor.blue = 0;
-  blankColor.alpha = 255;
+  blankColor.alpha = 0;
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++)
   {
@@ -716,6 +720,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
 
   int mandleCounts[xResolution / squareSize][yResolution / squareSize];
   const int startTimeSeconds = 0;
+  int onsetsPassed = 0;
   // Generate the frames
   for (int f = startTimeSeconds * framespersecond; f < numframes; ++f)
   {
@@ -744,14 +749,18 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                            framesSinceChangeOfCentre / framesToMoveCentres);
     }
 
-    int onsetsPassed = 1;
     if (onsetsModeMidi)
     {
-      for (MidiNote percNote : midiPercussionNotes)
+      for (unsigned int i = 0; i < midiPercussionNotes.size(); ++i)
       {
+        // std::cout << " percussion mide note " << i << "\n  ";
+        MidiNote percNote = midiPercussionNotes[i];
         if (timestamp > percNote.startSeconds)
         {
+          std::cout << " percussion midi note passed onset" << i << "\n  ";
           onsetsPassed++;
+          midiPercussionNotes.erase(midiPercussionNotes.begin() + i);
+          std::cout << " percussion midi note passed onset and erased" << i << "\n  ";
         }
       }
     }
@@ -864,6 +873,13 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
       for (unsigned int j = 0; j < aubioNotesVec[i].size(); j++)
       {
         AubioNote checkNote = aubioNotesVec[i][j];
+        if (checkNote.endSeconds < timestamp)
+        {
+          std::cout << " aubio note erasure " << i << j << "\n  ";
+          aubioNotesVec[i].erase(aubioNotesVec[i].begin() + j);
+          std::cout << " aubio note erased " << i << j << "\n  ";
+          break;
+        }
         if (checkNote.startSeconds < timestamp &&
             checkNote.endSeconds > timestamp)
         {
@@ -923,6 +939,13 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     for (unsigned int i = 0; i < midiNotes.size(); i++)
     {
       MidiNote checkNote = midiNotes[i];
+      if (checkNote.endSeconds < timestamp)
+      {
+        std::cout << " midi note erasure " << i << "\n  ";
+        midiNotes.erase(midiNotes.begin() + i);
+        std::cout << " midi note erasured " << i << "\n  ";
+        break;
+      }
       if (checkNote.startSeconds > timestamp || checkNote.endSeconds < timestamp)
       {
         break;
