@@ -21,7 +21,7 @@
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
 */
-
+#include <algorithm>
 #include "art.h"
 #include "aubioParser.h"
 #include "colors.h"
@@ -42,6 +42,19 @@ using namespace smf;
 #include <set>
 #include <string>
 #include <vector>
+#include <thread>
+#ifdef PARALLEL
+#include <execution>
+namespace execution = std::execution;
+#else
+enum class execution
+{
+  seq,
+  unseq,
+  par_unseq,
+  par
+};
+#endif
 
 static int PrintUsage();
 
@@ -63,6 +76,7 @@ static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp);
 
 int main(int argc, const char *argv[])
 {
+  std::cout << "Start of main";
   std::cout << std::setprecision(13) << std::fixed;
   if (argc >= 6)
   {
@@ -93,76 +107,81 @@ int main(int argc, const char *argv[])
     std::vector<MidiNote> midiPercussionNotes = {};
     int trackNumberCounter = 0;
     int percussionTrackNumberCounter = 0;
-    MidiTrack inputFiles[4] = {
+    MidiTrack inputFiles[0] = {
         // MidiTrack{.filename = "./input/percTest1PianoTrack.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/discosnailschords.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/discooffbeat.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/discochordstabs.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/discostring1.mid", .isPercussion = false},
-        MidiTrack{.filename = "./input/discolyrics.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/discooffbeat.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/discochordstabs.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/discostring1.mid", .isPercussion = false},
+        // MidiTrack{.filename = "./input/discolyrics.mid", .isPercussion = false},
         // MidiTrack{.filename = "./input/chordprogwurli.mid", .isPercussion = false},
     };
 
+    const int usePercussionOpt = false;
     MidiTrack percussionMidi = MidiTrack{.filename = "./input/discosnailsbetterbeat.mid", .isPercussion = true};
 
-    // Percussion
-    Options percussionOptions;
-    std::vector<std::string> percussionsArguments = {"run", percussionMidi.filename};
-    std::vector<char *> percussionFakeargv;
-    for (const auto &arg : percussionsArguments)
-      percussionFakeargv.push_back((char *)arg.data());
-    percussionFakeargv.push_back(nullptr);
-    std::cout << "Pushing mid file: " << percussionFakeargv[0] << "\n";
-    percussionOptions.process(percussionFakeargv.size() - 1, percussionFakeargv.data(), 2);
-    if (percussionOptions.getArgCount() != 1)
+    std::cout << "Before percussion check";
+    if (usePercussionOpt)
     {
-      std::cerr << "At least one MIDI filename is required.\n";
-      exit(1);
-    }
-    MidiFile percussionMidifile;
-    percussionMidifile.read(percussionOptions.getArg(1));
-    if (!percussionMidifile.status())
-    {
-      std::cerr << "Error reading MIDI file " << percussionOptions.getArg(1) << std::endl;
-      exit(1);
-    }
-    percussionMidifile.joinTracks();
-    percussionMidifile.doTimeAnalysis();
-    percussionMidifile.linkNotePairs();
+      // Percussion
+      Options percussionOptions;
+      std::vector<std::string> percussionsArguments = {"run", percussionMidi.filename};
+      std::vector<char *> percussionFakeargv;
+      for (const auto &arg : percussionsArguments)
+        percussionFakeargv.push_back((char *)arg.data());
+      percussionFakeargv.push_back(nullptr);
+      std::cout << "Pushing mid file: " << percussionFakeargv[0] << "\n";
+      percussionOptions.process(percussionFakeargv.size() - 1, percussionFakeargv.data(), 2);
+      if (percussionOptions.getArgCount() != 1)
+      {
+        std::cerr << "At least one MIDI filename is required.\n";
+        exit(1);
+      }
+      MidiFile percussionMidifile;
+      percussionMidifile.read(percussionOptions.getArg(1));
+      if (!percussionMidifile.status())
+      {
+        std::cerr << "Error reading MIDI file " << percussionOptions.getArg(1) << std::endl;
+        exit(1);
+      }
+      percussionMidifile.joinTracks();
+      percussionMidifile.doTimeAnalysis();
+      percussionMidifile.linkNotePairs();
 
-    // Percussion
-    int percussiontrack = 0;
-    for (int i = 0; i < percussionMidifile[percussiontrack].size(); i++)
-    {
-      if (!percussionMidifile[percussiontrack][i].isNoteOn())
+      // Percussion
+      int percussiontrack = 0;
+      for (int i = 0; i < percussionMidifile[percussiontrack].size(); i++)
       {
-        continue;
-      }
-      std::cout << "Note start: " << percussionMidifile[percussiontrack][i].seconds
-                << "; duration: " << percussionMidifile[percussiontrack][i].getDurationInSeconds()
-                << "; P1 (pitch?): " << percussionMidifile[percussiontrack][i].getP1()
-                << "; P2 (pitch?): " << percussionMidifile[percussiontrack][i].getP2()
-                << "; P3 (pitch?): " << percussionMidifile[percussiontrack][i].getP3() << '\t'
-                << "percussionTrack identifier?: " << percussionMidifile[percussiontrack][i][1] << std::endl;
-      MidiNote newPercussionNote;
+        if (!percussionMidifile[percussiontrack][i].isNoteOn())
+        {
+          continue;
+        }
+        std::cout << "Note start: " << percussionMidifile[percussiontrack][i].seconds
+                  << "; duration: " << percussionMidifile[percussiontrack][i].getDurationInSeconds()
+                  << "; P1 (pitch?): " << percussionMidifile[percussiontrack][i].getP1()
+                  << "; P2 (pitch?): " << percussionMidifile[percussiontrack][i].getP2()
+                  << "; P3 (pitch?): " << percussionMidifile[percussiontrack][i].getP3() << '\t'
+                  << "percussionTrack identifier?: " << percussionMidifile[percussiontrack][i][1] << std::endl;
+        MidiNote newPercussionNote;
 
-      newPercussionNote.pitch = percussionMidifile[percussiontrack][i].getP1();
-      newPercussionNote.volume = percussionMidifile[percussiontrack][i].getP2();
-      newPercussionNote.startSeconds = percussionMidifile[percussiontrack][i].seconds;
-      if (percussionMidi.isPercussion)
-      {
-        newPercussionNote.endSeconds = percussionMidifile[percussiontrack][i].seconds +
-                                       std::max(percussionMidifile[percussiontrack][i].getDurationInSeconds(), (double)(5 / framespersecond));
+        newPercussionNote.pitch = percussionMidifile[percussiontrack][i].getP1();
+        newPercussionNote.volume = percussionMidifile[percussiontrack][i].getP2();
+        newPercussionNote.startSeconds = percussionMidifile[percussiontrack][i].seconds;
+        if (percussionMidi.isPercussion)
+        {
+          newPercussionNote.endSeconds = percussionMidifile[percussiontrack][i].seconds +
+                                         std::max(percussionMidifile[percussiontrack][i].getDurationInSeconds(), (double)(5 / framespersecond));
+        }
+        else
+        {
+          newPercussionNote.endSeconds = percussionMidifile[percussiontrack][i].seconds +
+                                         // Tweak this if you want really snappy attack
+                                         std::max(percussionMidifile[percussiontrack][i].getDurationInSeconds(), (double)(0.15)); // or 17 / framespersecond for snappy attacks
+        }
+        newPercussionNote.trackNumber = percussionTrackNumberCounter;
+        newPercussionNote.isPercussion = percussionMidi.isPercussion;
+        midiPercussionNotes.push_back(newPercussionNote);
       }
-      else
-      {
-        newPercussionNote.endSeconds = percussionMidifile[percussiontrack][i].seconds +
-                                       // Tweak this if you want really snappy attack
-                                       std::max(percussionMidifile[percussiontrack][i].getDurationInSeconds(), (double)(0.15)); // or 17 / framespersecond for snappy attacks
-      }
-      newPercussionNote.trackNumber = percussionTrackNumberCounter;
-      newPercussionNote.isPercussion = percussionMidi.isPercussion;
-      midiPercussionNotes.push_back(newPercussionNote);
     }
     for (MidiTrack inputFile : inputFiles)
     {
@@ -246,12 +265,12 @@ int main(int argc, const char *argv[])
     std::vector<float> percussionOnsets = {};
     // ParseOnsetSecondsFile("./output/rhythmInstrument1Onsets.txt");
 
+    return GenerateMandleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
+                                    framespersecond, percussionOnsets,
+                                    pitchedNotesVec, midiNotes, midiPercussionNotes);
     // return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
     //                                 framespersecond, percussionOnsets,
     //                                 pitchedNotesVec, midiNotes);
-    return GenerateRippleZoomFrames(outdir, numframes, xcenter, ycenter, zoom,
-                                    framespersecond, percussionOnsets,
-                                    pitchedNotesVec, midiNotes);
   }
   return PrintUsage();
 }
@@ -657,6 +676,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                                     std::vector<std::vector<AubioNote>> aubioNotesVec,
                                     std::vector<MidiNote> midiNotes, std::vector<MidiNote> midiPercussionNotes)
 {
+  std::cout << "GenerateMandleZoomFrames";
   std::vector<PixelColor> availableColors = getColors();
   bool reverseDeadEnd = false;
   int framesSinceDeadEnd = 0;
@@ -667,14 +687,21 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   std::vector<int> aubioMinPitches{};
   std::vector<int> aubioPitchRanges{};
   std::vector<int> aubioMedianPitches{};
-  for (unsigned int i = 0; i < aubioNotesVec.size(); i++)
+  // for (unsigned int i = 0; i < aubioNotesVec.size(); i++)
+  // {
+  //   aubioMaxPitches.push_back(getMaxPitch(aubioNotesVec[i]));
+  //   aubioMinPitches.push_back(getMinPitch(aubioNotesVec[i]));
+  //   aubioPitchRanges.push_back((aubioMaxPitches[i] - aubioMinPitches[i]));
+  //   aubioMedianPitches.push_back((aubioMaxPitches[i] + aubioMinPitches[i]) / 2);
+  // }
+
+  std::cout << "\n"
+            << midiNotes.size() << ": Midi notes size \n";
+  int midiMidianPitch = getMaxPitch(midiNotes) + getMinPitch(midiNotes) / 2;
+  if (midiMidianPitch <= 0)
   {
-    aubioMaxPitches.push_back(getMaxPitch(aubioNotesVec[i]));
-    aubioMinPitches.push_back(getMinPitch(aubioNotesVec[i]));
-    aubioPitchRanges.push_back((aubioMaxPitches[i] - aubioMinPitches[i]));
-    aubioMedianPitches.push_back((aubioMaxPitches[i] + aubioMinPitches[i]) / 2);
+    midiMidianPitch = 50;
   }
-  int midiMidianPitch = getMaxPitch(midiNotes) - getMinPitch(midiNotes);
   bool isSilent = true;
   // Create a video frame buffer with 720p resolution (1280x720).
   PixelColor blankColor;
@@ -683,6 +710,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   blankColor.blue = 0;
   blankColor.alpha = 0;
   VideoFrame currentFrame(xResolution, yResolution);
+  std::mutex currentFrame_mutex;
   for (unsigned int x = 0; x < xResolution; x++)
   {
     for (unsigned int y = 0; y < yResolution; y++)
@@ -716,9 +744,11 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   nextCentre.imaginaryPart = ycenter;
   int framesSinceChangeOfCentre = 0;
   std::set<int> uniqueMandleCounts;
+  std::mutex unique_mandelcounts_mutex;
   int lastOnsetsPassed = 0;
 
   int mandleCounts[xResolution / squareSize][yResolution / squareSize];
+  std::mutex mandelcounts_mutex;
   const int startTimeSeconds = 0;
   int onsetsPassed = 0;
   // Generate the frames
@@ -732,7 +762,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     }
     double timestamp = GetTimestampSeconds(f, framespersecond);
 
-    // std::cout << " current timestamp " << timestamp << "\n  ";
+    std::cout << " current timestamp " << timestamp << "\n  ";
 
     long double ver_span = 4.0 / denom;
     long double hor_span = ver_span * ((xResolution / squareSize) - 1.0) / ((yResolution / squareSize) - 1.0);
@@ -757,10 +787,10 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
         MidiNote percNote = midiPercussionNotes[i];
         if (timestamp > percNote.startSeconds)
         {
-          std::cout << " percussion midi note passed onset" << i << "\n  ";
+          // std::cout << " percussion midi note passed onset" << i << "\n  ";
           onsetsPassed++;
           midiPercussionNotes.erase(midiPercussionNotes.begin() + i);
-          std::cout << " percussion midi note passed onset and erased" << i << "\n  ";
+          // std::cout << " percussion midi note passed onset and erased" << i << "\n  ";
         }
       }
     }
@@ -785,17 +815,22 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
       framesSinceLastOnsetPassed++;
     }
 
+    std::cout << " calculating pitch multiplier from current pitch " << currentPitch << ", " << defaultPitch << "\n  ";
     targetPitchMultiplier = 0.001 * currentPitch / defaultPitch;
+    std::cout << " calculating pitch multiplier 1 " << pitchMultiplier << ", " << targetPitchMultiplier << "\n  ";
     pitchMultiplier =
         pitchMultiplier + (targetPitchMultiplier - pitchMultiplier) / 8;
 
+    std::cout << " Clearing mandlecounts " << uniqueMandleCounts.size() << "\n  ";
     uniqueMandleCounts.clear();
     if (isSilent)
     {
+      std::cout << " Silent alpha modifier " << alphaModifier << "\n  ";
       alphaModifier = alphaModifier - 0.025;
     }
     else
     {
+      std::cout << " Loud alpha modifier " << alphaModifier << ", " << framesSinceChangeOfCentre << "\n  ";
       alphaModifier = alphaModifier - ((framesSinceChangeOfCentre - 1) * 0.025);
       if (currentNoteLength > 0)
       {
@@ -805,30 +840,82 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     }
     if (alphaModifier < 0)
     {
+      std::cout << " 0 alpha modifier " << alphaModifier << "\n  ";
       alphaModifier = 0;
     }
-    for (int x = 0; x < (xResolution / squareSize); ++x)
+
+    std::cout << "About to define color line lamda \n";
+    auto colorLine = [cr_left, xStepDistance, ci_top, yStepDistance, limit, &mandleCounts,
+                      &uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
+                      framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
+                      availableColors,
+                      &currentFrame, &unique_mandelcounts_mutex, &mandelcounts_mutex, &currentFrame_mutex](int x)
     {
       long double cr = getXPosition(x, cr_left, xStepDistance);
+      // std::cout << x << " " << ": st\n";
       for (int y = 0; y < (yResolution / squareSize); ++y)
       {
+        // // std::cout << y << " " << ": gyp ;";
         long double ci = getYPosition(y, ci_top, yStepDistance);
+        // std::cout << cr << " " << ": gm ;";
         int count = Mandelbrot(cr, ci, limit);
-        mandleCounts[x][y] = count;
-        uniqueMandleCounts.insert(count);
+        // std::cout << x << ": iim ;";
+        mandelcounts_mutex.lock();
+        mandleCounts[x][y] = count; // Problem
+        mandelcounts_mutex.unlock();
+        // std::cout << count << ": iium ;";
+        unique_mandelcounts_mutex.lock();
+        uniqueMandleCounts.insert(count); // Issues!
+        unique_mandelcounts_mutex.unlock();
+        // std::cout << ": iium done ;";
+        // std::cout << count << " " << limit << " " << onsetsPassed << " " << currentPitch << " " << previousPitch << " " << framesSinceChangeOfCentre << " " << framesSinceLastOnsetPassed << " " << alphaModifier << " " << availableColors.size() << ": Get color \n";
+        // std::cout << currentFrame.GetPixel(x, y).alpha << "cfpa;";
         PixelColor color = Palette(
             count, limit, onsetsPassed, currentPitch, previousPitch,
             framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
             alphaModifier, availableColors, currentFrame.GetPixel(x, y));
+        currentFrame_mutex.lock();
         for (int i = 0; i < squareSize; i++)
         {
           for (int j = 0; j < squareSize; j++)
           {
-            currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color);
+            // std::cout << "cfsp;";
+            currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color); // Issues!
           }
         }
+        currentFrame_mutex.unlock();
       }
+      // std::cout << "el \n";
+    };
+
+    std::vector<int> rows(xResolution / squareSize);
+
+#ifdef PARALLEL
+    std::for_each( // Why doesn't this compile?
+        execution::par_unseq,
+        rows.begin(), rows.end(),
+        colorLine);
+#else
+    std::vector<std::thread> threads;
+    // TODO for even more threads could thread y as well? Probably overkill though
+    for (int x = 0; x < (xResolution / squareSize); ++x)
+    {
+      // std::cout << "Making thread: " << x << "\n";
+
+      std::thread tn(colorLine, x);
+      threads.push_back(std::move(tn));
     }
+    for (int x = 0; x < (xResolution / squareSize); x++)
+    {
+      // std::cout << "Joining thread: " << x << "\n";
+      threads[x].join();
+    }
+    // auto asyncColorLine =
+    // std::for_each(
+    //     rows.begin(), rows.end(),
+    //      colorLine);
+#endif
+    std::cout << "lamdas finished \n";
     if (uniqueMandleCounts.size() <= 4 &&
         framesSinceDeadEnd > framespersecond)
     {
@@ -1010,6 +1097,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     }
     if (framesSinceChangeOfCentre > 1)
     {
+      std::cout << "Haven't changed centers in a while, refocussing \n";
       int minXIndex = 1;
       int maxXIndex = xResolution - 1;
       int minYIndex = 1;

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <set>
 #include <vector>
+#include <iostream>
 
 // #include <iostream>
 long double getXPosition(int xSquare, long double cr_left,
@@ -17,24 +18,44 @@ long double getYPosition(int ySquare, long double ci_top,
   return ci_top - ySquare * yStepDistance;
 };
 
-int Mandelbrot(long double cr, long double ci, int limit)
+// THIS should be more efficient (slightly)
+int Mandelbrot(long double cx, long double cy, int limit)
 {
   int count = 0;
-  long double zr = 0.0;
-  long double zi = 0.0;
-  long double zr2 = 0.0;
-  long double zi2 = 0.0;
-  while ((count < limit) && (zr2 + zi2 < 4.001))
+  long double zx = 0.0;
+  long double zy = 0.0;
+  long double xsqr = 0.0;
+  long double ysqr = 0.0;
+  while ((count < limit) && (xsqr + ysqr < 4.001))
   {
-    long double tzi = 2.0 * zr * zi + ci;
-    zr = zr2 - zi2 + cr;
-    zi = tzi;
-    zr2 = zr * zr;
-    zi2 = zi * zi;
+    zy *= zx;
+    zy += zy + cy;
+    zx = xsqr - ysqr + cx;
+    xsqr = zx * zx;
+    ysqr = zy * zy;
     ++count;
   }
   return count;
 }
+
+// int Mandelbrot(long double cr, long double ci, int limit)
+// {
+//   int count = 0;
+//   long double zr = 0.0;
+//   long double zi = 0.0;
+//   long double zr2 = 0.0;
+//   long double zi2 = 0.0;
+//   while ((count < limit) && (zr2 + zi2 < 4.001))
+//   {
+//     long double tzi = 2.0 * zr * zi + ci;
+//     zr = zr2 - zi2 + cr;
+//     zi = tzi;
+//     zr2 = zr * zr;
+//     zi2 = zi * zi;
+//     ++count;
+//   }
+//   return count;
+// }
 
 std::vector<PixelIndex>
 getInterestingPixelIndexes(int mandleCounts[xResolution / squareSize][yResolution / squareSize],
@@ -172,6 +193,10 @@ Coordinate getInterestingPoint(int mandleCounts[][yResolution / squareSize],
 
 int getMaxPitch(std::vector<AubioNote> notes)
 {
+  std::cout << notes.size() << ": max size \n";
+  if (notes.size() == 0) {
+    return 0;
+  }
   int maxPitch = notes[0].pitch;
   for (unsigned int i = 1; i < notes.size(); i++)
   {
@@ -185,6 +210,10 @@ int getMaxPitch(std::vector<AubioNote> notes)
 
 int getMaxPitch(std::vector<MidiNote> notes)
 {
+  std::cout << notes.size() << ": max size \n";
+  if (notes.size() == 0) {
+    return 0;
+  }
   int maxPitch = notes[0].pitch;
   for (unsigned int i = 1; i < notes.size(); i++)
   {
@@ -198,6 +227,11 @@ int getMaxPitch(std::vector<MidiNote> notes)
 
 int getMinPitch(std::vector<AubioNote> notes)
 {
+    std::cout << notes.size() << ": min size \n";
+
+  if (notes.size() == 0) {
+    return 0;
+  }
   int minPitch = notes[0].pitch;
   for (unsigned int i = 1; i < notes.size(); i++)
   {
@@ -211,6 +245,10 @@ int getMinPitch(std::vector<AubioNote> notes)
 
 int getMinPitch(std::vector<MidiNote> notes)
 {
+  std::cout << notes.size() << ": min size \n";
+  if (notes.size() == 0) {
+    return 0;
+  }
   int minPitch = notes[0].pitch;
   for (unsigned int i = 1; i < notes.size(); i++)
   {
@@ -224,6 +262,9 @@ int getMinPitch(std::vector<MidiNote> notes)
 
 int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec)
 {
+  if (notesVec.size() == 0) {
+    return 0;
+  }
   int maxMaxPitch = getMaxPitch(notesVec[0]);
   for (unsigned int i = 1; i < notesVec.size(); i++)
   {
@@ -238,6 +279,9 @@ int getMaxMaxPitch(std::vector<std::vector<AubioNote>> notesVec)
 
 int getMinMinPitch(std::vector<std::vector<AubioNote>> notesVec)
 {
+  if (notesVec.size() == 0) {
+    return 0;
+  }
   int minMinPitch = getMinPitch(notesVec[0]);
   for (unsigned int i = 1; i < notesVec.size(); i++)
   {
