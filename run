@@ -30,8 +30,11 @@ mkdir movie || Fail "Error creating movie directory."
 
 # TODO pass in aubio outputs instead of hard coding them
 # Run the mandelbrot generator. This creates all the output PNG files.
+# Nice starting points
+# 0.432574143 + -0.207743265i
+# 0.743643887037151 + 0.131825904205330i
 # 60 fps is nice for the ripples per note, mandlezoom is heavy and doesn't need to line up as tight so 30 should be fine
-./mandelzoom movie $((15 * 210)) 0.432574143 -0.207743265 1.0e12 15 ||
+./mandelzoom movie $((15 * 210)) 0.38832598 0.13591409 1.0e18 15 ||
     Fail "Error running Mandelbrot Zoom program."
 
 # Convert the PNG files to a video file zoom.mp4.
