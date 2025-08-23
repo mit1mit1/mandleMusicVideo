@@ -38,34 +38,45 @@ std::vector<PixelColor> getColors()
   //     PixelColor{.red = 239, .green = 245, .blue = 255, .alpha = 255},
   // };
 
-  // Autumn Pallette
+  // Sand Pallette
   std::vector<PixelColor> seedColors = {
-      // Macadamia
-      PixelColor{.red = 238, .green = 224, .blue = 200, .alpha = 255},
-      // Dark Ginger
-      PixelColor{.red = 172, .green = 92, .blue = 56, .alpha = 255},
-      // Amber
-      PixelColor{.red = 214, .green = 120, .blue = 52, .alpha = 255},
-      // Laguna 2
-      // PixelColor{.red = 0, .green = 100, .blue = 118, .alpha = 255},
-      // Brick red
-      PixelColor{.red = 211, .green = 58, .blue = 52, .alpha = 255},
-      // Olive
-      // PixelColor{.red = 147, .green = 152, .blue = 94, .alpha = 255},
-      // Camel
-      PixelColor{.red = 180, .green = 124, .blue = 65, .alpha = 255},
-      // Laguna 1
-      // PixelColor{.red = 29, .green = 90, .blue = 107, .alpha = 255},
-      // Soft Olive
-      // PixelColor{.red = 125, .green = 123, .blue = 79, .alpha = 255},
-      // Mustard
-      PixelColor{.red = 230, .green = 176, .blue = 81, .alpha = 255},
-      // Chocolate
-      PixelColor{.red = 50, .green = 39, .blue = 19, .alpha = 255},
-      // Spiced Coral
-      PixelColor{.red = 229, .green = 110, .blue = 104, .alpha = 255},
+      PixelColor{.red = 234, .green = 177, .blue = 122, .alpha = 255},
+      PixelColor{.red = 238, .green = 237, .blue = 245, .alpha = 255},
+      PixelColor{.red = 227, .green = 152, .blue = 59, .alpha = 255},
+      PixelColor{.red = 217, .green = 150, .blue = 80, .alpha = 255},
+      PixelColor{.red = 227, .green = 152, .blue = 59, .alpha = 255},
+      PixelColor{.red = 238, .green = 237, .blue = 245, .alpha = 255},
   };
-  std::vector<PixelColor> colors = {};
+
+  // // Autumn Pallette
+  // std::vector<PixelColor> seedColors = {
+  //     // Macadamia
+  //     PixelColor{.red = 238, .green = 224, .blue = 200, .alpha = 255},
+  //     // Dark Ginger
+  //     PixelColor{.red = 172, .green = 92, .blue = 56, .alpha = 255},
+  //     // Amber
+  //     PixelColor{.red = 214, .green = 120, .blue = 52, .alpha = 255},
+  //     // Laguna 2
+  //     // PixelColor{.red = 0, .green = 100, .blue = 118, .alpha = 255},
+  //     // Brick red
+  //     PixelColor{.red = 211, .green = 58, .blue = 52, .alpha = 255},
+  //     // Olive
+  //     // PixelColor{.red = 147, .green = 152, .blue = 94, .alpha = 255},
+  //     // Camel
+  //     PixelColor{.red = 180, .green = 124, .blue = 65, .alpha = 255},
+  //     // Laguna 1
+  //     // PixelColor{.red = 29, .green = 90, .blue = 107, .alpha = 255},
+  //     // Soft Olive
+  //     // PixelColor{.red = 125, .green = 123, .blue = 79, .alpha = 255},
+  //     // Mustard
+  //     PixelColor{.red = 230, .green = 176, .blue = 81, .alpha = 255},
+  //     // Chocolate
+  //     PixelColor{.red = 50, .green = 39, .blue = 19, .alpha = 255},
+  //     // Spiced Coral
+  //     PixelColor{.red = 229, .green = 110, .blue = 104, .alpha = 255},
+  // };
+  std::vector<PixelColor>
+      colors = {};
   const int colorsBetween = 96;
 
   for (unsigned int i = 0; i < seedColors.size(); i++)

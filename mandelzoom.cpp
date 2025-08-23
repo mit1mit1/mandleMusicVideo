@@ -712,9 +712,9 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   // blankColor.alpha = 0;
   // Autumn
   // PixelColor{.red = 238, .green = 224, .blue = 200, .alpha = 255},
-  blankColor.red = 234;
-  blankColor.green = 215;
-  blankColor.blue = 190;
+  blankColor.red = 237;
+  blankColor.green = 222;
+  blankColor.blue = 214;
   blankColor.alpha = 255;
   VideoFrame currentFrame(xResolution, yResolution);
   std::mutex currentFrame_mutex;
@@ -747,7 +747,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   std::cout << " initial pitch multiplier " << pitchMultiplier << "\n  ";
   std::cout << " initial target pitch multiplier " << targetPitchMultiplier
             << "\n  ";
-  long double denom = 48.0; // Initial zoom
+  long double denom = 96.0; // Initial zoom
   Coordinate nextCentre = {};
   nextCentre.realPart = xcenter;
   nextCentre.imaginaryPart = ycenter;
@@ -957,7 +957,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     if (error)
       return error;
 
-    long double accelerationMultiplier = noNotes ? 0.0005 * (std::log(f)) : 0.000005 * (f);
+    long double accelerationMultiplier = noNotes ? 0.0005 * (std::log(f + 3)) : 0.000005 * (f);
 
     // Increase the zoom magnification for the next frame.
     long double multiplier =
