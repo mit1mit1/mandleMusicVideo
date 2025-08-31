@@ -51,5 +51,7 @@ public:
   PixelColor GetPixel(int x, int y);
 
   int SavePng(const char *outFileName);
+
+  void MultiplyAlphaSetp(double alphaModifier);
 };
 #endif

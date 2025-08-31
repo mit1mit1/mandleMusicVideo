@@ -58,8 +58,8 @@ struct MidiTrack
   bool isPercussion;
 };
 
-const int xResolution = 1280;
-const int yResolution = 720;
+const int xResolution = 1280 * 3 / 2;
+const int yResolution = 720 * 3 / 2;
 
 const int squareSize = 1;
 

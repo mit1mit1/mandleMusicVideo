@@ -55,10 +55,13 @@ enum class execution
   par
 };
 #endif
-const int maxThreads = 4;
+const int maxThreads = 20;
 
 static int PrintUsage();
 
+// TODO use the theorem about enclosed spaces to potentially skip a heap of calculations - recursive quartering of the screen should do it?
+// Also maybe add a "pause" listener to the p key press?
+// And definitely slow down the zoom (maybe just make it constant) and maybe increase the scroll speed and stop it going inward
 static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                                     long double xcenter, long double ycenter,
                                     long double zoom, int framespersecond,
@@ -66,6 +69,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                                     std::vector<std::vector<AubioNote>> aubioNotesVec,
                                     std::vector<MidiNote> midiNotes, std::vector<MidiNote> midiPercussionNotes);
 
+// TODO add threading to this
 static int GenerateRippleZoomFrames(
     const char *outdir, int numframes, long double xcenter, long double ycenter,
     long double zoom, int framespersecond, std::vector<float> onsetTimestamps,
@@ -747,7 +751,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   std::cout << " initial pitch multiplier " << pitchMultiplier << "\n  ";
   std::cout << " initial target pitch multiplier " << targetPitchMultiplier
             << "\n  ";
-  long double denom = 96.0; // Initial zoom
+  long double denom = 12.0; // Initial zoom
   Coordinate nextCentre = {};
   nextCentre.realPart = xcenter;
   nextCentre.imaginaryPart = ycenter;
@@ -957,7 +961,7 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     if (error)
       return error;
 
-    long double accelerationMultiplier = noNotes ? 0.0005 * (std::log(f + 3)) : 0.000005 * (f);
+    long double accelerationMultiplier = noNotes ? 0.005 * (std::log(f + 3)) : 0.000005 * (f);
 
     // Increase the zoom magnification for the next frame.
     long double multiplier =

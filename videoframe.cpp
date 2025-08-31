@@ -273,6 +273,28 @@ PixelColor VideoFrame::GetPixel(int x, int y)
   return color;
 };
 
+void VideoFrame::MultiplyAlphaSetp(double alphaMultiplier)
+{
+  for (int x = 0; x < width; ++x)
+  {
+    for (int y = 0; y < height; ++y)
+    {
+
+      int index = 4 * (y * width + x);
+      buffer[index + 3] = std::min(std::max((int)((1 - alphaMultiplier) * buffer[index + 3] + alphaMultiplier * 255), 0), 255);
+    }
+  }
+}
+
+// new = (1 - m ) * old + m * 255
+// old * (1 - m) + m * 255  = new
+// old = (1 / (1 - m)) * new - m / (1 - m) * 255)
+
+// 1 - - m / (1-m) = (1 / (1-m))
+
+// Old step = m
+// New revert step = 1/(1-m)
+
 int VideoFrame::SavePng(const char *outFileName)
 {
   unsigned error = lodepng::encode(outFileName, buffer, width, height);
