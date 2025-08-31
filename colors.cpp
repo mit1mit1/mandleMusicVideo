@@ -165,8 +165,7 @@ static int getWavyOnsets(int onsetsPassed)
 PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
                    float previousPitch, int framesSincePitchChange,
                    int framesSinceLastOnsetPassed, float alphaModifier,
-                   std::vector<PixelColor> availableColors,
-                   PixelColor currentColor, PixelColor blankColor, const int onsetColorJump)
+                   std::vector<PixelColor> availableColors, PixelColor blankColor, const int onsetColorJump)
 {
   const float alphaSeed = 0.0;
   alphaModifier = 1.0;

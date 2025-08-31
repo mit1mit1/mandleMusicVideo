@@ -57,6 +57,13 @@ enum class execution
 #endif
 const int maxThreads = 20;
 
+static std::mutex currentFrame_mutex;
+std::mutex unique_mandelcounts_mutex;
+const int rectsPerSide = 2;
+const int numberOfRects = rectsPerSide * rectsPerSide; //(xResolution / squareSize) if lines
+
+std::mutex mandelcounts_mutex;
+
 static int PrintUsage();
 
 // TODO use the theorem about enclosed spaces to potentially skip a heap of calculations - recursive quartering of the screen should do it?
@@ -674,6 +681,173 @@ static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp)
   return fakeNote;
 }
 
+static void colorRectRecursive(long double cr_left, long double xStepDistance, long double ci_top, long double yStepDistance, int limit, int mandleCounts[xResolution][yResolution],
+                               std::set<int> uniqueMandleCounts, int onsetsPassed, int currentPitch, int previousPitch,
+                               int framesSinceChangeOfCentre, int framesSinceLastOnsetPassed, int alphaModifier,
+                               std::vector<PixelColor> availableColors,
+                               VideoFrame currentFrame, PixelColor blankColor,
+                               int xStart, int xEnd, int yStart, int yEnd)
+{
+  bool outlineAllIdentical = true;
+  int mandleCountTest = -1;
+  // Check top and bottom lines
+  for (int x = xStart; x <= xEnd; x++)
+  {
+    long double cr = getXPosition(x, cr_left, xStepDistance);
+    for (int y = yStart; y <= yEnd; y = y + yEnd - yStart)
+    {
+
+      long double ci = getYPosition(y, ci_top, yStepDistance);
+
+      int count = Mandelbrot(cr, ci, limit);
+      if (mandleCountTest == -1)
+      {
+        mandleCountTest = count;
+      }
+      else
+      {
+        if (mandleCountTest != count)
+        {
+          outlineAllIdentical = false;
+        }
+      }
+      // std::cout << x << ": iim ;";
+      mandelcounts_mutex.lock();
+      mandleCounts[x][y] = count;
+      mandelcounts_mutex.unlock();
+      // std::cout << count << ": iium ;";
+      unique_mandelcounts_mutex.lock();
+      uniqueMandleCounts.insert(count);
+      unique_mandelcounts_mutex.unlock();
+      // std::cout << ": iium done ;";
+      // std::cout << count << " " << limit << " " << onsetsPassed << " " << currentPitch << " " << previousPitch << " " << framesSinceChangeOfCentre << " " << framesSinceLastOnsetPassed << " " << alphaModifier << " " << availableColors.size() << ": Get color \n";
+      // std::cout << currentFrame.GetPixel(x, y).alpha << "cfpa;";
+      PixelColor color = Palette(
+          count, limit, onsetsPassed, currentPitch, previousPitch,
+          framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
+          alphaModifier, availableColors, blankColor, 1);
+      currentFrame_mutex.lock();
+      for (int i = 0; i < squareSize; i++)
+      {
+        for (int j = 0; j < squareSize; j++)
+        {
+          // std::cout << "cfsp;";
+          currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color);
+        }
+      }
+      currentFrame_mutex.unlock();
+    }
+  }
+  // Check left and right lines
+  for (int y = yStart + 1; y <= yEnd - 1; y++)
+  {
+    long double ci = getYPosition(y, ci_top, yStepDistance);
+    for (int x = xStart; x <= xEnd; x = x + xEnd - xStart)
+    {
+      long double cr = getXPosition(x, cr_left, xStepDistance);
+      int count = Mandelbrot(cr, ci, limit);
+      if (mandleCountTest == -1)
+      {
+        mandleCountTest = count;
+      }
+      else
+      {
+        if (mandleCountTest != count)
+        {
+          outlineAllIdentical = false;
+        }
+      }
+      std::cout << x << ": left line x ;\n";
+      std::cout << count << ": count x ;\n";
+      std::cout << ci << ": ci ;\n";
+      std::cout << cr << ": cr ;\n";
+      mandelcounts_mutex.lock();
+      mandleCounts[x][y] = count; // Problem
+      mandelcounts_mutex.unlock();
+      // std::cout << count << ": iium ;";
+      unique_mandelcounts_mutex.lock();
+      uniqueMandleCounts.insert(count);
+      unique_mandelcounts_mutex.unlock();
+      // std::cout << ": iium done ;";
+      // std::cout << count << " " << limit << " " << onsetsPassed << " " << currentPitch << " " << previousPitch << " " << framesSinceChangeOfCentre << " " << framesSinceLastOnsetPassed << " " << alphaModifier << " " << availableColors.size() << ": Get color \n";
+      // std::cout << currentFrame.GetPixel(x, y).alpha << "cfpa;";
+      PixelColor color = Palette(
+          count, limit, onsetsPassed, currentPitch, previousPitch,
+          framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
+          alphaModifier, availableColors, blankColor, 1);
+      currentFrame_mutex.lock();
+      for (int i = 0; i < squareSize; i++)
+      {
+        for (int j = 0; j < squareSize; j++)
+        {
+          // std::cout << "cfsp;";
+          currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color);
+        }
+      }
+      currentFrame_mutex.unlock();
+    }
+  }
+
+  if (outlineAllIdentical)
+  {
+    std::cout << "WOW ALLI DENTICXAL " << xStart << ", " << xEnd << ", " << yStart << ", " << yEnd << "\n";
+    PixelColor color = Palette(
+        mandleCountTest, limit, onsetsPassed, currentPitch, previousPitch,
+        framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
+        alphaModifier, availableColors, blankColor, 1);
+    for (int x = xStart + 1; x < xEnd; x++)
+    {
+      for (int y = yStart + 1; y < yEnd; y++)
+      {
+        mandelcounts_mutex.lock();
+        mandleCounts[x][y] = mandleCountTest;
+        mandelcounts_mutex.unlock();
+        currentFrame_mutex.lock();
+        for (int i = 0; i < squareSize; i++)
+        {
+          for (int j = 0; j < squareSize; j++)
+          {
+            // std::cout << "cfsp;";
+            currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color);
+          }
+        }
+        currentFrame_mutex.unlock();
+      }
+    }
+  }
+  else
+  {
+    if (xStart + 1 < xEnd - 1 && yStart + 1 < yEnd - 1)
+    {
+      int rectXLength = (xEnd - xStart) / rectsPerSide;
+      int rectYLength = (yEnd - yStart) / rectsPerSide;
+
+      for (int i = 0; i < rectsPerSide; i++)
+      {
+        for (int j = 0; j < rectsPerSide; j++)
+        {
+          int newXStart = i * rectXLength;
+          int newXEnd = (i + 1) * rectXLength - 1;
+          int newYStart = j * rectYLength;
+          int newYEnd = (j + 1) * rectYLength - 1;
+          colorRectRecursive(
+              cr_left, xStepDistance, ci_top, yStepDistance, limit, mandleCounts,
+              uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
+              framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
+              availableColors,
+              currentFrame, blankColor,
+              newXStart, newXEnd, newYStart, newYEnd);
+        }
+      }
+    }
+  }
+  // std::cout << x << " " << ": st\n";
+  // for (int y = 0; y < (yResolution / squareSize); ++y)
+  // {
+  // }
+  // std::cout << "el \n";
+};
+
 static int GenerateMandleZoomFrames(const char *outdir, int numframes,
                                     long double xcenter, long double ycenter,
                                     long double zoom, int framespersecond,
@@ -721,7 +895,6 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   blankColor.blue = 214;
   blankColor.alpha = 255;
   VideoFrame currentFrame(xResolution, yResolution);
-  std::mutex currentFrame_mutex;
   for (unsigned int x = 0; x < xResolution; x++)
   {
     for (unsigned int y = 0; y < yResolution; y++)
@@ -757,11 +930,9 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   nextCentre.imaginaryPart = ycenter;
   int framesSinceChangeOfCentre = 0;
   std::set<int> uniqueMandleCounts;
-  std::mutex unique_mandelcounts_mutex;
   int lastOnsetsPassed = 0;
 
   int mandleCounts[xResolution / squareSize][yResolution / squareSize];
-  std::mutex mandelcounts_mutex;
   const int startTimeSeconds = 0;
   int onsetsPassed = 0;
   // Generate the frames
@@ -782,7 +953,9 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     long double ci_top = ycenter + ver_span / 2.0;
     long double yStepDistance = ver_span / ((yResolution / squareSize) - 1.0);
     long double cr_left = xcenter - hor_span / 2.0;
+    std::cout << " cr_left ROOT " << cr_left << "\n  ";
     long double xStepDistance = hor_span / ((xResolution / squareSize) - 1.0);
+    std::cout << " xStepDistance ROOT " << xStepDistance << "\n  ";
 
     if (framesSinceChangeOfCentre <= framesToMoveCentres)
     {
@@ -862,85 +1035,54 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
     }
 
     std::cout << "About to define color line lamda \n";
-    auto colorLine = [cr_left, xStepDistance, ci_top, yStepDistance, limit, &mandleCounts,
-                      &uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
-                      framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
-                      availableColors,
-                      &currentFrame, &unique_mandelcounts_mutex, &mandelcounts_mutex, &currentFrame_mutex, &blankColor](int x)
+    auto colorRectRecursiveLambda = [cr_left, xStepDistance, ci_top, yStepDistance, limit, &mandleCounts,
+                                     &uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
+                                     framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
+                                     availableColors,
+                                     &currentFrame, &blankColor](int xStart, int xEnd, int yStart, int yEnd)
     {
-      long double cr = getXPosition(x, cr_left, xStepDistance);
-      // std::cout << x << " " << ": st\n";
-      for (int y = 0; y < (yResolution / squareSize); ++y)
-      {
-        // // std::cout << y << " " << ": gyp ;";
-        long double ci = getYPosition(y, ci_top, yStepDistance);
-        // std::cout << cr << " " << ": gm ;";
-        int count = Mandelbrot(cr, ci, limit);
-        // std::cout << x << ": iim ;";
-        mandelcounts_mutex.lock();
-        mandleCounts[x][y] = count; // Problem
-        mandelcounts_mutex.unlock();
-        // std::cout << count << ": iium ;";
-        unique_mandelcounts_mutex.lock();
-        uniqueMandleCounts.insert(count); // Issues!
-        unique_mandelcounts_mutex.unlock();
-        // std::cout << ": iium done ;";
-        // std::cout << count << " " << limit << " " << onsetsPassed << " " << currentPitch << " " << previousPitch << " " << framesSinceChangeOfCentre << " " << framesSinceLastOnsetPassed << " " << alphaModifier << " " << availableColors.size() << ": Get color \n";
-        // std::cout << currentFrame.GetPixel(x, y).alpha << "cfpa;";
-        PixelColor color = Palette(
-            count, limit, onsetsPassed, currentPitch, previousPitch,
-            framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
-            alphaModifier, availableColors, currentFrame.GetPixel(x, y), blankColor, 1);
-        currentFrame_mutex.lock();
-        for (int i = 0; i < squareSize; i++)
-        {
-          for (int j = 0; j < squareSize; j++)
-          {
-            // std::cout << "cfsp;";
-            currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color); // Issues!
-          }
-        }
-        currentFrame_mutex.unlock();
-      }
-      // std::cout << "el \n";
+      std::cout << " cr_left LAMDDA " << cr_left << "\n  ";
+      colorRectRecursive(cr_left, xStepDistance, ci_top, yStepDistance, limit, mandleCounts,
+                         uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
+                         framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
+                         availableColors,
+                         currentFrame, blankColor, xStart, xEnd, yStart, yEnd);
     };
 
     std::vector<int> rows(xResolution / squareSize);
 
-#ifdef PARALLEL
-    std::for_each( // Why doesn't this compile?
-        execution::par_unseq,
-        rows.begin(), rows.end(),
-        colorLine);
-#else
-    int loopCount = std::ceil((xResolution / squareSize) / maxThreads);
+    const int rectXLength = (xResolution / squareSize) / rectsPerSide;
+    const int rectYLength = (yResolution / squareSize) / rectsPerSide;
+    int loopCount = std::ceil((float)numberOfRects / (float)maxThreads);
     std::vector<std::thread> threads;
-    for (int tc = 0; tc < loopCount; tc++)
+
+    for (int i = 0; i < rectsPerSide; i++)
     {
-      for (int x = tc * maxThreads; x < ((tc + 1) * maxThreads); ++x)
+      for (int j = 0; j < rectsPerSide; j++)
       {
-        if (x >= (xResolution / squareSize))
-        {
-          break;
-        }
-        std::thread tn(colorLine, x);
+        int xStart = i * rectXLength;
+        int xEnd = (i + 1) * rectXLength - 1;
+        int yStart = j * rectYLength;
+        int yEnd = (j + 1) * rectYLength - 1;
+        std::thread tn(colorRectRecursiveLambda, xStart, xEnd, yStart, yEnd);
         threads.push_back(std::move(tn));
       }
-      for (int x = tc * maxThreads; x < ((tc + 1) * maxThreads); ++x)
+    }
+    for (int ij = 0; ij < numberOfRects; ij++)
+    {
+      if (threads[ij].joinable())
       {
-        if (x >= (xResolution / squareSize))
-        {
-          break;
-        }
-        // std::cout << "Joining thread: " << x << "\n";
-        threads[x].join();
+        std::cout << "Joinable thread?: " << ij << "\n";
+        threads[ij].join();
+        std::cout << "Joined thread: " << ij << "\n";
       }
+      std::cout << "Joined thread: " << ij << "\n";
     }
     // auto asyncColorLine =
     // std::for_each(
     //     rows.begin(), rows.end(),
     //      colorLine);
-#endif
+
     std::cout << "lamdas finished \n";
     if (uniqueMandleCounts.size() <= 4 &&
         framesSinceDeadEnd > framespersecond)
