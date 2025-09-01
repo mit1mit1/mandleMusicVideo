@@ -681,11 +681,11 @@ static AubioNote getCurrentNote(std::vector<AubioNote> notes, float timestamp)
   return fakeNote;
 }
 
-static void colorRectRecursive(long double cr_left, long double xStepDistance, long double ci_top, long double yStepDistance, int limit, int mandleCounts[xResolution][yResolution],
-                               std::set<int> uniqueMandleCounts, int onsetsPassed, int currentPitch, int previousPitch,
-                               int framesSinceChangeOfCentre, int framesSinceLastOnsetPassed, int alphaModifier,
+static void colorRectRecursive(long double cr_left, long double xStepDistance, long double ci_top, long double yStepDistance, int limit, int mandleCounts[xResolution / squareSize][yResolution / squareSize],
+                               std::set<int> uniqueMandleCounts, int onsetsPassed, float currentPitch, float previousPitch,
+                               int framesSinceChangeOfCentre, int framesSinceLastOnsetPassed, float alphaModifier,
                                std::vector<PixelColor> availableColors,
-                               VideoFrame currentFrame, PixelColor blankColor,
+                               VideoFrame& currentFrame, PixelColor blankColor,
                                int xStart, int xEnd, int yStart, int yEnd)
 {
   bool outlineAllIdentical = true;
@@ -702,13 +702,20 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
       int count = Mandelbrot(cr, ci, limit);
       if (mandleCountTest == -1)
       {
+        // std::cout << "Wow first count: " << count << " vs. " << mandleCountTest << "limit" << limit << "\n";
         mandleCountTest = count;
       }
       else
       {
+
         if (mandleCountTest != count)
         {
+          std::cout << "Wow not identical: " << count << " vs. " << mandleCountTest << "limit" << limit << "\n";
           outlineAllIdentical = false;
+        }
+        else
+        {
+          // std::cout << "Wow ITS IDNETICAL ON horz: " << count << " vs. " << mandleCountTest << "limit" << limit << "\n";
         }
       }
       // std::cout << x << ": iim ;";
@@ -727,11 +734,11 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
           framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
           alphaModifier, availableColors, blankColor, 1);
       currentFrame_mutex.lock();
+      std::cout << x * squareSize << ", " << y * squareSize << " rgb(" << (int)color.red << ", " << (int)color.blue << ", " << (int)color.green << ") " << "cfsp NOT IDENTICAL BRNACH top botom; \n";
       for (int i = 0; i < squareSize; i++)
       {
         for (int j = 0; j < squareSize; j++)
         {
-          // std::cout << "cfsp;";
           currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color);
         }
       }
@@ -748,21 +755,29 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
       int count = Mandelbrot(cr, ci, limit);
       if (mandleCountTest == -1)
       {
+        // std::cout << "Wow first count ON VERT???: " << count << " vs. " << mandleCountTest << "limit" << limit << "\n";
+
         mandleCountTest = count;
       }
       else
       {
         if (mandleCountTest != count)
         {
+          std::cout << "Wow not identical ON vert: " << count << " vs. " << mandleCountTest << "limit" << limit << "\n";
+
           outlineAllIdentical = false;
         }
+        else
+        {
+          // std::cout << "Wow ITS IDNETICAL ON vert: " << count << " vs. " << mandleCountTest << "limit" << limit << "\n";
+        }
       }
-      std::cout << x << ": left line x ;\n";
-      std::cout << count << ": count x ;\n";
-      std::cout << ci << ": ci ;\n";
-      std::cout << cr << ": cr ;\n";
+      // std::cout << x << ": left line x ;\n";
+      // std::cout << count << ": count x ;\n";
+      // std::cout << ci << ": ci ;\n";
+      // std::cout << cr << ": cr ;\n";
       mandelcounts_mutex.lock();
-      mandleCounts[x][y] = count; // Problem
+      mandleCounts[x][y] = count;
       mandelcounts_mutex.unlock();
       // std::cout << count << ": iium ;";
       unique_mandelcounts_mutex.lock();
@@ -776,11 +791,11 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
           framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
           alphaModifier, availableColors, blankColor, 1);
       currentFrame_mutex.lock();
+      std::cout << x * squareSize << ", " << y * squareSize << " rgb(" << (int)color.red << ", " << (int)color.blue << ", " << (int)color.green << ") " << "cfsp NOT IDENTICAL BRNACH left right; \n";
       for (int i = 0; i < squareSize; i++)
       {
         for (int j = 0; j < squareSize; j++)
         {
-          // std::cout << "cfsp;";
           currentFrame.SetPixel(x * squareSize + i, y * squareSize + j, color);
         }
       }
@@ -790,7 +805,7 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
 
   if (outlineAllIdentical)
   {
-    std::cout << "WOW ALLI DENTICXAL " << xStart << ", " << xEnd << ", " << yStart << ", " << yEnd << "\n";
+    // std::cout << "WOW ALLI DENTICXAL " << xStart << ", " << xEnd << ", " << yStart << ", " << yEnd << "\n";
     PixelColor color = Palette(
         mandleCountTest, limit, onsetsPassed, currentPitch, previousPitch,
         framesSinceChangeOfCentre, framesSinceLastOnsetPassed,
@@ -803,6 +818,8 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
         mandleCounts[x][y] = mandleCountTest;
         mandelcounts_mutex.unlock();
         currentFrame_mutex.lock();
+        std::cout << x * squareSize << ", " << y * squareSize << " rgb(" << (int)color.red << ", " << (int)color.blue << ", " << (int)color.green << ") " << "cfsp IDENTICAL; \n";
+
         for (int i = 0; i < squareSize; i++)
         {
           for (int j = 0; j < squareSize; j++)
@@ -819,26 +836,41 @@ static void colorRectRecursive(long double cr_left, long double xStepDistance, l
   {
     if (xStart + 1 < xEnd - 1 && yStart + 1 < yEnd - 1)
     {
+      // std::cout << "RECURSING DOWN " << xStart << ", " << xEnd << ", " << yStart << ", " << yEnd << "\n";
+
       int rectXLength = (xEnd - xStart) / rectsPerSide;
       int rectYLength = (yEnd - yStart) / rectsPerSide;
 
-      for (int i = 0; i < rectsPerSide; i++)
+      if (rectXLength > 4 && rectYLength > 4)
       {
-        for (int j = 0; j < rectsPerSide; j++)
+
+        for (int i = 0; i < rectsPerSide; i++)
         {
-          int newXStart = i * rectXLength;
-          int newXEnd = (i + 1) * rectXLength - 1;
-          int newYStart = j * rectYLength;
-          int newYEnd = (j + 1) * rectYLength - 1;
-          colorRectRecursive(
-              cr_left, xStepDistance, ci_top, yStepDistance, limit, mandleCounts,
-              uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
-              framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
-              availableColors,
-              currentFrame, blankColor,
-              newXStart, newXEnd, newYStart, newYEnd);
+          for (int j = 0; j < rectsPerSide; j++)
+          {
+            int newXStart = xStart + i * rectXLength + 1;
+            int newXEnd = xStart + (i + 1) * rectXLength - 1;
+            int newYStart = yStart + j * rectYLength + 1;
+            int newYEnd = yStart + (j + 1) * rectYLength - 1;
+            // Huh recursion is probably bad here because it takes up so much more memory
+            colorRectRecursive(
+                cr_left, xStepDistance, ci_top, yStepDistance, limit, mandleCounts,
+                uniqueMandleCounts, onsetsPassed, currentPitch, previousPitch,
+                framesSinceChangeOfCentre, framesSinceLastOnsetPassed, alphaModifier,
+                availableColors,
+                currentFrame, blankColor,
+                newXStart, newXEnd, newYStart, newYEnd);
+          }
         }
       }
+      else
+      {
+        // std::cout << "TODO handle end of recursion\n";
+      }
+    }
+    else
+    {
+      // std::cout << "CANT RECURSE DOWN " << xStart << ", " << xEnd << ", " << yStart << ", " << yEnd << "\n";
     }
   }
   // std::cout << x << " " << ": st\n";
@@ -890,9 +922,9 @@ static int GenerateMandleZoomFrames(const char *outdir, int numframes,
   // blankColor.alpha = 0;
   // Autumn
   // PixelColor{.red = 238, .green = 224, .blue = 200, .alpha = 255},
-  blankColor.red = 237;
-  blankColor.green = 222;
-  blankColor.blue = 214;
+  blankColor.red = 0;
+  blankColor.green = 0;
+  blankColor.blue = 0;
   blankColor.alpha = 255;
   VideoFrame currentFrame(xResolution, yResolution);
   for (unsigned int x = 0; x < xResolution; x++)

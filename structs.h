@@ -61,6 +61,6 @@ struct MidiTrack
 const int xResolution = 1280 * 3 / 2;
 const int yResolution = 720 * 3 / 2;
 
-const int squareSize = 1;
+const int squareSize = 10;
 
 #endif

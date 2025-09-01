@@ -175,11 +175,9 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
   // onsetsPassed = getWavyOnsets(onsetsPassed);
 
   // TODO: Set alpha based on volume (of particular notes?
-  PixelColor color;
-  color.alpha = 255;
   if (count >= limit)
   {
-    return blankColor;
+    // return blankColor;
 
     // color.green = std::min(std::max((int)(blankColor.green * (1 - ((onsetsPassed) % 10 - 10) * 0.01)), 0), 255);
     // color.blue = std::min(std::max((int)(blankColor.blue * (1 - ((onsetsPassed) % 10 - 10) * 0.01)), 0), 255);
@@ -202,69 +200,64 @@ PixelColor Palette(int count, int limit, int onsetsPassed, float currentPitch,
     // }
     // color.red = static_cast<unsigned char>(red);
   }
-  else
-  {
-    // TODO: Fade different colors based on what note
-    // TODO: Keep track of previous fade, and slowly transition fade (so can
-    // increase to 90% fade without triggering epilepsy)
-    // const int framesToChangeFade = 6;
-    // if (framesSincePitchChange > framesToChangeFade) {
-    //   framesSincePitchChange = framesToChangeFade;
-    // }
-    // float previousBonusAlphaModified =
-    //     1 - (count * previousPitch * 0.593284783 -
-    //          floor(count * previousPitch * 0.593284783));
-    // float currentAlphaModifier = 1 - (count * currentPitch * alphaSeed -
-    //                                   floor(count * currentPitch * alphaSeed));
-    // float bonusAlphaModifier =
-    //     previousBonusAlphaModified +
-    //     (currentAlphaModifier - previousBonusAlphaModified) *
-    //         framesSincePitchChange / framesToChangeFade;
+  // TODO: Fade different colors based on what note
+  // TODO: Keep track of previous fade, and slowly transition fade (so can
+  // increase to 90% fade without triggering epilepsy)
+  // const int framesToChangeFade = 6;
+  // if (framesSincePitchChange > framesToChangeFade) {
+  //   framesSincePitchChange = framesToChangeFade;
+  // }
+  // float previousBonusAlphaModified =
+  //     1 - (count * previousPitch * 0.593284783 -
+  //          floor(count * previousPitch * 0.593284783));
+  // float currentAlphaModifier = 1 - (count * currentPitch * alphaSeed -
+  //                                   floor(count * currentPitch * alphaSeed));
+  // float bonusAlphaModifier =
+  //     previousBonusAlphaModified +
+  //     (currentAlphaModifier - previousBonusAlphaModified) *
+  //         framesSincePitchChange / framesToChangeFade;
 
-    // PixelColor previousOffsetColor =
-    //     availableColors[previousColorIndex %
-    //                     availableColors.size()];
-    PixelColor selectedColor =
-        availableColors[colorIndex %
-                        availableColors.size()];
-    return selectedColor;
-    // Weird smoothing
-    // float smoothColorChangeRatio = framesSinceLastOnsetPassed * 0.2;
-    // if (smoothColorChangeRatio > 1.0)
-    // {
-    //   smoothColorChangeRatio = 1.0;
-    // }
-    // if (smoothColorChangeRatio < 0.0)
-    // {
-    //   smoothColorChangeRatio = 0.0;
-    // }
+  // PixelColor previousOffsetColor =
+  //     availableColors[previousColorIndex %
+  //                     availableColors.size()];
+  PixelColor selectedColor =
+      availableColors[colorIndex %
+                      availableColors.size()];
+  return selectedColor;
+  // Weird smoothing
+  // float smoothColorChangeRatio = framesSinceLastOnsetPassed * 0.2;
+  // if (smoothColorChangeRatio > 1.0)
+  // {
+  //   smoothColorChangeRatio = 1.0;
+  // }
+  // if (smoothColorChangeRatio < 0.0)
+  // {
+  //   smoothColorChangeRatio = 0.0;
+  // }
 
-    // selectedColor.red = static_cast<unsigned char>(
-    //     selectedColor.red * smoothColorChangeRatio +
-    //     previousOffsetColor.red * (1.0 - smoothColorChangeRatio));
-    // selectedColor.green = static_cast<unsigned char>(
-    //     selectedColor.green * smoothColorChangeRatio +
-    //     previousOffsetColor.green * (1.0 - smoothColorChangeRatio));
-    // selectedColor.blue = static_cast<unsigned char>(
-    //     selectedColor.blue * smoothColorChangeRatio +
-    //     previousOffsetColor.blue * (1.0 - smoothColorChangeRatio));
+  // selectedColor.red = static_cast<unsigned char>(
+  //     selectedColor.red * smoothColorChangeRatio +
+  //     previousOffsetColor.red * (1.0 - smoothColorChangeRatio));
+  // selectedColor.green = static_cast<unsigned char>(
+  //     selectedColor.green * smoothColorChangeRatio +
+  //     previousOffsetColor.green * (1.0 - smoothColorChangeRatio));
+  // selectedColor.blue = static_cast<unsigned char>(
+  //     selectedColor.blue * smoothColorChangeRatio +
+  //     previousOffsetColor.blue * (1.0 - smoothColorChangeRatio));
 
-    //   if (alphaModifier >= 1 || alphaModifier <= 0)
-    //   {
-    //     alphaModifier = 1.0;
-    //   }
-    //   // alphaModifier = alphaModifier;
-    //   float blurRatio = 1.0;
-    //   color.red = static_cast<unsigned char>(
-    //       currentColor.red * (1.0 - blurRatio) +
-    //       (selectedColor.red * alphaModifier) * blurRatio);
-    //   color.green = static_cast<unsigned char>(
-    //       currentColor.green * (1.0 - blurRatio) +
-    //       (selectedColor.green * alphaModifier) * blurRatio);
-    //   color.blue = static_cast<unsigned char>(
-    //       currentColor.blue * (1.0 - blurRatio) +
-    //       (selectedColor.blue * alphaModifier) * blurRatio);
-  }
-
-  return color;
+  //   if (alphaModifier >= 1 || alphaModifier <= 0)
+  //   {
+  //     alphaModifier = 1.0;
+  //   }
+  //   // alphaModifier = alphaModifier;
+  //   float blurRatio = 1.0;
+  //   color.red = static_cast<unsigned char>(
+  //       currentColor.red * (1.0 - blurRatio) +
+  //       (selectedColor.red * alphaModifier) * blurRatio);
+  //   color.green = static_cast<unsigned char>(
+  //       currentColor.green * (1.0 - blurRatio) +
+  //       (selectedColor.green * alphaModifier) * blurRatio);
+  //   color.blue = static_cast<unsigned char>(
+  //       currentColor.blue * (1.0 - blurRatio) +
+  //       (selectedColor.blue * alphaModifier) * blurRatio);
 }

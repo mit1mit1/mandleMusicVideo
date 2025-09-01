@@ -242,6 +242,7 @@ void VideoFrame::SetAllPixels(PixelColor color)
 
 void VideoFrame::SetPixel(int x, int y, PixelColor color)
 {
+  std::cout << "SetPixel at (" << x << ", " << y << ") to rgb(" << (int)color.red << ", " << (int)color.green << ", " << (int)color.blue << ") \n";
   int index = 4 * (y * width + x);
   buffer[index] = color.red;
   buffer[index + 1] = color.green;
